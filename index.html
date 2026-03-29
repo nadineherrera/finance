@@ -789,11 +789,18 @@
     ]);
     let family = load(storageKeys.family, [
       { text: 'Family time', done: false },
-      { text: 'Take out trash', done: false }
+      { text: 'Take out trash', done: false },
+      { text: 'Feed cats', done: false },
+      { text: 'Clean cat litter', done: false }
     ]);
     let fitness = load(storageKeys.fitness, {
-      cardio: { exercise: '', time: '', notes: '' },
-      strength: { exercise: '', reps: '', notes: '' }
+      cardio: [
+        { exercise: 'Walking', time: '', notes: '' },
+        { exercise: 'Stretching', time: '', notes: '' }
+      ],
+      strength: [
+        { exercise: 'Squats', reps: '', notes: '' }
+      ]
     });
     let bodyLog = load(storageKeys.bodyLog, {
       weight: '',
