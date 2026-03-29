@@ -276,12 +276,19 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      transform: scale(1);
-      transition: transform 0.9s ease-in-out;
+      transform: scale(0.92);
+      will-change: transform;
     }
 
-    .bubble.inhale { transform: scale(1.12); }
-    .bubble.exhale { transform: scale(0.92); }
+    .bubble.running {
+      animation: breatheCycle 11s ease-in-out infinite;
+    }
+
+    @keyframes breatheCycle {
+      0% { transform: scale(0.92); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(0.92); }
+    }
 
     .bubble-inner {
       display: grid;
@@ -448,7 +455,7 @@
           <h2>Breathing</h2>
           <div class="sub">A calm 5.5 second inhale and 5.5 second exhale rhythm.</div>
           <div class="bubble-card">
-            <div class="bubble inhale" id="bubble">
+            <div class="bubble" id="bubble">
               <div class="bubble-inner">
                 <div class="breath-phase" id="breathPhase">Breathe In</div>
                 <div class="muted" id="breathInstruction">for 5 to 6 seconds</div>
@@ -786,8 +793,7 @@
       const instruction = document.getElementById('breathInstruction');
       breathPhase.textContent = breathPhaseState === 'inhale' ? 'Breathe In' : 'Breathe Out';
       instruction.textContent = 'for 5 to 6 seconds';
-      bubble.classList.toggle('inhale', breathPhaseState === 'inhale');
-      bubble.classList.toggle('exhale', breathPhaseState === 'exhale');
+      bubble.classList.toggle('running', breathRunning);
       breathStatus.textContent = breathRunning ? 'Coherent breathing in progress' : 'Ready to begin';
     }
 
