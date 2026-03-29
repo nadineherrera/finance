@@ -604,6 +604,36 @@
         <section class="card">
           <div class="section-head">
             <div>
+              <h2>Meraki Routine</h2>
+              <div class="sub">Keep Meraki’s daily routine visible and easy to reset.</div>
+            </div>
+            <button class="ghost" id="resetMerakiBtn">Reset</button>
+          </div>
+          <div class="input-row">
+            <input id="merakiInput" type="text" placeholder="Add a routine task" />
+            <button id="addMerakiBtn">Add</button>
+          </div>
+          <div class="task-list" id="merakiList"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Family</h2>
+              <div class="sub">Track shared family priorities and home responsibilities.</div>
+            </div>
+            <button class="ghost" id="resetFamilyBtn">Reset</button>
+          </div>
+          <div class="input-row">
+            <input id="familyInput" type="text" placeholder="Add a family task" />
+            <button id="addFamilyBtn">Add</button>
+          </div>
+          <div class="task-list" id="familyList"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
               <h2>Home Cleaning</h2>
               <div class="sub">Open your full cleaning system in a separate page.</div>
             </div>
@@ -709,6 +739,8 @@
       notes: 'simpleDashboardNotes',
       cleaning: 'simpleDashboardCleaning',
       meals: 'simpleDashboardMeals',
+      meraki: 'simpleDashboardMeraki',
+      family: 'simpleDashboardFamily',
       fitness: 'simpleDashboardFitness',
       bodyLog: 'simpleDashboardBodyLog',
       medication: 'simpleDashboardMedication',
@@ -748,6 +780,17 @@
       lunch: { meal: '', ingredients: '' },
       dinner: { meal: '', ingredients: '' }
     });
+    let meraki = load(storageKeys.meraki, [
+      { text: 'Take a bath', done: false },
+      { text: 'Brush teeth', done: false },
+      { text: 'Do homework', done: false },
+      { text: 'Get on the bus', done: false },
+      { text: 'Get off the bus', done: false }
+    ]);
+    let family = load(storageKeys.family, [
+      { text: 'Family time', done: false },
+      { text: 'Take out trash', done: false }
+    ]);
     let fitness = load(storageKeys.fitness, {
       cardio: { exercise: '', time: '', notes: '' },
       strength: { exercise: '', reps: '', notes: '' }
@@ -788,6 +831,8 @@
     const lunchIngredients = document.getElementById('lunchIngredients');
     const dinnerMeal = document.getElementById('dinnerMeal');
     const dinnerIngredients = document.getElementById('dinnerIngredients');
+    const merakiList = document.getElementById('merakiList');
+    const familyList = document.getElementById('familyList');
     const cardioExercise = document.getElementById('cardioExercise');
     const cardioTime = document.getElementById('cardioTime');
     const cardioNotes = document.getElementById('cardioNotes');
@@ -1014,6 +1059,86 @@
 
         cleaningList.appendChild(el);
       });
+    }
+
+    function renderRoutineList(listEl, items, storageKey) {
+      listEl.innerHTML = '';
+      if (!items.length) {
+        listEl.innerHTML = '<div class="mini">No tasks yet.</div>';
+        return;
+      }
+
+      items.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = `task-item ${item.done ? 'done' : ''}`;
+        el.innerHTML = `
+          <div class="task-top">
+            <div class="task-left">
+              <input class="check" type="checkbox" ${item.done ? 'checked' : ''} />
+              <div class="task-text">${escapeHtml(item.text)}</div>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        el.querySelector('.check').addEventListener('change', () => {
+          items[index].done = !items[index].done;
+          save(storageKey, items);
+          if (storageKey === storageKeys.meraki) renderMeraki();
+          if (storageKey === storageKeys.family) renderFamily();
+        });
+
+        el.querySelector('.tiny-btn').addEventListener('click', () => {
+          items.splice(index, 1);
+          save(storageKey, items);
+          if (storageKey === storageKeys.meraki) renderMeraki();
+          if (storageKey === storageKeys.family) renderFamily();
+        });
+
+        listEl.appendChild(el);
+      });
+    }
+
+    function renderMeraki() {
+      renderRoutineList(merakiList, meraki, storageKeys.meraki);
+    }
+
+    function renderFamily() {
+      renderRoutineList(familyList, family, storageKeys.family);
+    }
+
+    function addMerakiTask() {
+      const input = document.getElementById('merakiInput');
+      const text = input.value.trim();
+      if (!text) return;
+      meraki.unshift({ text, done: false });
+      input.value = '';
+      save(storageKeys.meraki, meraki);
+      renderMeraki();
+    }
+
+    function addFamilyTask() {
+      const input = document.getElementById('familyInput');
+      const text = input.value.trim();
+      if (!text) return;
+      family.unshift({ text, done: false });
+      input.value = '';
+      save(storageKeys.family, family);
+      renderFamily();
+    }
+
+    function resetMerakiTasks() {
+      meraki = meraki.map(item => ({ ...item, done: false }));
+      save(storageKeys.meraki, meraki);
+      renderMeraki();
+    }
+
+    function resetFamilyTasks() {
+      family = family.map(item => ({ ...item, done: false }));
+      save(storageKeys.family, family);
+      renderFamily();
     }
 
     function renderMeals() {
@@ -1312,6 +1437,10 @@
 
     document.getElementById('resetTasksBtn').addEventListener('click', resetTasks);
     document.getElementById('addCleaningBtn').addEventListener('click', addCleaningTask);
+    document.getElementById('addMerakiBtn').addEventListener('click', addMerakiTask);
+    document.getElementById('addFamilyBtn').addEventListener('click', addFamilyTask);
+    document.getElementById('resetMerakiBtn').addEventListener('click', resetMerakiTasks);
+    document.getElementById('resetFamilyBtn').addEventListener('click', resetFamilyTasks);
     document.getElementById('resetMealsBtn').addEventListener('click', resetMeals);
     document.getElementById('resetFitnessBtn').addEventListener('click', resetFitness);
     document.getElementById('resetBodyLogBtn').addEventListener('click', resetBodyLog);
@@ -1320,6 +1449,12 @@
     document.getElementById('resetCleaningBtn').addEventListener('click', resetCleaningTasks);
     document.getElementById('cleaningInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') addCleaningTask();
+    });
+    document.getElementById('merakiInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addMerakiTask();
+    });
+    document.getElementById('familyInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addFamilyTask();
     });
 
     document.getElementById('waterAddBtn').addEventListener('click', () => {
@@ -1426,6 +1561,8 @@
     renderFinances();
     renderWater();
     renderCleaning();
+    renderMeraki();
+    renderFamily();
     renderMeals();
     renderFitness();
     renderBodyLog();
