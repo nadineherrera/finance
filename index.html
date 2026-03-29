@@ -500,6 +500,11 @@
         <section class="card">
           <h2>Cleaning Focus</h2>
           <div class="sub">A short list for upkeep without overwhelm.</div>
+          <div class="input-row">
+            <input id="cleaningInput" type="text" placeholder="Add a cleaning task" />
+            <button id="addCleaningBtn">Add</button>
+            <button class="ghost" id="resetCleaningBtn">Reset</button>
+          </div>
           <div class="task-list" id="cleaningList"></div>
         </section>
       </div>
@@ -712,6 +717,11 @@
 
     function renderCleaning() {
       cleaningList.innerHTML = '';
+      if (!cleaning.length) {
+        cleaningList.innerHTML = '<div class="mini">No cleaning tasks yet.</div>';
+        return;
+      }
+
       cleaning.forEach((item, index) => {
         const el = document.createElement('div');
         el.className = `task-item ${item.done ? 'done' : ''}`;
@@ -722,12 +732,23 @@
               <div class="task-text">${escapeHtml(item.text)}</div>
             </div>
           </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+            <button class="tiny-btn">Delete</button>
+          </div>
         `;
+
         el.querySelector('.check').addEventListener('change', () => {
           cleaning[index].done = !cleaning[index].done;
           save(storageKeys.cleaning, cleaning);
           renderCleaning();
         });
+
+        el.querySelector('.tiny-btn').addEventListener('click', () => {
+          cleaning.splice(index, 1);
+          save(storageKeys.cleaning, cleaning);
+          renderCleaning();
+        });
+
         cleaningList.appendChild(el);
       });
     }
@@ -789,6 +810,22 @@
       renderCleaning();
     }
 
+    function addCleaningTask() {
+      const input = document.getElementById('cleaningInput');
+      const text = input.value.trim();
+      if (!text) return;
+      cleaning.unshift({ text, done: false });
+      input.value = '';
+      save(storageKeys.cleaning, cleaning);
+      renderCleaning();
+    }
+
+    function resetCleaningTasks() {
+      cleaning = cleaning.map(item => ({ ...item, done: false }));
+      save(storageKeys.cleaning, cleaning);
+      renderCleaning();
+    }
+
     function updateBreathingVisual() {
       const instruction = document.getElementById('breathInstruction');
       breathPhase.textContent = breathPhaseState === 'inhale' ? 'Breathe In' : 'Breathe Out';
@@ -835,6 +872,11 @@
     });
 
     document.getElementById('resetTasksBtn').addEventListener('click', resetTasks);
+    document.getElementById('addCleaningBtn').addEventListener('click', addCleaningTask);
+    document.getElementById('resetCleaningBtn').addEventListener('click', resetCleaningTasks);
+    document.getElementById('cleaningInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addCleaningTask();
+    });
 
     document.getElementById('waterAddBtn').addEventListener('click', () => {
       water.cups += 1;
