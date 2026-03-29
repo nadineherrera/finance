@@ -444,6 +444,34 @@
         </section>
 
         <section class="card">
+          <h2>Meal Planning</h2>
+          <div class="sub">Plan breakfast, lunch, and dinner with ingredients in one place.</div>
+          <div class="stack" style="gap: 12px;">
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Breakfast</strong>
+              </div>
+              <input id="breakfastMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
+              <textarea id="breakfastIngredients" placeholder="Ingredients"></textarea>
+            </div>
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Lunch</strong>
+              </div>
+              <input id="lunchMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
+              <textarea id="lunchIngredients" placeholder="Ingredients"></textarea>
+            </div>
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Dinner</strong>
+              </div>
+              <input id="dinnerMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
+              <textarea id="dinnerIngredients" placeholder="Ingredients"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
           <h2>Notes</h2>
           <div class="sub">A simple space for reminders or thoughts.</div>
           <textarea id="notesBox" placeholder="Write anything you want to remember..."></textarea>
@@ -520,7 +548,8 @@
       finances: 'simpleDashboardFinances',
       water: 'simpleDashboardWater',
       notes: 'simpleDashboardNotes',
-      cleaning: 'simpleDashboardCleaning'
+      cleaning: 'simpleDashboardCleaning',
+      meals: 'simpleDashboardMeals'
     };
 
     const defaultCleaning = [
@@ -541,6 +570,11 @@
     let finances = load(storageKeys.finances, []);
     let water = load(storageKeys.water, { cups: 0, goal: 8 });
     let cleaning = load(storageKeys.cleaning, defaultCleaning);
+    let meals = load(storageKeys.meals, {
+      breakfast: { meal: '', ingredients: '' },
+      lunch: { meal: '', ingredients: '' },
+      dinner: { meal: '', ingredients: '' }
+    });
 
     const todayDate = document.getElementById('todayDate');
     const taskList = document.getElementById('taskList');
@@ -550,6 +584,12 @@
     const waterFill = document.getElementById('waterFill');
     const waterText = document.getElementById('waterText');
     const cleaningList = document.getElementById('cleaningList');
+    const breakfastMeal = document.getElementById('breakfastMeal');
+    const breakfastIngredients = document.getElementById('breakfastIngredients');
+    const lunchMeal = document.getElementById('lunchMeal');
+    const lunchIngredients = document.getElementById('lunchIngredients');
+    const dinnerMeal = document.getElementById('dinnerMeal');
+    const dinnerIngredients = document.getElementById('dinnerIngredients');
     const incomeTotal = document.getElementById('incomeTotal');
     const expenseTotal = document.getElementById('expenseTotal');
     const balanceTotal = document.getElementById('balanceTotal');
@@ -753,6 +793,33 @@
       });
     }
 
+    function renderMeals() {
+      breakfastMeal.value = meals.breakfast.meal || '';
+      breakfastIngredients.value = meals.breakfast.ingredients || '';
+      lunchMeal.value = meals.lunch.meal || '';
+      lunchIngredients.value = meals.lunch.ingredients || '';
+      dinnerMeal.value = meals.dinner.meal || '';
+      dinnerIngredients.value = meals.dinner.ingredients || '';
+    }
+
+    function saveMeals() {
+      meals = {
+        breakfast: {
+          meal: breakfastMeal.value,
+          ingredients: breakfastIngredients.value
+        },
+        lunch: {
+          meal: lunchMeal.value,
+          ingredients: lunchIngredients.value
+        },
+        dinner: {
+          meal: dinnerMeal.value,
+          ingredients: dinnerIngredients.value
+        }
+      };
+      save(storageKeys.meals, meals);
+    }
+
     function formatTime(t) {
       if (!t) return '';
       const [h, m] = t.split(':').map(Number);
@@ -908,6 +975,17 @@
       save(storageKeys.notes, notesBox.value);
     });
 
+    [
+      breakfastMeal,
+      breakfastIngredients,
+      lunchMeal,
+      lunchIngredients,
+      dinnerMeal,
+      dinnerIngredients
+    ].forEach(el => {
+      el.addEventListener('input', saveMeals);
+    });
+
     breathToggleBtn.addEventListener('click', () => {
       if (breathRunning) {
         stopBreathing();
@@ -924,6 +1002,7 @@
     renderFinances();
     renderWater();
     renderCleaning();
+    renderMeals();
     updateBreathingVisual();
   </script>
 </body>
