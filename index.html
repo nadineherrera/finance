@@ -444,8 +444,13 @@
         </section>
 
         <section class="card">
-          <h2>Meal Planning</h2>
-          <div class="sub">Plan breakfast, lunch, and dinner with ingredients in one place.</div>
+          <div class="section-head">
+            <div>
+              <h2>Meal Planning</h2>
+              <div class="sub">Plan breakfast, lunch, and dinner with ingredients in one place.</div>
+            </div>
+            <button class="ghost" id="resetMealsBtn">Reset</button>
+          </div>
           <div class="stack" style="gap: 12px;">
             <div class="task-item">
               <div class="section-head" style="margin-bottom: 8px;">
@@ -467,6 +472,66 @@
               </div>
               <input id="dinnerMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
               <textarea id="dinnerIngredients" placeholder="Ingredients"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Fitness</h2>
+              <div class="sub">Track cardio and strength training in one place.</div>
+            </div>
+            <button class="ghost" id="resetFitnessBtn">Reset</button>
+          </div>
+          <div class="stack" style="gap: 12px;">
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Cardio</strong>
+              </div>
+              <div class="input-row" style="margin-bottom: 8px;">
+                <input id="cardioExercise" type="text" placeholder="Exercise" />
+                <input id="cardioTime" type="text" placeholder="Time or distance" />
+              </div>
+              <textarea id="cardioNotes" placeholder="Notes"></textarea>
+            </div>
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Strength Training</strong>
+              </div>
+              <div class="input-row" style="margin-bottom: 8px;">
+                <input id="strengthExercise" type="text" placeholder="Exercise" />
+                <input id="strengthReps" type="text" placeholder="Sets / reps / time" />
+              </div>
+              <textarea id="strengthNotes" placeholder="Notes"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Body Log</h2>
+              <div class="sub">Track weight, body fat, and measurements.</div>
+            </div>
+            <button class="ghost" id="resetBodyLogBtn">Reset</button>
+          </div>
+          <div class="stack" style="gap: 10px;">
+            <div class="input-row" style="margin-bottom: 0;">
+              <input id="logWeight" type="text" placeholder="Weight" />
+              <input id="logBodyFat" type="text" placeholder="Body fat %" />
+            </div>
+            <div class="input-row" style="margin-bottom: 0;">
+              <input id="logWaist" type="text" placeholder="Waist" />
+              <input id="logHips" type="text" placeholder="Hips" />
+            </div>
+            <div class="input-row" style="margin-bottom: 0;">
+              <input id="logChest" type="text" placeholder="Chest" />
+              <input id="logArms" type="text" placeholder="Arms" />
+            </div>
+            <div class="input-row" style="margin-bottom: 0;">
+              <input id="logThighs" type="text" placeholder="Thighs" />
+              <input id="logNotes" type="text" placeholder="Extra notes" />
             </div>
           </div>
         </section>
@@ -549,7 +614,9 @@
       water: 'simpleDashboardWater',
       notes: 'simpleDashboardNotes',
       cleaning: 'simpleDashboardCleaning',
-      meals: 'simpleDashboardMeals'
+      meals: 'simpleDashboardMeals',
+      fitness: 'simpleDashboardFitness',
+      bodyLog: 'simpleDashboardBodyLog'
     };
 
     const defaultCleaning = [
@@ -575,6 +642,20 @@
       lunch: { meal: '', ingredients: '' },
       dinner: { meal: '', ingredients: '' }
     });
+    let fitness = load(storageKeys.fitness, {
+      cardio: { exercise: '', time: '', notes: '' },
+      strength: { exercise: '', reps: '', notes: '' }
+    });
+    let bodyLog = load(storageKeys.bodyLog, {
+      weight: '',
+      bodyFat: '',
+      waist: '',
+      hips: '',
+      chest: '',
+      arms: '',
+      thighs: '',
+      notes: ''
+    });
 
     const todayDate = document.getElementById('todayDate');
     const taskList = document.getElementById('taskList');
@@ -590,6 +671,20 @@
     const lunchIngredients = document.getElementById('lunchIngredients');
     const dinnerMeal = document.getElementById('dinnerMeal');
     const dinnerIngredients = document.getElementById('dinnerIngredients');
+    const cardioExercise = document.getElementById('cardioExercise');
+    const cardioTime = document.getElementById('cardioTime');
+    const cardioNotes = document.getElementById('cardioNotes');
+    const strengthExercise = document.getElementById('strengthExercise');
+    const strengthReps = document.getElementById('strengthReps');
+    const strengthNotes = document.getElementById('strengthNotes');
+    const logWeight = document.getElementById('logWeight');
+    const logBodyFat = document.getElementById('logBodyFat');
+    const logWaist = document.getElementById('logWaist');
+    const logHips = document.getElementById('logHips');
+    const logChest = document.getElementById('logChest');
+    const logArms = document.getElementById('logArms');
+    const logThighs = document.getElementById('logThighs');
+    const logNotes = document.getElementById('logNotes');
     const incomeTotal = document.getElementById('incomeTotal');
     const expenseTotal = document.getElementById('expenseTotal');
     const balanceTotal = document.getElementById('balanceTotal');
@@ -820,6 +915,90 @@
       save(storageKeys.meals, meals);
     }
 
+    function resetMeals() {
+      meals = {
+        breakfast: { meal: '', ingredients: '' },
+        lunch: { meal: '', ingredients: '' },
+        dinner: { meal: '', ingredients: '' }
+      };
+      save(storageKeys.meals, meals);
+      renderMeals();
+    }
+
+    function renderFitness() {
+      cardioExercise.value = fitness.cardio.exercise || '';
+      cardioTime.value = fitness.cardio.time || '';
+      cardioNotes.value = fitness.cardio.notes || '';
+      strengthExercise.value = fitness.strength.exercise || '';
+      strengthReps.value = fitness.strength.reps || '';
+      strengthNotes.value = fitness.strength.notes || '';
+    }
+
+    function saveFitness() {
+      fitness = {
+        cardio: {
+          exercise: cardioExercise.value,
+          time: cardioTime.value,
+          notes: cardioNotes.value
+        },
+        strength: {
+          exercise: strengthExercise.value,
+          reps: strengthReps.value,
+          notes: strengthNotes.value
+        }
+      };
+      save(storageKeys.fitness, fitness);
+    }
+
+    function resetFitness() {
+      fitness = {
+        cardio: { exercise: '', time: '', notes: '' },
+        strength: { exercise: '', reps: '', notes: '' }
+      };
+      save(storageKeys.fitness, fitness);
+      renderFitness();
+    }
+
+    function renderBodyLog() {
+      logWeight.value = bodyLog.weight || '';
+      logBodyFat.value = bodyLog.bodyFat || '';
+      logWaist.value = bodyLog.waist || '';
+      logHips.value = bodyLog.hips || '';
+      logChest.value = bodyLog.chest || '';
+      logArms.value = bodyLog.arms || '';
+      logThighs.value = bodyLog.thighs || '';
+      logNotes.value = bodyLog.notes || '';
+    }
+
+    function saveBodyLog() {
+      bodyLog = {
+        weight: logWeight.value,
+        bodyFat: logBodyFat.value,
+        waist: logWaist.value,
+        hips: logHips.value,
+        chest: logChest.value,
+        arms: logArms.value,
+        thighs: logThighs.value,
+        notes: logNotes.value
+      };
+      save(storageKeys.bodyLog, bodyLog);
+    }
+
+    function resetBodyLog() {
+      bodyLog = {
+        weight: '',
+        bodyFat: '',
+        waist: '',
+        hips: '',
+        chest: '',
+        arms: '',
+        thighs: '',
+        notes: ''
+      };
+      save(storageKeys.bodyLog, bodyLog);
+      renderBodyLog();
+    }
+
     function formatTime(t) {
       if (!t) return '';
       const [h, m] = t.split(':').map(Number);
@@ -940,6 +1119,9 @@
 
     document.getElementById('resetTasksBtn').addEventListener('click', resetTasks);
     document.getElementById('addCleaningBtn').addEventListener('click', addCleaningTask);
+    document.getElementById('resetMealsBtn').addEventListener('click', resetMeals);
+    document.getElementById('resetFitnessBtn').addEventListener('click', resetFitness);
+    document.getElementById('resetBodyLogBtn').addEventListener('click', resetBodyLog);
     document.getElementById('resetCleaningBtn').addEventListener('click', resetCleaningTasks);
     document.getElementById('cleaningInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') addCleaningTask();
@@ -986,6 +1168,30 @@
       el.addEventListener('input', saveMeals);
     });
 
+    [
+      cardioExercise,
+      cardioTime,
+      cardioNotes,
+      strengthExercise,
+      strengthReps,
+      strengthNotes
+    ].forEach(el => {
+      el.addEventListener('input', saveFitness);
+    });
+
+    [
+      logWeight,
+      logBodyFat,
+      logWaist,
+      logHips,
+      logChest,
+      logArms,
+      logThighs,
+      logNotes
+    ].forEach(el => {
+      el.addEventListener('input', saveBodyLog);
+    });
+
     breathToggleBtn.addEventListener('click', () => {
       if (breathRunning) {
         stopBreathing();
@@ -1003,6 +1209,8 @@
     renderWater();
     renderCleaning();
     renderMeals();
+    renderFitness();
+    renderBodyLog();
     updateBreathingVisual();
   </script>
 </body>
