@@ -537,6 +537,71 @@
         </section>
 
         <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Medication</h2>
+              <div class="sub">Track medication reminders for morning and night.</div>
+            </div>
+            <button class="ghost" id="resetMedicationBtn">Reset</button>
+          </div>
+          <div class="stack" style="gap: 12px;">
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Morning Medication</strong>
+              </div>
+              <div class="input-row" style="margin-bottom: 8px;">
+                <input id="morningMedicationName" type="text" placeholder="Medication or reminder" />
+                <input id="morningMedicationTime" type="time" />
+              </div>
+              <label class="task-left" style="margin-top: 4px;">
+                <input class="check" id="morningMedicationTaken" type="checkbox" />
+                <span class="task-text">Taken</span>
+              </label>
+            </div>
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Night Medication</strong>
+              </div>
+              <div class="input-row" style="margin-bottom: 8px;">
+                <input id="nightMedicationName" type="text" placeholder="Medication or reminder" />
+                <input id="nightMedicationTime" type="time" />
+              </div>
+              <label class="task-left" style="margin-top: 4px;">
+                <input class="check" id="nightMedicationTaken" type="checkbox" />
+                <span class="task-text">Taken</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Sleep Tracker</h2>
+              <div class="sub">Log your sleep schedule and how rested you feel.</div>
+            </div>
+            <button class="ghost" id="resetSleepBtn">Reset</button>
+          </div>
+          <div class="stack" style="gap: 10px;">
+            <div class="input-row" style="margin-bottom: 0;">
+              <input id="sleepBedtime" type="time" />
+              <input id="sleepWakeTime" type="time" />
+            </div>
+            <div class="input-row" style="margin-bottom: 0;">
+              <input id="sleepHours" type="text" placeholder="Total hours slept" />
+              <select id="sleepQuality">
+                <option value="">Sleep quality</option>
+                <option value="Great">Great</option>
+                <option value="Good">Good</option>
+                <option value="Okay">Okay</option>
+                <option value="Poor">Poor</option>
+              </select>
+            </div>
+            <textarea id="sleepNotes" placeholder="Sleep notes"></textarea>
+          </div>
+        </section>
+
+        <section class="card">
           <h2>Notes</h2>
           <div class="sub">A simple space for reminders or thoughts.</div>
           <textarea id="notesBox" placeholder="Write anything you want to remember..."></textarea>
@@ -616,7 +681,9 @@
       cleaning: 'simpleDashboardCleaning',
       meals: 'simpleDashboardMeals',
       fitness: 'simpleDashboardFitness',
-      bodyLog: 'simpleDashboardBodyLog'
+      bodyLog: 'simpleDashboardBodyLog',
+      medication: 'simpleDashboardMedication',
+      sleep: 'simpleDashboardSleep'
     };
 
     const defaultCleaning = [
@@ -660,6 +727,17 @@
       thighs: '',
       notes: ''
     });
+    let medication = load(storageKeys.medication, {
+      morning: { name: '', time: '', taken: false },
+      night: { name: '', time: '', taken: false }
+    });
+    let sleep = load(storageKeys.sleep, {
+      bedtime: '',
+      wakeTime: '',
+      hours: '',
+      quality: '',
+      notes: ''
+    });
 
     const todayDate = document.getElementById('todayDate');
     const taskList = document.getElementById('taskList');
@@ -689,6 +767,17 @@
     const logArms = document.getElementById('logArms');
     const logThighs = document.getElementById('logThighs');
     const logNotes = document.getElementById('logNotes');
+    const morningMedicationName = document.getElementById('morningMedicationName');
+    const morningMedicationTime = document.getElementById('morningMedicationTime');
+    const morningMedicationTaken = document.getElementById('morningMedicationTaken');
+    const nightMedicationName = document.getElementById('nightMedicationName');
+    const nightMedicationTime = document.getElementById('nightMedicationTime');
+    const nightMedicationTaken = document.getElementById('nightMedicationTaken');
+    const sleepBedtime = document.getElementById('sleepBedtime');
+    const sleepWakeTime = document.getElementById('sleepWakeTime');
+    const sleepHours = document.getElementById('sleepHours');
+    const sleepQuality = document.getElementById('sleepQuality');
+    const sleepNotes = document.getElementById('sleepNotes');
     const incomeTotal = document.getElementById('incomeTotal');
     const expenseTotal = document.getElementById('expenseTotal');
     const balanceTotal = document.getElementById('balanceTotal');
@@ -1003,6 +1092,71 @@
       renderBodyLog();
     }
 
+    function renderMedication() {
+      morningMedicationName.value = medication.morning.name || '';
+      morningMedicationTime.value = medication.morning.time || '';
+      morningMedicationTaken.checked = !!medication.morning.taken;
+      nightMedicationName.value = medication.night.name || '';
+      nightMedicationTime.value = medication.night.time || '';
+      nightMedicationTaken.checked = !!medication.night.taken;
+    }
+
+    function saveMedication() {
+      medication = {
+        morning: {
+          name: morningMedicationName.value,
+          time: morningMedicationTime.value,
+          taken: morningMedicationTaken.checked
+        },
+        night: {
+          name: nightMedicationName.value,
+          time: nightMedicationTime.value,
+          taken: nightMedicationTaken.checked
+        }
+      };
+      save(storageKeys.medication, medication);
+    }
+
+    function resetMedication() {
+      medication = {
+        morning: { name: '', time: '', taken: false },
+        night: { name: '', time: '', taken: false }
+      };
+      save(storageKeys.medication, medication);
+      renderMedication();
+    }
+
+    function renderSleep() {
+      sleepBedtime.value = sleep.bedtime || '';
+      sleepWakeTime.value = sleep.wakeTime || '';
+      sleepHours.value = sleep.hours || '';
+      sleepQuality.value = sleep.quality || '';
+      sleepNotes.value = sleep.notes || '';
+    }
+
+    function saveSleep() {
+      sleep = {
+        bedtime: sleepBedtime.value,
+        wakeTime: sleepWakeTime.value,
+        hours: sleepHours.value,
+        quality: sleepQuality.value,
+        notes: sleepNotes.value
+      };
+      save(storageKeys.sleep, sleep);
+    }
+
+    function resetSleep() {
+      sleep = {
+        bedtime: '',
+        wakeTime: '',
+        hours: '',
+        quality: '',
+        notes: ''
+      };
+      save(storageKeys.sleep, sleep);
+      renderSleep();
+    }
+
     function formatTime(t) {
       if (!t) return '';
       const [h, m] = t.split(':').map(Number);
@@ -1126,6 +1280,8 @@
     document.getElementById('resetMealsBtn').addEventListener('click', resetMeals);
     document.getElementById('resetFitnessBtn').addEventListener('click', resetFitness);
     document.getElementById('resetBodyLogBtn').addEventListener('click', resetBodyLog);
+    document.getElementById('resetMedicationBtn').addEventListener('click', resetMedication);
+    document.getElementById('resetSleepBtn').addEventListener('click', resetSleep);
     document.getElementById('resetCleaningBtn').addEventListener('click', resetCleaningTasks);
     document.getElementById('cleaningInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') addCleaningTask();
@@ -1196,6 +1352,29 @@
       el.addEventListener('input', saveBodyLog);
     });
 
+    [
+      morningMedicationName,
+      morningMedicationTime,
+      morningMedicationTaken,
+      nightMedicationName,
+      nightMedicationTime,
+      nightMedicationTaken
+    ].forEach(el => {
+      el.addEventListener('input', saveMedication);
+      el.addEventListener('change', saveMedication);
+    });
+
+    [
+      sleepBedtime,
+      sleepWakeTime,
+      sleepHours,
+      sleepQuality,
+      sleepNotes
+    ].forEach(el => {
+      el.addEventListener('input', saveSleep);
+      el.addEventListener('change', saveSleep);
+    });
+
     breathToggleBtn.addEventListener('click', () => {
       if (breathRunning) {
         stopBreathing();
@@ -1215,6 +1394,8 @@
     renderMeals();
     renderFitness();
     renderBodyLog();
+    renderMedication();
+    renderSleep();
     updateBreathingVisual();
   </script>
 </body>
