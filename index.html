@@ -627,7 +627,11 @@
     ];
 
     let tasks = load(storageKeys.tasks, [
-      { id: uid(), text: 'Review today’s priorities', category: 'Daily', done: false }
+      { id: uid(), text: 'Review today’s priorities', category: 'Daily', done: false },
+      { id: uid(), text: 'Journal', category: 'Daily', done: false },
+      { id: uid(), text: 'Read', category: 'Daily', done: false },
+      { id: uid(), text: 'Shower', category: 'Daily', done: false },
+      { id: uid(), text: 'Brush teeth', category: 'Daily', done: false }
     ]);
 
     let scheduleItems = load(storageKeys.schedule, [
