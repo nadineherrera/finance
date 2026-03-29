@@ -294,12 +294,7 @@
       letter-spacing: -0.02em;
     }
 
-    .breath-count {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: -0.04em;
-    }
-
+    
     .muted {
       color: var(--muted);
     }
@@ -456,8 +451,7 @@
             <div class="bubble inhale" id="bubble">
               <div class="bubble-inner">
                 <div class="breath-phase" id="breathPhase">Breathe In</div>
-                <div class="breath-count" id="breathCount">5.5</div>
-                <div class="muted">No hold</div>
+                <div class="muted" id="breathInstruction">for 5 to 6 seconds</div>
               </div>
             </div>
             <div class="mini" id="breathStatus">Ready to begin</div>
@@ -480,6 +474,13 @@
               <div class="water-bar">
                 <div class="water-fill" id="waterFill"></div>
               </div>
+            </div>
+            <div class="input-row" style="margin-bottom: 4px;">
+              <select id="waterGoalSelect">
+                <option value="8">8 cups</option>
+                <option value="11">11 cups</option>
+                <option value="15">15 cups</option>
+              </select>
             </div>
             <div class="water-actions">
               <button id="waterAddBtn">+ 1 cup</button>
@@ -544,15 +545,13 @@
 
     const bubble = document.getElementById('bubble');
     const breathPhase = document.getElementById('breathPhase');
-    const breathCount = document.getElementById('breathCount');
-    const breathStatus = document.getElementById('breathStatus');
+        const breathStatus = document.getElementById('breathStatus');
     const breathToggleBtn = document.getElementById('breathToggleBtn');
     const breathResetBtn = document.getElementById('breathResetBtn');
 
     let breathRunning = false;
     let breathPhaseState = 'inhale';
-    let breathCountdown = 5.5;
-    let breathTimer = null;
+        let breathTimer = null;
 
     function uid() {
       return Math.random().toString(36).slice(2, 10);
@@ -700,6 +699,8 @@
       const percent = Math.max(0, Math.min(100, (water.cups / water.goal) * 100));
       waterFill.style.width = percent + '%';
       waterText.textContent = `${water.cups} / ${water.goal} cups`;
+      const goalSelect = document.getElementById('waterGoalSelect');
+      if (goalSelect) goalSelect.value = String(water.goal);
     }
 
     function renderCleaning() {
@@ -782,8 +783,9 @@
     }
 
     function updateBreathingVisual() {
+      const instruction = document.getElementById('breathInstruction');
       breathPhase.textContent = breathPhaseState === 'inhale' ? 'Breathe In' : 'Breathe Out';
-      breathCount.textContent = breathCountdown.toFixed(1);
+      instruction.textContent = 'for 5 to 6 seconds';
       bubble.classList.toggle('inhale', breathPhaseState === 'inhale');
       bubble.classList.toggle('exhale', breathPhaseState === 'exhale');
       breathStatus.textContent = breathRunning ? 'Coherent breathing in progress' : 'Ready to begin';
@@ -792,19 +794,14 @@
     function startBreathing() {
       if (breathRunning) return;
       breathRunning = true;
-      breathToggleBtn.textContent = 'Running';
+      breathToggleBtn.textContent = 'Pause';
       breathPhaseState = 'inhale';
-      breathCountdown = 5.5;
       updateBreathingVisual();
 
       breathTimer = setInterval(() => {
-        breathCountdown = Math.max(0, breathCountdown - 0.1);
-        if (breathCountdown <= 0) {
-          breathPhaseState = breathPhaseState === 'inhale' ? 'exhale' : 'inhale';
-          breathCountdown = 5.5;
-        }
+        breathPhaseState = breathPhaseState === 'inhale' ? 'exhale' : 'inhale';
         updateBreathingVisual();
-      }, 100);
+      }, 5500);
     }
 
     function stopBreathing() {
@@ -813,7 +810,6 @@
       breathTimer = null;
       breathToggleBtn.textContent = 'Start';
       breathPhaseState = 'inhale';
-      breathCountdown = 5.5;
       updateBreathingVisual();
     }
 
@@ -848,6 +844,13 @@
 
     document.getElementById('waterResetBtn').addEventListener('click', () => {
       water.cups = 0;
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    document.getElementById('waterGoalSelect').addEventListener('change', (e) => {
+      water.goal = Number(e.target.value);
+      if (water.cups > water.goal) water.cups = water.goal;
       save(storageKeys.water, water);
       renderWater();
     });
