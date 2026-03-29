@@ -1,126 +1,879 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finance Tabs Viewer</title>
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f6f1e7;
-  margin: 0;
-  padding: 20px;
-}
-.tabs {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-}
-.tab {
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  background: white;
-}
-.tab.active {
-  background: #b89a4c;
-  color: white;
-}
-.table-wrap {
-  overflow: auto;
-  max-height: 70vh;
-  background: white;
-  border-radius: 10px;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th, td {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
-  text-align: left;
-}
-th {
-  position: sticky;
-  top: 0;
-  background: #eee;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Daily Dashboard</title>
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --card: rgba(255,255,255,0.88);
+      --text: #1e1e1e;
+      --muted: #6e6a63;
+      --line: #e4ddd3;
+      --accent: #b89a4c;
+      --accent-soft: rgba(184,154,76,0.14);
+      --shadow: 0 10px 30px rgba(0,0,0,0.06);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(184,154,76,0.08), transparent 35%),
+        linear-gradient(180deg, #fbf9f6 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 14px 36px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .title-wrap p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    .today-chip {
+      padding: 12px 16px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr 0.95fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      backdrop-filter: blur(8px);
+    }
+
+    .card h2 {
+      margin: 0 0 4px;
+      font-size: 1.08rem;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 14px;
+    }
+
+    .stack { display: grid; gap: 16px; }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .input-row,
+    .finance-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    input, select, button, textarea {
+      font: inherit;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.92);
+      border-radius: 14px;
+      padding: 12px 13px;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(184,154,76,0.12);
+    }
+
+    button {
+      border: 0;
+      background: var(--text);
+      color: white;
+      padding: 11px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { opacity: 0.94; }
+    button:active { transform: scale(0.985); }
+
+    .ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .gold {
+      background: var(--accent);
+      color: white;
+    }
+
+    .task-list, .finance-list, .schedule-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .task-item, .finance-item, .schedule-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,0.82);
+    }
+
+    .task-top, .schedule-top, .finance-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .check {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .task-text {
+      word-break: break-word;
+    }
+
+    .done .task-text {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #846a29;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .tiny-btn {
+      background: transparent;
+      color: #8b5e5e;
+      border: 1px solid #ecd8d8;
+      padding: 8px 10px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+    }
+
+    .water-wrap {
+      display: grid;
+      gap: 12px;
+    }
+
+    .water-bar {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: #ebe5db;
+      overflow: hidden;
+    }
+
+    .water-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #cbb06a, #b89a4c);
+      transition: width 0.25s ease;
+    }
+
+    .water-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .bubble-card {
+      display: grid;
+      place-items: center;
+      text-align: center;
+      gap: 12px;
+      padding-top: 8px;
+    }
+
+    .bubble {
+      width: min(220px, 62vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.18) 35%),
+        linear-gradient(180deg, rgba(184,154,76,0.35), rgba(184,154,76,0.12));
+      border: 1px solid rgba(184,154,76,0.28);
+      box-shadow: inset 0 0 30px rgba(255,255,255,0.35), 0 14px 32px rgba(184,154,76,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      transform: scale(1);
+      transition: transform 0.9s ease-in-out;
+    }
+
+    .bubble.inhale { transform: scale(1.12); }
+    .bubble.exhale { transform: scale(0.92); }
+
+    .bubble-inner {
+      display: grid;
+      gap: 6px;
+    }
+
+    .breath-phase {
+      font-size: 1.12rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .breath-count {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .finance-summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .summary-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,0.82);
+    }
+
+    .summary-box .label {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .schedule-time {
+      font-weight: 700;
+      min-width: 78px;
+    }
+
+    .schedule-layout {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .app { padding: 12px 10px 28px; }
+      .card { padding: 15px; border-radius: 18px; }
+      .water-actions { grid-template-columns: 1fr; }
+      .finance-summary { grid-template-columns: 1fr; }
+      .schedule-layout { flex-direction: column; gap: 4px; }
+      .schedule-time { min-width: 0; }
+    }
+  </style>
 </head>
 <body>
-
-<h2>Finance Tabs Viewer</h2>
-<p>Click tabs to view each sheet from your Excel file.</p>
-
-<div class="tabs" id="tabs"></div>
-<div id="content"></div>
-
-<script>
-const sheets = {
-  "Groceries": {
-    "columns": ["Date", "Store", "Item", "Category", "Amount"],
-    "rows": [
-      {"Date":"2026-03-01","Store":"Costco","Item":"Chicken","Category":"Protein","Amount":"24.99"},
-      {"Date":"2026-03-02","Store":"Target","Item":"Rice","Category":"Pantry","Amount":"6.49"}
-    ]
-  },
-  "Bills": {
-    "columns": ["Due Date", "Bill", "Amount", "Status"],
-    "rows": [
-      {"Due Date":"2026-03-05","Bill":"Internet","Amount":"89.99","Status":"Paid"},
-      {"Due Date":"2026-03-10","Bill":"Electric","Amount":"145.22","Status":"Due"}
-    ]
-  }
-};
-
-let active = Object.keys(sheets)[0];
-
-const tabsEl = document.getElementById("tabs");
-const contentEl = document.getElementById("content");
-
-function renderTabs() {
-  tabsEl.innerHTML = Object.keys(sheets).map(name =>
-    `<div class="tab ${name === active ? 'active' : ''}" data-name="${name}">${name}</div>`
-  ).join('');
-
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.onclick = () => {
-      active = tab.dataset.name;
-      renderTabs();
-      renderTable();
-    };
-  });
-}
-
-function renderTable() {
-  const sheet = sheets[active];
-  contentEl.innerHTML = `
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            ${sheet.columns.map(c => `<th>${c}</th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>
-          ${sheet.rows.map(row => `
-            <tr>
-              ${sheet.columns.map(c => `<td>${row[c] ?? ''}</td>`).join('')}
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
+  <div class="app">
+    <div class="topbar">
+      <div class="title-wrap">
+        <h1>My Daily Dashboard</h1>
+        <p>Simple, phone-friendly, and easy to keep up with.</p>
+      </div>
+      <div class="today-chip" id="todayDate"></div>
     </div>
-  `;
-}
 
-renderTabs();
-renderTable();
-</script>
+    <div class="grid">
+      <div class="stack">
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Tasks</h2>
+              <div class="sub">One place for daily to-dos.</div>
+            </div>
+            <button class="ghost" id="resetTasksBtn">Reset</button>
+          </div>
+          <div class="input-row">
+            <input id="taskInput" type="text" placeholder="Add a task" />
+            <select id="taskCategory">
+              <option value="Daily">Daily</option>
+              <option value="Work">Work</option>
+              <option value="Home">Home</option>
+              <option value="Personal">Personal</option>
+            </select>
+            <button id="addTaskBtn">Add</button>
+          </div>
+          <div class="task-list" id="taskList"></div>
+        </section>
 
+        <section class="card">
+          <h2>Schedule</h2>
+          <div class="sub">Keep your day visible at a glance.</div>
+          <div class="input-row">
+            <input id="scheduleTime" type="time" />
+            <input id="scheduleText" type="text" placeholder="What is happening?" />
+            <button id="addScheduleBtn">Add</button>
+          </div>
+          <div class="schedule-list" id="scheduleList"></div>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card">
+          <h2>Finances</h2>
+          <div class="sub">A light tracker for money in and money out.</div>
+          <div class="finance-summary">
+            <div class="summary-box">
+              <div class="label">Income</div>
+              <div class="value" id="incomeTotal">$0.00</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Expenses</div>
+              <div class="value" id="expenseTotal">$0.00</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Balance</div>
+              <div class="value" id="balanceTotal">$0.00</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Entries</div>
+              <div class="value" id="entryCount">0</div>
+            </div>
+          </div>
+          <div class="finance-row">
+            <input id="financeDesc" type="text" placeholder="Description" />
+            <input id="financeAmount" type="number" step="0.01" placeholder="Amount" />
+            <select id="financeType">
+              <option value="expense">Expense</option>
+              <option value="income">Income</option>
+            </select>
+            <button id="addFinanceBtn">Add</button>
+          </div>
+          <div class="finance-list" id="financeList"></div>
+        </section>
+
+        <section class="card">
+          <h2>Notes</h2>
+          <div class="sub">A simple space for reminders or thoughts.</div>
+          <textarea id="notesBox" placeholder="Write anything you want to remember..."></textarea>
+        </section>
+      </div>
+
+      <div class="stack">
+        <section class="card">
+          <h2>Breathing</h2>
+          <div class="sub">A calm 5.5 second inhale and 5.5 second exhale rhythm.</div>
+          <div class="bubble-card">
+            <div class="bubble inhale" id="bubble">
+              <div class="bubble-inner">
+                <div class="breath-phase" id="breathPhase">Breathe In</div>
+                <div class="breath-count" id="breathCount">5.5</div>
+                <div class="muted">No hold</div>
+              </div>
+            </div>
+            <div class="mini" id="breathStatus">Ready to begin</div>
+            <div class="input-row" style="margin:0; justify-content:center;">
+              <button class="gold" id="breathToggleBtn">Start</button>
+              <button class="ghost" id="breathResetBtn">Reset</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Water Tracker</h2>
+          <div class="sub">Track cups of water through the day.</div>
+          <div class="water-wrap">
+            <div>
+              <div class="section-head" style="margin-bottom:8px;">
+                <span class="mini">Progress</span>
+                <span class="pill" id="waterText">0 / 8 cups</span>
+              </div>
+              <div class="water-bar">
+                <div class="water-fill" id="waterFill"></div>
+              </div>
+            </div>
+            <div class="water-actions">
+              <button id="waterAddBtn">+ 1 cup</button>
+              <button class="ghost" id="waterMinusBtn">- 1 cup</button>
+              <button class="ghost" id="waterResetBtn">Reset</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Cleaning Focus</h2>
+          <div class="sub">A short list for upkeep without overwhelm.</div>
+          <div class="task-list" id="cleaningList"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="footer-note">Saved on this device automatically.</div>
+  </div>
+
+  <script>
+    const storageKeys = {
+      tasks: 'simpleDashboardTasks',
+      schedule: 'simpleDashboardSchedule',
+      finances: 'simpleDashboardFinances',
+      water: 'simpleDashboardWater',
+      notes: 'simpleDashboardNotes',
+      cleaning: 'simpleDashboardCleaning'
+    };
+
+    const defaultCleaning = [
+      { text: 'Make bed', done: false },
+      { text: 'Wipe kitchen counters', done: false },
+      { text: '15-minute tidy', done: false },
+      { text: 'Check one laundry load', done: false }
+    ];
+
+    let tasks = load(storageKeys.tasks, [
+      { id: uid(), text: 'Review today’s priorities', category: 'Daily', done: false }
+    ]);
+
+    let scheduleItems = load(storageKeys.schedule, [
+      { id: uid(), time: '08:00', text: 'Start the day' }
+    ]);
+
+    let finances = load(storageKeys.finances, []);
+    let water = load(storageKeys.water, { cups: 0, goal: 8 });
+    let cleaning = load(storageKeys.cleaning, defaultCleaning);
+
+    const todayDate = document.getElementById('todayDate');
+    const taskList = document.getElementById('taskList');
+    const scheduleList = document.getElementById('scheduleList');
+    const financeList = document.getElementById('financeList');
+    const notesBox = document.getElementById('notesBox');
+    const waterFill = document.getElementById('waterFill');
+    const waterText = document.getElementById('waterText');
+    const cleaningList = document.getElementById('cleaningList');
+    const incomeTotal = document.getElementById('incomeTotal');
+    const expenseTotal = document.getElementById('expenseTotal');
+    const balanceTotal = document.getElementById('balanceTotal');
+    const entryCount = document.getElementById('entryCount');
+
+    const bubble = document.getElementById('bubble');
+    const breathPhase = document.getElementById('breathPhase');
+    const breathCount = document.getElementById('breathCount');
+    const breathStatus = document.getElementById('breathStatus');
+    const breathToggleBtn = document.getElementById('breathToggleBtn');
+    const breathResetBtn = document.getElementById('breathResetBtn');
+
+    let breathRunning = false;
+    let breathPhaseState = 'inhale';
+    let breathCountdown = 5.5;
+    let breathTimer = null;
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 10);
+    }
+
+    function load(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function save(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function formatCurrency(n) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(n || 0));
+    }
+
+    function renderDate() {
+      const now = new Date();
+      todayDate.textContent = now.toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+      if (!tasks.length) {
+        taskList.innerHTML = '<div class="mini">No tasks yet.</div>';
+        return;
+      }
+
+      tasks.forEach(task => {
+        const item = document.createElement('div');
+        item.className = `task-item ${task.done ? 'done' : ''}`;
+        item.innerHTML = `
+          <div class="task-top">
+            <div class="task-left">
+              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
+              <div class="task-text">${escapeHtml(task.text)}</div>
+            </div>
+            <span class="pill">${escapeHtml(task.category)}</span>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        item.querySelector('.check').addEventListener('change', () => {
+          task.done = !task.done;
+          save(storageKeys.tasks, tasks);
+          renderTasks();
+        });
+
+        item.querySelector('.tiny-btn').addEventListener('click', () => {
+          tasks = tasks.filter(t => t.id !== task.id);
+          save(storageKeys.tasks, tasks);
+          renderTasks();
+        });
+
+        taskList.appendChild(item);
+      });
+    }
+
+    function renderSchedule() {
+      scheduleList.innerHTML = '';
+      if (!scheduleItems.length) {
+        scheduleList.innerHTML = '<div class="mini">No schedule items yet.</div>';
+        return;
+      }
+
+      scheduleItems
+        .sort((a, b) => a.time.localeCompare(b.time))
+        .forEach(item => {
+          const el = document.createElement('div');
+          el.className = 'schedule-item';
+          el.innerHTML = `
+            <div class="schedule-top">
+              <div class="schedule-layout">
+                <div class="schedule-time">${formatTime(item.time)}</div>
+                <div>${escapeHtml(item.text)}</div>
+              </div>
+              <button class="tiny-btn">Delete</button>
+            </div>
+          `;
+          el.querySelector('.tiny-btn').addEventListener('click', () => {
+            scheduleItems = scheduleItems.filter(s => s.id !== item.id);
+            save(storageKeys.schedule, scheduleItems);
+            renderSchedule();
+          });
+          scheduleList.appendChild(el);
+        });
+    }
+
+    function renderFinances() {
+      financeList.innerHTML = '';
+      const income = finances.filter(f => f.type === 'income').reduce((sum, f) => sum + Number(f.amount), 0);
+      const expenses = finances.filter(f => f.type === 'expense').reduce((sum, f) => sum + Number(f.amount), 0);
+      const balance = income - expenses;
+
+      incomeTotal.textContent = formatCurrency(income);
+      expenseTotal.textContent = formatCurrency(expenses);
+      balanceTotal.textContent = formatCurrency(balance);
+      entryCount.textContent = finances.length;
+
+      if (!finances.length) {
+        financeList.innerHTML = '<div class="mini">No finance entries yet.</div>';
+        return;
+      }
+
+      [...finances].reverse().forEach(entry => {
+        const el = document.createElement('div');
+        el.className = 'finance-item';
+        el.innerHTML = `
+          <div class="finance-top">
+            <div>
+              <div>${escapeHtml(entry.desc)}</div>
+              <div class="mini">${entry.type === 'income' ? 'Income' : 'Expense'}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="pill">${formatCurrency(entry.amount)}</span>
+              <button class="tiny-btn">Delete</button>
+            </div>
+          </div>
+        `;
+        el.querySelector('.tiny-btn').addEventListener('click', () => {
+          finances = finances.filter(f => f.id !== entry.id);
+          save(storageKeys.finances, finances);
+          renderFinances();
+        });
+        financeList.appendChild(el);
+      });
+    }
+
+    function renderWater() {
+      const percent = Math.max(0, Math.min(100, (water.cups / water.goal) * 100));
+      waterFill.style.width = percent + '%';
+      waterText.textContent = `${water.cups} / ${water.goal} cups`;
+    }
+
+    function renderCleaning() {
+      cleaningList.innerHTML = '';
+      cleaning.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = `task-item ${item.done ? 'done' : ''}`;
+        el.innerHTML = `
+          <div class="task-top">
+            <div class="task-left">
+              <input class="check" type="checkbox" ${item.done ? 'checked' : ''} />
+              <div class="task-text">${escapeHtml(item.text)}</div>
+            </div>
+          </div>
+        `;
+        el.querySelector('.check').addEventListener('change', () => {
+          cleaning[index].done = !cleaning[index].done;
+          save(storageKeys.cleaning, cleaning);
+          renderCleaning();
+        });
+        cleaningList.appendChild(el);
+      });
+    }
+
+    function formatTime(t) {
+      if (!t) return '';
+      const [h, m] = t.split(':').map(Number);
+      const suffix = h >= 12 ? 'PM' : 'AM';
+      const hour = h % 12 || 12;
+      return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      const category = document.getElementById('taskCategory');
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.unshift({ id: uid(), text, category: category.value, done: false });
+      input.value = '';
+      save(storageKeys.tasks, tasks);
+      renderTasks();
+    }
+
+    function addSchedule() {
+      const time = document.getElementById('scheduleTime').value;
+      const text = document.getElementById('scheduleText').value.trim();
+      if (!time || !text) return;
+      scheduleItems.push({ id: uid(), time, text });
+      document.getElementById('scheduleTime').value = '';
+      document.getElementById('scheduleText').value = '';
+      save(storageKeys.schedule, scheduleItems);
+      renderSchedule();
+    }
+
+    function addFinance() {
+      const desc = document.getElementById('financeDesc').value.trim();
+      const amount = document.getElementById('financeAmount').value;
+      const type = document.getElementById('financeType').value;
+      if (!desc || !amount) return;
+      finances.push({ id: uid(), desc, amount: Number(amount), type });
+      document.getElementById('financeDesc').value = '';
+      document.getElementById('financeAmount').value = '';
+      save(storageKeys.finances, finances);
+      renderFinances();
+    }
+
+    function resetTasks() {
+      tasks = tasks.map(task => ({ ...task, done: false }));
+      cleaning = cleaning.map(item => ({ ...item, done: false }));
+      save(storageKeys.tasks, tasks);
+      save(storageKeys.cleaning, cleaning);
+      renderTasks();
+      renderCleaning();
+    }
+
+    function updateBreathingVisual() {
+      breathPhase.textContent = breathPhaseState === 'inhale' ? 'Breathe In' : 'Breathe Out';
+      breathCount.textContent = breathCountdown.toFixed(1);
+      bubble.classList.toggle('inhale', breathPhaseState === 'inhale');
+      bubble.classList.toggle('exhale', breathPhaseState === 'exhale');
+      breathStatus.textContent = breathRunning ? 'Coherent breathing in progress' : 'Ready to begin';
+    }
+
+    function startBreathing() {
+      if (breathRunning) return;
+      breathRunning = true;
+      breathToggleBtn.textContent = 'Running';
+      breathPhaseState = 'inhale';
+      breathCountdown = 5.5;
+      updateBreathingVisual();
+
+      breathTimer = setInterval(() => {
+        breathCountdown = Math.max(0, breathCountdown - 0.1);
+        if (breathCountdown <= 0) {
+          breathPhaseState = breathPhaseState === 'inhale' ? 'exhale' : 'inhale';
+          breathCountdown = 5.5;
+        }
+        updateBreathingVisual();
+      }, 100);
+    }
+
+    function stopBreathing() {
+      breathRunning = false;
+      clearInterval(breathTimer);
+      breathTimer = null;
+      breathToggleBtn.textContent = 'Start';
+      breathPhaseState = 'inhale';
+      breathCountdown = 5.5;
+      updateBreathingVisual();
+    }
+
+    document.getElementById('addTaskBtn').addEventListener('click', addTask);
+    document.getElementById('taskInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    document.getElementById('addScheduleBtn').addEventListener('click', addSchedule);
+    document.getElementById('scheduleText').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addSchedule();
+    });
+
+    document.getElementById('addFinanceBtn').addEventListener('click', addFinance);
+    document.getElementById('financeAmount').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addFinance();
+    });
+
+    document.getElementById('resetTasksBtn').addEventListener('click', resetTasks);
+
+    document.getElementById('waterAddBtn').addEventListener('click', () => {
+      water.cups += 1;
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    document.getElementById('waterMinusBtn').addEventListener('click', () => {
+      water.cups = Math.max(0, water.cups - 1);
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    document.getElementById('waterResetBtn').addEventListener('click', () => {
+      water.cups = 0;
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    notesBox.value = load(storageKeys.notes, '');
+    notesBox.addEventListener('input', () => {
+      save(storageKeys.notes, notesBox.value);
+    });
+
+    breathToggleBtn.addEventListener('click', () => {
+      if (breathRunning) {
+        stopBreathing();
+      } else {
+        startBreathing();
+      }
+    });
+
+    breathResetBtn.addEventListener('click', stopBreathing);
+
+    renderDate();
+    renderTasks();
+    renderSchedule();
+    renderFinances();
+    renderWater();
+    renderCleaning();
+    updateBreathingVisual();
+  </script>
 </body>
 </html>
