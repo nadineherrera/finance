@@ -1,7 +1,7 @@
 {
   "name": "My Daily Dashboard",
   "short_name": "Finance",
-  "start_url": "./",
+  "start_url": "../",
   "display": "standalone",
   "background_color": "#F6F3EE",
   "theme_color": "#F6F3EE",
