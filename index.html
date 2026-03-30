@@ -2,8 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
   <title>My Daily Dashboard</title>
+
+  <meta name="theme-color" content="#F6F3EE" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Finance" />
+  <meta name="application-name" content="Finance" />
+  <meta name="format-detection" content="telephone=no" />
+
+  <link rel="icon" href="icons/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+  <link rel="manifest" href="icons/site.webmanifest" />
+
   <style>
     :root {
       --bg: #f6f3ee;
@@ -15,24 +33,46 @@
       --accent-soft: rgba(184,154,76,0.14);
       --shadow: 0 10px 30px rgba(0,0,0,0.06);
       --radius: 22px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
     }
 
     * { box-sizing: border-box; }
 
+    html {
+      height: 100%;
+      background: var(--bg);
+      overscroll-behavior-y: none;
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
+      min-height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       color: var(--text);
       background:
         radial-gradient(circle at top left, rgba(184,154,76,0.08), transparent 35%),
         linear-gradient(180deg, #fbf9f6 0%, var(--bg) 100%);
-      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overscroll-behavior-y: none;
+    }
+
+    body.app-installed {
+      min-height: 100svh;
     }
 
     .app {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 18px 14px 36px;
+      padding:
+        calc(18px + var(--safe-top))
+        calc(14px + var(--safe-right))
+        calc(36px + var(--safe-bottom))
+        calc(14px + var(--safe-left));
     }
 
     .topbar {
@@ -80,6 +120,7 @@
       box-shadow: var(--shadow);
       padding: 18px;
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
 
     .card h2 {
@@ -117,7 +158,7 @@
       margin-bottom: 12px;
     }
 
-    input, select, button, textarea {
+    input, select, button, textarea, a {
       font: inherit;
     }
 
@@ -148,7 +189,7 @@
       padding: 11px 14px;
       border-radius: 14px;
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.2s ease;
     }
 
     button:hover { opacity: 0.94; }
@@ -163,6 +204,7 @@
     .gold {
       background: var(--accent);
       color: white;
+      box-shadow: 0 10px 24px rgba(184,154,76,0.18);
     }
 
     .task-list, .finance-list, .schedule-list {
@@ -264,30 +306,24 @@
     }
 
     .bubble {
-      width: min(220px, 62vw);
+      width: min(228px, 64vw);
       aspect-ratio: 1;
       border-radius: 50%;
       background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.18) 35%),
-        linear-gradient(180deg, rgba(184,154,76,0.35), rgba(184,154,76,0.12));
-      border: 1px solid rgba(184,154,76,0.28);
-      box-shadow: inset 0 0 30px rgba(255,255,255,0.35), 0 14px 32px rgba(184,154,76,0.15);
+        radial-gradient(circle at 30% 28%, rgba(255,255,255,0.92), rgba(255,255,255,0.18) 34%),
+        radial-gradient(circle at 50% 70%, rgba(255,241,201,0.9), rgba(255,241,201,0.15) 35%),
+        linear-gradient(180deg, rgba(184,154,76,0.34), rgba(184,154,76,0.12));
+      border: 1px solid rgba(184,154,76,0.24);
+      box-shadow:
+        inset 0 0 36px rgba(255,255,255,0.36),
+        0 18px 34px rgba(184,154,76,0.14);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
       transform: scale(0.92);
+      transition: transform 5.5s ease-in-out;
       will-change: transform;
-    }
-
-    .bubble.running {
-      animation: breatheCycle 11s ease-in-out infinite;
-    }
-
-    @keyframes breatheCycle {
-      0% { transform: scale(0.92); }
-      50% { transform: scale(1.12); }
-      100% { transform: scale(0.92); }
     }
 
     .bubble-inner {
@@ -301,7 +337,6 @@
       letter-spacing: -0.02em;
     }
 
-    
     .muted {
       color: var(--muted);
     }
@@ -348,6 +383,7 @@
       color: var(--muted);
       font-size: 0.84rem;
       text-align: center;
+      padding-bottom: calc(4px + var(--safe-bottom));
     }
 
     @media (max-width: 980px) {
@@ -355,7 +391,13 @@
     }
 
     @media (max-width: 560px) {
-      .app { padding: 12px 10px 28px; }
+      .app {
+        padding:
+          calc(12px + var(--safe-top))
+          calc(10px + var(--safe-right))
+          calc(28px + var(--safe-bottom))
+          calc(10px + var(--safe-left));
+      }
       .card { padding: 15px; border-radius: 18px; }
       .water-actions { grid-template-columns: 1fr; }
       .finance-summary { grid-template-columns: 1fr; }
@@ -413,27 +455,29 @@
         <section class="card">
           <h2>Finances</h2>
           <div class="sub">A light tracker for money in and money out.</div>
+
           <div class="input-row" style="margin-bottom:12px;">
-  <a
-    href="https://docs.google.com/spreadsheets/d/1422qrl3-yqWdeeFNaFKcL1P4vprcy7xTNRCPIR62xdI/edit?usp=sharing"
-    target="_blank"
-    rel="noopener noreferrer"
-    style="
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      width:100%;
-      text-decoration:none;
-      background:var(--accent);
-      color:white;
-      padding:12px 16px;
-      border-radius:14px;
-      font-weight:500;
-    "
-  >
-    Open Full Finance Tracker
-  </a>
-</div>
+            <a
+              href="https://docs.google.com/spreadsheets/d/1422qrl3-yqWdeeFNaFKcL1P4vprcy7xTNRCPIR62xdI/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                width:100%;
+                text-decoration:none;
+                background:var(--accent);
+                color:white;
+                padding:12px 16px;
+                border-radius:14px;
+                font-weight:500;
+              "
+            >
+              Open Full Finance Tracker
+            </a>
+          </div>
+
           <div class="finance-summary">
             <div class="summary-box">
               <div class="label">Income</div>
@@ -452,6 +496,7 @@
               <div class="value" id="entryCount">0</div>
             </div>
           </div>
+
           <div class="finance-row">
             <input id="financeDesc" type="text" placeholder="Description" />
             <input id="financeAmount" type="number" step="0.01" placeholder="Amount" />
@@ -461,6 +506,7 @@
             </select>
             <button id="addFinanceBtn">Add</button>
           </div>
+
           <div class="finance-list" id="financeList"></div>
         </section>
 
@@ -696,7 +742,7 @@
             <div class="bubble" id="bubble">
               <div class="bubble-inner">
                 <div class="breath-phase" id="breathPhase">Breathe In</div>
-                <div class="muted" id="breathInstruction">for 5 to 6 seconds</div>
+                <div class="muted" id="breathInstruction">for 5.5 seconds</div>
               </div>
             </div>
             <div class="mini" id="breathStatus">Ready to begin</div>
@@ -752,6 +798,16 @@
   </div>
 
   <script>
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (isStandalone) {
+        document.body.classList.add('app-installed');
+      }
+    });
+
     const storageKeys = {
       tasks: 'simpleDashboardTasks',
       schedule: 'simpleDashboardSchedule',
@@ -785,7 +841,7 @@
       { id: uid(), text: 'Check social media', category: 'Work', done: false },
       { id: uid(), text: 'Learn something', category: 'Personal', done: false },
       { id: uid(), text: 'Yoga & Meditation', category: 'Personal', done: false },
-      { id: uid(), text: 'Pay bills', category: 'Home', done: false },
+      { id: uid(), text: 'Pay bills', category: 'Home', done: false }
     ]);
 
     let scheduleItems = load(storageKeys.schedule, [
@@ -892,13 +948,10 @@
 
     const bubble = document.getElementById('bubble');
     const breathPhase = document.getElementById('breathPhase');
-        const breathStatus = document.getElementById('breathStatus');
+    const breathInstruction = document.getElementById('breathInstruction');
+    const breathStatus = document.getElementById('breathStatus');
     const breathToggleBtn = document.getElementById('breathToggleBtn');
     const breathResetBtn = document.getElementById('breathResetBtn');
-
-    let breathRunning = false;
-    let breathPhaseState = 'inhale';
-        let breathTimer = null;
 
     function uid() {
       return Math.random().toString(36).slice(2, 10);
@@ -922,6 +975,24 @@
         style: 'currency',
         currency: 'USD'
       }).format(Number(n || 0));
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatTime(time) {
+      if (!time) return '';
+      const [hour, minute] = time.split(':');
+      const h = Number(hour);
+      const suffix = h >= 12 ? 'PM' : 'AM';
+      const normalized = h % 12 || 12;
+      return `${normalized}:${minute} ${suffix}`;
     }
 
     function renderDate() {
@@ -979,7 +1050,7 @@
         return;
       }
 
-      scheduleItems
+      [...scheduleItems]
         .sort((a, b) => a.time.localeCompare(b.time))
         .forEach(item => {
           const el = document.createElement('div');
@@ -993,61 +1064,76 @@
               <button class="tiny-btn">Delete</button>
             </div>
           `;
+
           el.querySelector('.tiny-btn').addEventListener('click', () => {
             scheduleItems = scheduleItems.filter(s => s.id !== item.id);
             save(storageKeys.schedule, scheduleItems);
             renderSchedule();
           });
+
           scheduleList.appendChild(el);
         });
     }
 
     function renderFinances() {
       financeList.innerHTML = '';
-      const income = finances.filter(f => f.type === 'income').reduce((sum, f) => sum + Number(f.amount), 0);
-      const expenses = finances.filter(f => f.type === 'expense').reduce((sum, f) => sum + Number(f.amount), 0);
-      const balance = income - expenses;
+
+      let income = 0;
+      let expenses = 0;
+
+      finances.forEach(entry => {
+        if (entry.type === 'income') {
+          income += Number(entry.amount || 0);
+        } else {
+          expenses += Number(entry.amount || 0);
+        }
+      });
 
       incomeTotal.textContent = formatCurrency(income);
       expenseTotal.textContent = formatCurrency(expenses);
-      balanceTotal.textContent = formatCurrency(balance);
-      entryCount.textContent = finances.length;
+      balanceTotal.textContent = formatCurrency(income - expenses);
+      entryCount.textContent = String(finances.length);
 
       if (!finances.length) {
         financeList.innerHTML = '<div class="mini">No finance entries yet.</div>';
         return;
       }
 
-      [...finances].reverse().forEach(entry => {
-        const el = document.createElement('div');
-        el.className = 'finance-item';
-        el.innerHTML = `
-          <div class="finance-top">
-            <div>
-              <div>${escapeHtml(entry.desc)}</div>
-              <div class="mini">${entry.type === 'income' ? 'Income' : 'Expense'}</div>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="pill">${formatCurrency(entry.amount)}</span>
+      [...finances]
+        .reverse()
+        .forEach(entry => {
+          const item = document.createElement('div');
+          item.className = 'finance-item';
+          item.innerHTML = `
+            <div class="finance-top">
+              <div>
+                <div style="font-weight:600;">${escapeHtml(entry.desc)}</div>
+                <div class="mini">${entry.type === 'income' ? 'Income' : 'Expense'} • ${formatCurrency(entry.amount)}</div>
+              </div>
               <button class="tiny-btn">Delete</button>
             </div>
-          </div>
-        `;
-        el.querySelector('.tiny-btn').addEventListener('click', () => {
-          finances = finances.filter(f => f.id !== entry.id);
-          save(storageKeys.finances, finances);
-          renderFinances();
+          `;
+
+          item.querySelector('.tiny-btn').addEventListener('click', () => {
+            finances = finances.filter(f => f.id !== entry.id);
+            save(storageKeys.finances, finances);
+            renderFinances();
+          });
+
+          financeList.appendChild(item);
         });
-        financeList.appendChild(el);
-      });
     }
 
     function renderWater() {
-      const percent = Math.max(0, Math.min(100, (water.cups / water.goal) * 100));
-      waterFill.style.width = percent + '%';
-      waterText.textContent = `${water.cups} / ${water.goal} cups`;
+      const cups = Number(water.cups || 0);
+      const goal = Number(water.goal || 8);
+      const pct = Math.max(0, Math.min(100, (cups / goal) * 100));
+
+      waterFill.style.width = `${pct}%`;
+      waterText.textContent = `${cups} / ${goal} cups`;
+
       const goalSelect = document.getElementById('waterGoalSelect');
-      if (goalSelect) goalSelect.value = String(water.goal);
+      goalSelect.value = String(goal);
     }
 
     function renderCleaning() {
@@ -1057,115 +1143,105 @@
         return;
       }
 
-      cleaning.forEach((item, index) => {
-        const el = document.createElement('div');
-        el.className = `task-item ${item.done ? 'done' : ''}`;
-        el.innerHTML = `
+      cleaning.forEach((itemData, index) => {
+        const item = document.createElement('div');
+        item.className = `task-item ${itemData.done ? 'done' : ''}`;
+        item.innerHTML = `
           <div class="task-top">
             <div class="task-left">
-              <input class="check" type="checkbox" ${item.done ? 'checked' : ''} />
-              <div class="task-text">${escapeHtml(item.text)}</div>
+              <input class="check" type="checkbox" ${itemData.done ? 'checked' : ''} />
+              <div class="task-text">${escapeHtml(itemData.text)}</div>
             </div>
-          </div>
-          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
             <button class="tiny-btn">Delete</button>
           </div>
         `;
 
-        el.querySelector('.check').addEventListener('change', () => {
+        item.querySelector('.check').addEventListener('change', () => {
           cleaning[index].done = !cleaning[index].done;
           save(storageKeys.cleaning, cleaning);
           renderCleaning();
         });
 
-        el.querySelector('.tiny-btn').addEventListener('click', () => {
+        item.querySelector('.tiny-btn').addEventListener('click', () => {
           cleaning.splice(index, 1);
           save(storageKeys.cleaning, cleaning);
           renderCleaning();
         });
 
-        cleaningList.appendChild(el);
-      });
-    }
-
-    function renderRoutineList(listEl, items, storageKey) {
-      listEl.innerHTML = '';
-      if (!items.length) {
-        listEl.innerHTML = '<div class="mini">No tasks yet.</div>';
-        return;
-      }
-
-      items.forEach((item, index) => {
-        const el = document.createElement('div');
-        el.className = `task-item ${item.done ? 'done' : ''}`;
-        el.innerHTML = `
-          <div class="task-top">
-            <div class="task-left">
-              <input class="check" type="checkbox" ${item.done ? 'checked' : ''} />
-              <div class="task-text">${escapeHtml(item.text)}</div>
-            </div>
-          </div>
-          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        el.querySelector('.check').addEventListener('change', () => {
-          items[index].done = !items[index].done;
-          save(storageKey, items);
-          if (storageKey === storageKeys.meraki) renderMeraki();
-          if (storageKey === storageKeys.family) renderFamily();
-        });
-
-        el.querySelector('.tiny-btn').addEventListener('click', () => {
-          items.splice(index, 1);
-          save(storageKey, items);
-          if (storageKey === storageKeys.meraki) renderMeraki();
-          if (storageKey === storageKeys.family) renderFamily();
-        });
-
-        listEl.appendChild(el);
+        cleaningList.appendChild(item);
       });
     }
 
     function renderMeraki() {
-      renderRoutineList(merakiList, meraki, storageKeys.meraki);
+      merakiList.innerHTML = '';
+      if (!meraki.length) {
+        merakiList.innerHTML = '<div class="mini">No routine tasks yet.</div>';
+        return;
+      }
+
+      meraki.forEach((itemData, index) => {
+        const item = document.createElement('div');
+        item.className = `task-item ${itemData.done ? 'done' : ''}`;
+        item.innerHTML = `
+          <div class="task-top">
+            <div class="task-left">
+              <input class="check" type="checkbox" ${itemData.done ? 'checked' : ''} />
+              <div class="task-text">${escapeHtml(itemData.text)}</div>
+            </div>
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        item.querySelector('.check').addEventListener('change', () => {
+          meraki[index].done = !meraki[index].done;
+          save(storageKeys.meraki, meraki);
+          renderMeraki();
+        });
+
+        item.querySelector('.tiny-btn').addEventListener('click', () => {
+          meraki.splice(index, 1);
+          save(storageKeys.meraki, meraki);
+          renderMeraki();
+        });
+
+        merakiList.appendChild(item);
+      });
     }
 
     function renderFamily() {
-      renderRoutineList(familyList, family, storageKeys.family);
-    }
+      familyList.innerHTML = '';
+      if (!family.length) {
+        familyList.innerHTML = '<div class="mini">No family tasks yet.</div>';
+        return;
+      }
 
-    function addMerakiTask() {
-      const input = document.getElementById('merakiInput');
-      const text = input.value.trim();
-      if (!text) return;
-      meraki.unshift({ text, done: false });
-      input.value = '';
-      save(storageKeys.meraki, meraki);
-      renderMeraki();
-    }
+      family.forEach((itemData, index) => {
+        const item = document.createElement('div');
+        item.className = `task-item ${itemData.done ? 'done' : ''}`;
+        item.innerHTML = `
+          <div class="task-top">
+            <div class="task-left">
+              <input class="check" type="checkbox" ${itemData.done ? 'checked' : ''} />
+              <div class="task-text">${escapeHtml(itemData.text)}</div>
+            </div>
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
 
-    function addFamilyTask() {
-      const input = document.getElementById('familyInput');
-      const text = input.value.trim();
-      if (!text) return;
-      family.unshift({ text, done: false });
-      input.value = '';
-      save(storageKeys.family, family);
-      renderFamily();
-    }
+        item.querySelector('.check').addEventListener('change', () => {
+          family[index].done = !family[index].done;
+          save(storageKeys.family, family);
+          renderFamily();
+        });
 
-    function resetMerakiTasks() {
-      meraki = meraki.map(item => ({ ...item, done: false }));
-      save(storageKeys.meraki, meraki);
-      renderMeraki();
-    }
+        item.querySelector('.tiny-btn').addEventListener('click', () => {
+          family.splice(index, 1);
+          save(storageKeys.family, family);
+          renderFamily();
+        });
 
-    function resetFamilyTasks() {
-      family = family.map(item => ({ ...item, done: false }));
-      save(storageKeys.family, family);
-      renderFamily();
+        familyList.appendChild(item);
+      });
     }
 
     function renderMeals() {
@@ -1195,48 +1271,33 @@
       save(storageKeys.meals, meals);
     }
 
-    function resetMeals() {
-      meals = {
-        breakfast: { meal: '', ingredients: '' },
-        lunch: { meal: '', ingredients: '' },
-        dinner: { meal: '', ingredients: '' }
-      };
-      save(storageKeys.meals, meals);
-      renderMeals();
-    }
-
     function renderFitness() {
-      cardioExercise.value = fitness.cardio.exercise || '';
-      cardioTime.value = fitness.cardio.time || '';
-      cardioNotes.value = fitness.cardio.notes || '';
-      strengthExercise.value = fitness.strength.exercise || '';
-      strengthReps.value = fitness.strength.reps || '';
-      strengthNotes.value = fitness.strength.notes || '';
+      cardioExercise.value = fitness.cardio?.[0]?.exercise || '';
+      cardioTime.value = fitness.cardio?.[0]?.time || '';
+      cardioNotes.value = fitness.cardio?.[0]?.notes || '';
+      strengthExercise.value = fitness.strength?.[0]?.exercise || '';
+      strengthReps.value = fitness.strength?.[0]?.reps || '';
+      strengthNotes.value = fitness.strength?.[0]?.notes || '';
     }
 
     function saveFitness() {
       fitness = {
-        cardio: {
-          exercise: cardioExercise.value,
-          time: cardioTime.value,
-          notes: cardioNotes.value
-        },
-        strength: {
-          exercise: strengthExercise.value,
-          reps: strengthReps.value,
-          notes: strengthNotes.value
-        }
+        cardio: [
+          {
+            exercise: cardioExercise.value,
+            time: cardioTime.value,
+            notes: cardioNotes.value
+          }
+        ],
+        strength: [
+          {
+            exercise: strengthExercise.value,
+            reps: strengthReps.value,
+            notes: strengthNotes.value
+          }
+        ]
       };
       save(storageKeys.fitness, fitness);
-    }
-
-    function resetFitness() {
-      fitness = {
-        cardio: { exercise: '', time: '', notes: '' },
-        strength: { exercise: '', reps: '', notes: '' }
-      };
-      save(storageKeys.fitness, fitness);
-      renderFitness();
     }
 
     function renderBodyLog() {
@@ -1264,28 +1325,13 @@
       save(storageKeys.bodyLog, bodyLog);
     }
 
-    function resetBodyLog() {
-      bodyLog = {
-        weight: '',
-        bodyFat: '',
-        waist: '',
-        hips: '',
-        chest: '',
-        arms: '',
-        thighs: '',
-        notes: ''
-      };
-      save(storageKeys.bodyLog, bodyLog);
-      renderBodyLog();
-    }
-
     function renderMedication() {
       morningMedicationName.value = medication.morning.name || '';
       morningMedicationTime.value = medication.morning.time || '';
-      morningMedicationTaken.checked = !!medication.morning.taken;
+      morningMedicationTaken.checked = Boolean(medication.morning.taken);
       nightMedicationName.value = medication.night.name || '';
       nightMedicationTime.value = medication.night.time || '';
-      nightMedicationTaken.checked = !!medication.night.taken;
+      nightMedicationTaken.checked = Boolean(medication.night.taken);
     }
 
     function saveMedication() {
@@ -1302,15 +1348,6 @@
         }
       };
       save(storageKeys.medication, medication);
-    }
-
-    function resetMedication() {
-      medication = {
-        morning: { name: '', time: '', taken: false },
-        night: { name: '', time: '', taken: false }
-      };
-      save(storageKeys.medication, medication);
-      renderMedication();
     }
 
     function renderSleep() {
@@ -1332,166 +1369,139 @@
       save(storageKeys.sleep, sleep);
     }
 
-    function resetSleep() {
-      sleep = {
-        bedtime: '',
-        wakeTime: '',
-        hours: '',
-        quality: '',
-        notes: ''
-      };
-      save(storageKeys.sleep, sleep);
-      renderSleep();
+    let breathRunning = false;
+    let breathTimer = null;
+    let breathTimeout = null;
+
+    function updateBreathUI(phase) {
+      if (phase === 'inhale') {
+        breathPhase.textContent = 'Breathe In';
+        breathInstruction.textContent = 'for 5.5 seconds';
+        bubble.style.transform = 'scale(1.12)';
+        breathStatus.textContent = 'Inhale slowly';
+      } else {
+        breathPhase.textContent = 'Breathe Out';
+        breathInstruction.textContent = 'for 5.5 seconds';
+        bubble.style.transform = 'scale(0.92)';
+        breathStatus.textContent = 'Exhale slowly';
+      }
     }
 
-    function formatTime(t) {
-      if (!t) return '';
-      const [h, m] = t.split(':').map(Number);
-      const suffix = h >= 12 ? 'PM' : 'AM';
-      const hour = h % 12 || 12;
-      return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
-    }
+    function runBreathCycle() {
+      if (!breathRunning) return;
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
+      updateBreathUI('inhale');
 
-    function addTask() {
-      const input = document.getElementById('taskInput');
-      const category = document.getElementById('taskCategory');
-      const text = input.value.trim();
-      if (!text) return;
-      tasks.unshift({ id: uid(), text, category: category.value, done: false });
-      input.value = '';
-      save(storageKeys.tasks, tasks);
-      renderTasks();
-    }
+      breathTimeout = setTimeout(() => {
+        if (!breathRunning) return;
+        updateBreathUI('exhale');
 
-    function addSchedule() {
-      const time = document.getElementById('scheduleTime').value;
-      const text = document.getElementById('scheduleText').value.trim();
-      if (!time || !text) return;
-      scheduleItems.push({ id: uid(), time, text });
-      document.getElementById('scheduleTime').value = '';
-      document.getElementById('scheduleText').value = '';
-      save(storageKeys.schedule, scheduleItems);
-      renderSchedule();
-    }
-
-    function addFinance() {
-      const desc = document.getElementById('financeDesc').value.trim();
-      const amount = document.getElementById('financeAmount').value;
-      const type = document.getElementById('financeType').value;
-      if (!desc || !amount) return;
-      finances.push({ id: uid(), desc, amount: Number(amount), type });
-      document.getElementById('financeDesc').value = '';
-      document.getElementById('financeAmount').value = '';
-      save(storageKeys.finances, finances);
-      renderFinances();
-    }
-
-    function resetTasks() {
-      tasks = tasks.map(task => ({ ...task, done: false }));
-      cleaning = cleaning.map(item => ({ ...item, done: false }));
-      save(storageKeys.tasks, tasks);
-      save(storageKeys.cleaning, cleaning);
-      renderTasks();
-      renderCleaning();
-    }
-
-    function addCleaningTask() {
-      const input = document.getElementById('cleaningInput');
-      const text = input.value.trim();
-      if (!text) return;
-      cleaning.unshift({ text, done: false });
-      input.value = '';
-      save(storageKeys.cleaning, cleaning);
-      renderCleaning();
-    }
-
-    function resetCleaningTasks() {
-      cleaning = cleaning.map(item => ({ ...item, done: false }));
-      save(storageKeys.cleaning, cleaning);
-      renderCleaning();
-    }
-
-    function updateBreathingVisual() {
-      const instruction = document.getElementById('breathInstruction');
-      breathPhase.textContent = breathPhaseState === 'inhale' ? 'Breathe In' : 'Breathe Out';
-      instruction.textContent = 'for 5 to 6 seconds';
-      bubble.classList.toggle('running', breathRunning);
-      breathStatus.textContent = breathRunning ? 'Coherent breathing in progress' : 'Ready to begin';
+        breathTimer = setTimeout(() => {
+          runBreathCycle();
+        }, 5500);
+      }, 5500);
     }
 
     function startBreathing() {
       if (breathRunning) return;
       breathRunning = true;
       breathToggleBtn.textContent = 'Pause';
-      breathPhaseState = 'inhale';
-      updateBreathingVisual();
-
-      breathTimer = setInterval(() => {
-        breathPhaseState = breathPhaseState === 'inhale' ? 'exhale' : 'inhale';
-        updateBreathingVisual();
-      }, 5500);
+      runBreathCycle();
     }
 
-    function stopBreathing() {
+    function stopBreathing(showPaused = true) {
       breathRunning = false;
-      clearInterval(breathTimer);
+      clearTimeout(breathTimer);
+      clearTimeout(breathTimeout);
       breathTimer = null;
+      breathTimeout = null;
       breathToggleBtn.textContent = 'Start';
-      breathPhaseState = 'inhale';
-      updateBreathingVisual();
+      if (showPaused) {
+        breathStatus.textContent = 'Paused';
+      }
     }
 
-    document.getElementById('addTaskBtn').addEventListener('click', addTask);
-    document.getElementById('taskInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addTask();
+    function resetBreathing() {
+      stopBreathing(false);
+      bubble.style.transform = 'scale(0.92)';
+      breathPhase.textContent = 'Breathe In';
+      breathInstruction.textContent = 'for 5.5 seconds';
+      breathStatus.textContent = 'Ready to begin';
+    }
+
+    function setViewportHeight() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    document.getElementById('addTaskBtn').addEventListener('click', () => {
+      const input = document.getElementById('taskInput');
+      const category = document.getElementById('taskCategory');
+      const text = input.value.trim();
+      if (!text) return;
+
+      tasks.push({
+        id: uid(),
+        text,
+        category: category.value,
+        done: false
+      });
+      save(storageKeys.tasks, tasks);
+      input.value = '';
+      renderTasks();
     });
 
-    document.getElementById('addScheduleBtn').addEventListener('click', addSchedule);
-    document.getElementById('scheduleText').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addSchedule();
+    document.getElementById('resetTasksBtn').addEventListener('click', () => {
+      tasks = tasks.map(task => ({ ...task, done: false }));
+      save(storageKeys.tasks, tasks);
+      renderTasks();
     });
 
-    document.getElementById('addFinanceBtn').addEventListener('click', addFinance);
-    document.getElementById('financeAmount').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addFinance();
+    document.getElementById('addScheduleBtn').addEventListener('click', () => {
+      const time = document.getElementById('scheduleTime').value;
+      const text = document.getElementById('scheduleText').value.trim();
+      if (!time || !text) return;
+
+      scheduleItems.push({
+        id: uid(),
+        time,
+        text
+      });
+      save(storageKeys.schedule, scheduleItems);
+      document.getElementById('scheduleTime').value = '';
+      document.getElementById('scheduleText').value = '';
+      renderSchedule();
     });
 
-    document.getElementById('resetTasksBtn').addEventListener('click', resetTasks);
-    document.getElementById('addCleaningBtn').addEventListener('click', addCleaningTask);
-    document.getElementById('addMerakiBtn').addEventListener('click', addMerakiTask);
-    document.getElementById('addFamilyBtn').addEventListener('click', addFamilyTask);
-    document.getElementById('resetMerakiBtn').addEventListener('click', resetMerakiTasks);
-    document.getElementById('resetFamilyBtn').addEventListener('click', resetFamilyTasks);
-    document.getElementById('resetMealsBtn').addEventListener('click', resetMeals);
-    document.getElementById('resetFitnessBtn').addEventListener('click', resetFitness);
-    document.getElementById('resetBodyLogBtn').addEventListener('click', resetBodyLog);
-    document.getElementById('resetMedicationBtn').addEventListener('click', resetMedication);
-    document.getElementById('resetSleepBtn').addEventListener('click', resetSleep);
-    document.getElementById('resetCleaningBtn').addEventListener('click', resetCleaningTasks);
-    document.getElementById('cleaningInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addCleaningTask();
-    });
-    document.getElementById('merakiInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addMerakiTask();
-    });
-    document.getElementById('familyInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addFamilyTask();
+    document.getElementById('addFinanceBtn').addEventListener('click', () => {
+      const desc = document.getElementById('financeDesc').value.trim();
+      const amount = Number(document.getElementById('financeAmount').value);
+      const type = document.getElementById('financeType').value;
+
+      if (!desc || !amount) return;
+
+      finances.push({
+        id: uid(),
+        desc,
+        amount,
+        type
+      });
+
+      save(storageKeys.finances, finances);
+      document.getElementById('financeDesc').value = '';
+      document.getElementById('financeAmount').value = '';
+      document.getElementById('financeType').value = 'expense';
+      renderFinances();
     });
 
     document.getElementById('waterAddBtn').addEventListener('click', () => {
-      water.cups += 1;
+      water.cups = Number(water.cups || 0) + 1;
       save(storageKeys.water, water);
       renderWater();
     });
 
     document.getElementById('waterMinusBtn').addEventListener('click', () => {
-      water.cups = Math.max(0, water.cups - 1);
+      water.cups = Math.max(0, Number(water.cups || 0) - 1);
       save(storageKeys.water, water);
       renderWater();
     });
@@ -1504,9 +1514,114 @@
 
     document.getElementById('waterGoalSelect').addEventListener('change', (e) => {
       water.goal = Number(e.target.value);
-      if (water.cups > water.goal) water.cups = water.goal;
       save(storageKeys.water, water);
       renderWater();
+    });
+
+    document.getElementById('addCleaningBtn').addEventListener('click', () => {
+      const input = document.getElementById('cleaningInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      cleaning.push({ text, done: false });
+      save(storageKeys.cleaning, cleaning);
+      input.value = '';
+      renderCleaning();
+    });
+
+    document.getElementById('resetCleaningBtn').addEventListener('click', () => {
+      cleaning = cleaning.map(item => ({ ...item, done: false }));
+      save(storageKeys.cleaning, cleaning);
+      renderCleaning();
+    });
+
+    document.getElementById('addMerakiBtn').addEventListener('click', () => {
+      const input = document.getElementById('merakiInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      meraki.push({ text, done: false });
+      save(storageKeys.meraki, meraki);
+      input.value = '';
+      renderMeraki();
+    });
+
+    document.getElementById('resetMerakiBtn').addEventListener('click', () => {
+      meraki = meraki.map(item => ({ ...item, done: false }));
+      save(storageKeys.meraki, meraki);
+      renderMeraki();
+    });
+
+    document.getElementById('addFamilyBtn').addEventListener('click', () => {
+      const input = document.getElementById('familyInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      family.push({ text, done: false });
+      save(storageKeys.family, family);
+      input.value = '';
+      renderFamily();
+    });
+
+    document.getElementById('resetFamilyBtn').addEventListener('click', () => {
+      family = family.map(item => ({ ...item, done: false }));
+      save(storageKeys.family, family);
+      renderFamily();
+    });
+
+    document.getElementById('resetMealsBtn').addEventListener('click', () => {
+      meals = {
+        breakfast: { meal: '', ingredients: '' },
+        lunch: { meal: '', ingredients: '' },
+        dinner: { meal: '', ingredients: '' }
+      };
+      save(storageKeys.meals, meals);
+      renderMeals();
+    });
+
+    document.getElementById('resetFitnessBtn').addEventListener('click', () => {
+      fitness = {
+        cardio: [{ exercise: '', time: '', notes: '' }],
+        strength: [{ exercise: '', reps: '', notes: '' }]
+      };
+      save(storageKeys.fitness, fitness);
+      renderFitness();
+    });
+
+    document.getElementById('resetBodyLogBtn').addEventListener('click', () => {
+      bodyLog = {
+        weight: '',
+        bodyFat: '',
+        waist: '',
+        hips: '',
+        chest: '',
+        arms: '',
+        thighs: '',
+        notes: ''
+      };
+      save(storageKeys.bodyLog, bodyLog);
+      renderBodyLog();
+    });
+
+    document.getElementById('resetMedicationBtn').addEventListener('click', () => {
+      medication = {
+        morning: { name: '', time: '', taken: false },
+        night: { name: '', time: '', taken: false }
+      };
+      save(storageKeys.medication, medication);
+      renderMedication();
+    });
+
+    document.getElementById('resetSleepBtn').addEventListener('click', () => {
+      sleep = {
+        bedtime: '',
+        wakeTime: '',
+        hours: '',
+        quality: '',
+        notes: ''
+      };
+      save(storageKeys.sleep, sleep);
+      renderSleep();
     });
 
     notesBox.value = load(storageKeys.notes, '');
@@ -1574,14 +1689,24 @@
 
     breathToggleBtn.addEventListener('click', () => {
       if (breathRunning) {
-        stopBreathing();
+        stopBreathing(true);
       } else {
         startBreathing();
       }
     });
 
-    breathResetBtn.addEventListener('click', stopBreathing);
+    breathResetBtn.addEventListener('click', resetBreathing);
 
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', setViewportHeight);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && breathRunning) {
+        stopBreathing(true);
+      }
+    });
+
+    setViewportHeight();
     renderDate();
     renderTasks();
     renderSchedule();
@@ -1595,7 +1720,7 @@
     renderBodyLog();
     renderMedication();
     renderSleep();
-    updateBreathingVisual();
+    resetBreathing();
   </script>
 </body>
 </html>
