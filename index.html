@@ -391,12 +391,22 @@
       padding-bottom: calc(4px + var(--safe-bottom));
     }
 
+    .auth-wrap {
+      max-width: 560px;
+      margin: 20px auto 0;
+      padding:
+        calc(18px + var(--safe-top))
+        calc(14px + var(--safe-right))
+        0
+        calc(14px + var(--safe-left));
+    }
+
     @media (max-width: 980px) {
       .grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 560px) {
-      .app {
+      .app, .auth-wrap {
         padding:
           calc(12px + var(--safe-top))
           calc(10px + var(--safe-right))
@@ -412,7 +422,25 @@
   </style>
 </head>
 <body>
-  <div class="app">
+
+  <div class="auth-wrap" id="authCard">
+    <section class="card">
+      <h2>Sign In</h2>
+      <div class="sub">Use the same email and password on each device to sync your journal across devices.</div>
+      <div class="stack" style="gap: 12px;">
+        <input id="authEmail" type="email" placeholder="Email address" />
+        <input id="authPassword" type="password" placeholder="Password" />
+        <div class="input-row" style="margin-bottom: 0;">
+          <button id="signUpBtn" class="ghost">Create Account</button>
+          <button id="signInBtn">Sign In</button>
+          <button id="signOutBtn" class="ghost" style="display:none;">Sign Out</button>
+        </div>
+        <div class="mini" id="authStatus">Not signed in</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="app" id="appShell" style="display:none;">
     <div class="topbar">
       <div class="title-wrap">
         <h1>My Daily Dashboard</h1>
@@ -424,63 +452,63 @@
     <div class="grid">
       <!-- LEFT COLUMN -->
       <div class="stack">
-       <section class="card">
-  <div class="section-head">
-    <div>
-      <h2>Business Tasks</h2>
-      <div class="sub">Work, Alchemy Body Werks, content, and priorities.</div>
-    </div>
-    <button class="ghost" id="resetBusinessTasksBtn">Reset</button>
-  </div>
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Business Tasks</h2>
+              <div class="sub">Work, Alchemy Body Werks, content, and priorities.</div>
+            </div>
+            <button class="ghost" id="resetBusinessTasksBtn">Reset</button>
+          </div>
 
-  <div class="stack" style="gap: 10px; margin-bottom: 12px;">
-    <a
-      href="https://docs.google.com/spreadsheets/d/1D6q7TkxJlTKZwOfIoh4IgEDrMtr-i8Sv5vNR5IICSnc/edit?usp=sharing"
-      target="_blank"
-      rel="noopener noreferrer"
-      style="
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        width:100%;
-        text-decoration:none;
-        background:var(--accent);
-        color:white;
-        padding:12px 16px;
-        border-radius:14px;
-        font-weight:500;
-      "
-    >
-      Inventory 
-    </a>
+          <div class="stack" style="gap: 10px; margin-bottom: 12px;">
+            <a
+              href="https://docs.google.com/spreadsheets/d/1D6q7TkxJlTKZwOfIoh4IgEDrMtr-i8Sv5vNR5IICSnc/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                width:100%;
+                text-decoration:none;
+                background:var(--accent);
+                color:white;
+                padding:12px 16px;
+                border-radius:14px;
+                font-weight:500;
+              "
+            >
+              Inventory
+            </a>
 
-    <a
-      href="https://docs.google.com/spreadsheets/d/120xRbdgAryktRwWyVW3E3DTeYD628CKT9T9a6UoDs3U/edit?usp=sharing"
-      target="_blank"
-      rel="noopener noreferrer"
-      style="
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        width:100%;
-        text-decoration:none;
-        background:var(--text);
-        color:white;
-        padding:12px 16px;
-        border-radius:14px;
-        font-weight:500;
-      "
-    >
-      Recipes
-    </a>
-  </div>
+            <a
+              href="https://docs.google.com/spreadsheets/d/120xRbdgAryktRwWyVW3E3DTeYD628CKT9T9a6UoDs3U/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                width:100%;
+                text-decoration:none;
+                background:var(--text);
+                color:white;
+                padding:12px 16px;
+                border-radius:14px;
+                font-weight:500;
+              "
+            >
+              Recipes
+            </a>
+          </div>
 
-  <div class="input-row">
-    <input id="businessTaskInput" type="text" placeholder="Add a business task" />
-    <button id="addBusinessTaskBtn">Add</button>
-  </div>
-  <div class="task-list" id="businessTaskList"></div>
-</section>
+          <div class="input-row">
+            <input id="businessTaskInput" type="text" placeholder="Add a business task" />
+            <button id="addBusinessTaskBtn">Add</button>
+          </div>
+          <div class="task-list" id="businessTaskList"></div>
+        </section>
 
         <section class="card">
           <div class="section-head">
@@ -923,8 +951,50 @@
       </div>
     </div>
 
-    <div class="footer-note">Saved on this device automatically.</div>
+    <div class="footer-note">Journal syncs when signed in. Other sections are still saved on this device.</div>
   </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB7A82VMGP00juZFGQO4UzNtdBVSJ4WsYo",
+      authDomain: "my-dashboard-7e226.firebaseapp.com",
+      projectId: "my-dashboard-7e226",
+      storageBucket: "my-dashboard-7e226.firebasestorage.app",
+      messagingSenderId: "285644854859",
+      appId: "1:285644854859:web:9ea327fb231d7002a81fce"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.firebaseAuth = auth;
+    window.db = db;
+    window.firebaseHelpers = {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      doc,
+      setDoc,
+      getDoc
+    };
+  </script>
 
   <script>
     const isStandalone =
@@ -971,6 +1041,15 @@
       } catch (error) {
         return fallback;
       }
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
     }
 
     const defaultCleaning = [
@@ -1062,6 +1141,16 @@
     let breathingActive = false;
     let breathState = 'inhale';
     let breathInterval = null;
+    let currentUser = null;
+
+    const authCard = document.getElementById('authCard');
+    const appShell = document.getElementById('appShell');
+    const authEmail = document.getElementById('authEmail');
+    const authPassword = document.getElementById('authPassword');
+    const signUpBtn = document.getElementById('signUpBtn');
+    const signInBtn = document.getElementById('signInBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const authStatus = document.getElementById('authStatus');
 
     const todayDate = document.getElementById('todayDate');
 
@@ -1175,7 +1264,7 @@
     const breathToggleBtn = document.getElementById('breathToggleBtn');
     const breathResetBtn = document.getElementById('breathResetBtn');
 
-    function formatToday() {
+    function formatDate() {
       const now = new Date();
       todayDate.textContent = now.toLocaleDateString(undefined, {
         weekday: 'long',
@@ -1184,139 +1273,168 @@
       });
     }
 
-    function createTaskItem(task, onToggle, onDelete) {
-      const item = document.createElement('div');
-      item.className = `task-item ${task.done ? 'done' : ''}`;
-
-      item.innerHTML = `
-        <div class="task-top">
-          <label class="task-left">
-            <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
-            <span class="task-text">${task.text}</span>
-          </label>
-          <button class="tiny-btn">Delete</button>
-        </div>
-      `;
-
-      const checkbox = item.querySelector('.check');
-      const deleteBtn = item.querySelector('.tiny-btn');
-
-      checkbox.addEventListener('change', () => onToggle(task.id));
-      deleteBtn.addEventListener('click', () => onDelete(task.id));
-
-      return item;
+    function sortByTime(items) {
+      return [...items].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
     }
 
-    function renderTaskCollection(listEl, collection, saveKey, setCollection) {
-      listEl.innerHTML = '';
-      collection.forEach(task => {
-        listEl.appendChild(createTaskItem(
-          task,
-          id => {
-            const updated = collection.map(item =>
-              item.id === id ? { ...item, done: !item.done } : item
-            );
-            setCollection(updated);
-            save(saveKey, updated);
-            renderAll();
-          },
-          id => {
-            const updated = collection.filter(item => item.id !== id);
-            setCollection(updated);
-            save(saveKey, updated);
+    function renderTaskGroup(listElement, items, storageKey) {
+      listElement.innerHTML = '';
+
+      if (!items.length) {
+        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
+        return;
+      }
+
+      items.forEach((task) => {
+        const div = document.createElement('div');
+        div.className = 'task-item' + (task.done ? ' done' : '');
+
+        div.innerHTML = `
+          <div class="task-top">
+            <label class="task-left">
+              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
+              <span class="task-text">${escapeHtml(task.text)}</span>
+            </label>
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        const checkbox = div.querySelector('.check');
+        const deleteBtn = div.querySelector('.tiny-btn');
+
+        checkbox.addEventListener('change', () => {
+          task.done = checkbox.checked;
+          save(storageKey, items);
+          renderAll();
+        });
+
+        deleteBtn.addEventListener('click', () => {
+          const index = items.findIndex(item => item.id === task.id);
+          if (index > -1) {
+            items.splice(index, 1);
+            save(storageKey, items);
             renderAll();
           }
-        ));
+        });
+
+        listElement.appendChild(div);
       });
     }
 
     function renderBusinessTasks() {
-      renderTaskCollection(
-        businessTaskList,
-        businessTasks,
-        storageKeys.businessTasks,
-        updated => businessTasks = updated
-      );
+      renderTaskGroup(businessTaskList, businessTasks, storageKeys.businessTasks);
     }
 
     function renderPersonalTasks() {
-      renderTaskCollection(
-        personalTaskList,
-        personalTasks,
-        storageKeys.personalTasks,
-        updated => personalTasks = updated
-      );
+      renderTaskGroup(personalTaskList, personalTasks, storageKeys.personalTasks);
     }
 
-    function renderMeraki() {
-      renderTaskCollection(
-        merakiList,
-        meraki,
-        storageKeys.meraki,
-        updated => meraki = updated
-      );
-    }
+    function renderSimpleTaskGroup(listElement, items, storageKey) {
+      listElement.innerHTML = '';
 
-    function renderFamily() {
-      renderTaskCollection(
-        familyList,
-        family,
-        storageKeys.family,
-        updated => family = updated
-      );
-    }
+      if (!items.length) {
+        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
+        return;
+      }
 
-    function renderCleaning() {
-      renderTaskCollection(
-        cleaningList,
-        cleaning,
-        storageKeys.cleaning,
-        updated => cleaning = updated
-      );
-    }
+      items.forEach((task) => {
+        const div = document.createElement('div');
+        div.className = 'task-item' + (task.done ? ' done' : '');
 
-    function createScheduleItem(item, onDelete) {
-      const card = document.createElement('div');
-      card.className = 'schedule-item';
-      card.innerHTML = `
-        <div class="schedule-layout">
-          <div class="schedule-time">${item.time || '—'}</div>
-          <div class="schedule-main">
-            <div>${item.text}</div>
+        div.innerHTML = `
+          <div class="task-top">
+            <label class="task-left">
+              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
+              <span class="task-text">${escapeHtml(task.text)}</span>
+            </label>
+            <button class="tiny-btn">Delete</button>
           </div>
-          <button class="tiny-btn">Delete</button>
-        </div>
-      `;
-      card.querySelector('.tiny-btn').addEventListener('click', () => onDelete(item.id));
-      return card;
+        `;
+
+        const checkbox = div.querySelector('.check');
+        const deleteBtn = div.querySelector('.tiny-btn');
+
+        checkbox.addEventListener('change', () => {
+          task.done = checkbox.checked;
+          save(storageKey, items);
+          renderAll();
+        });
+
+        deleteBtn.addEventListener('click', () => {
+          const index = items.findIndex(item => item.id === task.id);
+          if (index > -1) {
+            items.splice(index, 1);
+            save(storageKey, items);
+            renderAll();
+          }
+        });
+
+        listElement.appendChild(div);
+      });
     }
 
     function renderAppointments() {
       appointmentList.innerHTML = '';
-      appointments
-        .slice()
-        .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
-        .forEach(item => {
-          appointmentList.appendChild(createScheduleItem(item, id => {
-            appointments = appointments.filter(entry => entry.id !== id);
-            save(storageKeys.appointments, appointments);
-            renderAppointments();
-          }));
+      const sorted = sortByTime(appointments);
+
+      if (!sorted.length) {
+        appointmentList.innerHTML = '<div class="mini">No appointments yet.</div>';
+        return;
+      }
+
+      sorted.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'schedule-item';
+        div.innerHTML = `
+          <div class="task-top">
+            <div class="schedule-layout schedule-main">
+              <div class="schedule-time">${escapeHtml(item.time || '—')}</div>
+              <div>${escapeHtml(item.text)}</div>
+            </div>
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        div.querySelector('.tiny-btn').addEventListener('click', () => {
+          appointments = appointments.filter(appt => appt.id !== item.id);
+          save(storageKeys.appointments, appointments);
+          renderAppointments();
         });
+
+        appointmentList.appendChild(div);
+      });
     }
 
     function renderSchedule() {
       scheduleList.innerHTML = '';
-      scheduleItems
-        .slice()
-        .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
-        .forEach(item => {
-          scheduleList.appendChild(createScheduleItem(item, id => {
-            scheduleItems = scheduleItems.filter(entry => entry.id !== id);
-            save(storageKeys.schedule, scheduleItems);
-            renderSchedule();
-          }));
+      const sorted = sortByTime(scheduleItems);
+
+      if (!sorted.length) {
+        scheduleList.innerHTML = '<div class="mini">No schedule items yet.</div>';
+        return;
+      }
+
+      sorted.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'schedule-item';
+        div.innerHTML = `
+          <div class="task-top">
+            <div class="schedule-layout schedule-main">
+              <div class="schedule-time">${escapeHtml(item.time || '—')}</div>
+              <div>${escapeHtml(item.text)}</div>
+            </div>
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        div.querySelector('.tiny-btn').addEventListener('click', () => {
+          scheduleItems = scheduleItems.filter(entry => entry.id !== item.id);
+          save(storageKeys.schedule, scheduleItems);
+          renderSchedule();
         });
+
+        scheduleList.appendChild(div);
+      });
     }
 
     function renderFinances() {
@@ -1324,45 +1442,41 @@
       let income = 0;
       let expenses = 0;
 
-      finances.forEach(entry => {
-        if (entry.type === 'income') income += entry.amount;
-        else expenses += entry.amount;
+      finances.forEach((entry) => {
+        if (entry.type === 'income') {
+          income += entry.amount;
+        } else {
+          expenses += entry.amount;
+        }
 
-        const row = document.createElement('div');
-        row.className = 'finance-item';
-        row.innerHTML = `
+        const div = document.createElement('div');
+        div.className = 'finance-item';
+        div.innerHTML = `
           <div class="finance-top">
             <div>
-              <div><strong>${entry.desc}</strong></div>
-              <div class="mini">${entry.type === 'income' ? 'Income' : 'Expense'}</div>
+              <div><strong>${escapeHtml(entry.desc)}</strong></div>
+              <div class="mini">${escapeHtml(entry.type)}</div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span class="pill">${entry.type === 'income' ? '+' : '-'}$${entry.amount.toFixed(2)}</span>
+              <span class="pill">${entry.type === 'income' ? '+' : '-'}$${Number(entry.amount).toFixed(2)}</span>
               <button class="tiny-btn">Delete</button>
             </div>
           </div>
         `;
-        row.querySelector('.tiny-btn').addEventListener('click', () => {
+
+        div.querySelector('.tiny-btn').addEventListener('click', () => {
           finances = finances.filter(item => item.id !== entry.id);
           save(storageKeys.finances, finances);
           renderFinances();
         });
-        financeList.appendChild(row);
+
+        financeList.appendChild(div);
       });
 
       incomeTotal.textContent = `$${income.toFixed(2)}`;
       expenseTotal.textContent = `$${expenses.toFixed(2)}`;
       balanceTotal.textContent = `$${(income - expenses).toFixed(2)}`;
-      entryCount.textContent = finances.length.toString();
-    }
-
-    function renderWater() {
-      const goal = Number(water.goal) || 8;
-      const cups = Math.max(0, Number(water.cups) || 0);
-      const percent = Math.min(100, (cups / goal) * 100);
-      waterText.textContent = `${cups} / ${goal} cups`;
-      waterFill.style.width = `${percent}%`;
-      waterGoalSelect.value = String(goal);
+      entryCount.textContent = String(finances.length);
     }
 
     function renderMeals() {
@@ -1419,20 +1533,58 @@
       journalEntry.value = journal.journalEntry || '';
     }
 
+    function renderWater() {
+      const goal = Number(water.goal) || 8;
+      const cups = Number(water.cups) || 0;
+      const percent = Math.max(0, Math.min(100, (cups / goal) * 100));
+      waterText.textContent = `${cups} / ${goal} cups`;
+      waterFill.style.width = `${percent}%`;
+      waterGoalSelect.value = String(goal);
+    }
+
+    function renderMeraki() {
+      renderSimpleTaskGroup(merakiList, meraki, storageKeys.meraki);
+    }
+
+    function renderFamily() {
+      renderSimpleTaskGroup(familyList, family, storageKeys.family);
+    }
+
+    function renderCleaning() {
+      renderSimpleTaskGroup(cleaningList, cleaning, storageKeys.cleaning);
+    }
+
+    async function saveCloudDoc(key, value) {
+      if (!currentUser || !window.db || !window.firebaseHelpers) return;
+      const { doc, setDoc } = window.firebaseHelpers;
+      await setDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key), value);
+    }
+
+    async function loadCloudDoc(key, fallback) {
+      if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
+      const { doc, getDoc } = window.firebaseHelpers;
+      const snap = await getDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key));
+      return snap.exists() ? snap.data() : fallback;
+    }
+
+    async function loadUserDataFromCloud() {
+      journal = await loadCloudDoc(storageKeys.journal, {
+        mood: '',
+        dreamTitle: '',
+        dreamEntry: '',
+        journalTitle: '',
+        journalEntry: ''
+      });
+
+      save(storageKeys.journal, journal);
+      renderJournal();
+    }
+
     function saveMeals() {
       meals = {
-        breakfast: {
-          meal: breakfastMeal.value,
-          ingredients: breakfastIngredients.value
-        },
-        lunch: {
-          meal: lunchMeal.value,
-          ingredients: lunchIngredients.value
-        },
-        dinner: {
-          meal: dinnerMeal.value,
-          ingredients: dinnerIngredients.value
-        }
+        breakfast: { meal: breakfastMeal.value, ingredients: breakfastIngredients.value },
+        lunch: { meal: lunchMeal.value, ingredients: lunchIngredients.value },
+        dinner: { meal: dinnerMeal.value, ingredients: dinnerIngredients.value }
       };
       save(storageKeys.meals, meals);
     }
@@ -1490,7 +1642,7 @@
       save(storageKeys.sleep, sleep);
     }
 
-    function saveJournal() {
+    async function saveJournal() {
       journal = {
         mood: moodPicker.value,
         dreamTitle: dreamTitle.value,
@@ -1498,7 +1650,14 @@
         journalTitle: journalTitle.value,
         journalEntry: journalEntry.value
       };
+
       save(storageKeys.journal, journal);
+
+      try {
+        await saveCloudDoc(storageKeys.journal, journal);
+      } catch (error) {
+        console.error('Journal cloud save failed:', error);
+      }
     }
 
     function resetBreathingUI() {
@@ -1543,97 +1702,121 @@
       breathStatus.textContent = 'Paused';
     }
 
+    function setSignedInUI(isSignedIn, email = '') {
+      authCard.style.display = isSignedIn ? 'none' : 'block';
+      appShell.style.display = isSignedIn ? 'block' : 'none';
+      signOutBtn.style.display = isSignedIn ? 'inline-flex' : 'none';
+      authStatus.textContent = isSignedIn ? `Signed in as ${email}` : 'Not signed in';
+    }
+
+    function setupAuth() {
+      const auth = window.firebaseAuth;
+      const helpers = window.firebaseHelpers;
+
+      if (!auth || !helpers) {
+        authStatus.textContent = 'Firebase auth not loaded';
+        return;
+      }
+
+      signUpBtn.addEventListener('click', async () => {
+        try {
+          const cred = await helpers.createUserWithEmailAndPassword(
+            auth,
+            authEmail.value.trim(),
+            authPassword.value
+          );
+          currentUser = cred.user;
+          setSignedInUI(true, currentUser.email || '');
+          await loadUserDataFromCloud();
+          renderAll();
+        } catch (error) {
+          authStatus.textContent = error.message;
+        }
+      });
+
+      signInBtn.addEventListener('click', async () => {
+        try {
+          const cred = await helpers.signInWithEmailAndPassword(
+            auth,
+            authEmail.value.trim(),
+            authPassword.value
+          );
+          currentUser = cred.user;
+          setSignedInUI(true, currentUser.email || '');
+          await loadUserDataFromCloud();
+          renderAll();
+        } catch (error) {
+          authStatus.textContent = error.message;
+        }
+      });
+
+      signOutBtn.addEventListener('click', async () => {
+        try {
+          await helpers.signOut(auth);
+        } catch (error) {
+          authStatus.textContent = error.message;
+        }
+      });
+
+      helpers.onAuthStateChanged(auth, async (user) => {
+        currentUser = user || null;
+        if (currentUser) {
+          setSignedInUI(true, currentUser.email || '');
+          await loadUserDataFromCloud();
+          renderAll();
+        } else {
+          setSignedInUI(false);
+        }
+      });
+    }
+
     function renderAll() {
-      formatToday();
+      formatDate();
       renderBusinessTasks();
       renderPersonalTasks();
       renderAppointments();
       renderSchedule();
       renderFinances();
-      renderWater();
-      renderCleaning();
       renderMeals();
-      renderMeraki();
-      renderFamily();
       renderFitness();
       renderBodyLog();
       renderMedication();
       renderSleep();
       renderJournal();
+      renderWater();
+      renderMeraki();
+      renderFamily();
+      renderCleaning();
       notesBox.value = notes;
     }
 
-    function addTask(inputEl, collection, saveKey, setter, renderer) {
-      const text = inputEl.value.trim();
-      if (!text) return;
-      const updated = [...collection, { id: uid(), text, done: false }];
-      setter(updated);
-      save(saveKey, updated);
+    function addTask(targetArray, inputEl, storageKey, renderFn) {
+      const value = inputEl.value.trim();
+      if (!value) return;
+      targetArray.push({ id: uid(), text: value, done: false });
+      save(storageKey, targetArray);
       inputEl.value = '';
-      renderer();
+      renderFn();
     }
 
     addBusinessTaskBtn.addEventListener('click', () => {
-      addTask(
-        businessTaskInput,
-        businessTasks,
-        storageKeys.businessTasks,
-        updated => businessTasks = updated,
-        renderBusinessTasks
-      );
+      addTask(businessTasks, businessTaskInput, storageKeys.businessTasks, renderBusinessTasks);
     });
 
     addPersonalTaskBtn.addEventListener('click', () => {
-      addTask(
-        personalTaskInput,
-        personalTasks,
-        storageKeys.personalTasks,
-        updated => personalTasks = updated,
-        renderPersonalTasks
-      );
+      addTask(personalTasks, personalTaskInput, storageKeys.personalTasks, renderPersonalTasks);
     });
 
     addMerakiBtn.addEventListener('click', () => {
-      addTask(
-        merakiInput,
-        meraki,
-        storageKeys.meraki,
-        updated => meraki = updated,
-        renderMeraki
-      );
+      addTask(meraki, merakiInput, storageKeys.meraki, renderMeraki);
     });
 
     addFamilyBtn.addEventListener('click', () => {
-      addTask(
-        familyInput,
-        family,
-        storageKeys.family,
-        updated => family = updated,
-        renderFamily
-      );
+      addTask(family, familyInput, storageKeys.family, renderFamily);
     });
 
     addCleaningBtn.addEventListener('click', () => {
-      addTask(
-        cleaningInput,
-        cleaning,
-        storageKeys.cleaning,
-        updated => cleaning = updated,
-        renderCleaning
-      );
-    });
-
-    [businessTaskInput, personalTaskInput, merakiInput, familyInput, cleaningInput].forEach((inputEl, index) => {
-      const buttons = [
-        addBusinessTaskBtn,
-        addPersonalTaskBtn,
-        addMerakiBtn,
-        addFamilyBtn,
-        addCleaningBtn
-      ];
-      inputEl.addEventListener('keydown', event => {
-        if (event.key === 'Enter') buttons[index].click();
-      });
+      addTask(cleaning, cleaningInput, storageKeys.cleaning, renderCleaning);
     });
 
     addAppointmentBtn.addEventListener('click', () => {
@@ -1656,27 +1839,25 @@
       renderSchedule();
     });
 
-    [appointmentText, scheduleText].forEach((inputEl, index) => {
-      const buttons = [addAppointmentBtn, addScheduleBtn];
-      inputEl.addEventListener('keydown', event => {
-        if (event.key === 'Enter') buttons[index].click();
-      });
-    });
-
     addFinanceBtn.addEventListener('click', () => {
       const desc = financeDesc.value.trim();
       const amount = Number(financeAmount.value);
-      if (!desc || !amount) return;
+
+      if (!desc || Number.isNaN(amount) || amount <= 0) return;
+
       finances.unshift({
         id: uid(),
         desc,
         amount,
         type: financeType.value
       });
+
       save(storageKeys.finances, finances);
+
       financeDesc.value = '';
       financeAmount.value = '';
       financeType.value = 'expense';
+
       renderFinances();
     });
 
@@ -1849,7 +2030,7 @@
       renderSleep();
     });
 
-    document.getElementById('resetJournalBtn').addEventListener('click', () => {
+    document.getElementById('resetJournalBtn').addEventListener('click', async () => {
       journal = {
         mood: '',
         dreamTitle: '',
@@ -1858,35 +2039,40 @@
         journalEntry: ''
       };
       save(storageKeys.journal, journal);
+      try {
+        await saveCloudDoc(storageKeys.journal, journal);
+      } catch (error) {
+        console.error('Journal cloud reset failed:', error);
+      }
       renderJournal();
     });
 
-    renderAll();
+    [businessTaskInput, personalTaskInput, merakiInput, familyInput, cleaningInput].forEach((input, index) => {
+      const buttonMap = [
+        addBusinessTaskBtn,
+        addPersonalTaskBtn,
+        addMerakiBtn,
+        addFamilyBtn,
+        addCleaningBtn
+      ];
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          buttonMap[index].click();
+        }
+      });
+    });
+
+    [appointmentText, scheduleText, financeDesc].forEach((input, index) => {
+      const buttonMap = [addAppointmentBtn, addScheduleBtn, addFinanceBtn];
+      input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          buttonMap[index].click();
+        }
+      });
+    });
+
     resetBreathingUI();
+    setupAuth();
   </script>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyB7A82VMGP00juZFGQO4UzNtdBVSJ4WsYo",
-    authDomain: "my-dashboard-7e226.firebaseapp.com",
-    projectId: "my-dashboard-7e226",
-    storageBucket: "my-dashboard-7e226.firebasestorage.app",
-    messagingSenderId: "285644854859",
-    appId: "1:285644854859:web:9ea327fb231d7002a81fce",
-    measurementId: "G-YYV7PEZY0K"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-  
 </body>
 </html>
