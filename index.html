@@ -113,6 +113,8 @@
       gap: 16px;
     }
 
+    .stack { display: grid; gap: 16px; }
+
     .card {
       background: var(--card);
       border: 1px solid var(--line);
@@ -134,8 +136,6 @@
       font-size: 0.92rem;
       margin-bottom: 14px;
     }
-
-    .stack { display: grid; gap: 16px; }
 
     .section-head {
       display: flex;
@@ -219,7 +219,7 @@
       background: rgba(255,255,255,0.82);
     }
 
-    .task-top, .schedule-top, .finance-top {
+    .task-top, .finance-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -369,13 +369,18 @@
 
     .schedule-time {
       font-weight: 700;
-      min-width: 78px;
+      min-width: 82px;
+      color: var(--text);
     }
 
     .schedule-layout {
       display: flex;
       gap: 10px;
       align-items: flex-start;
+    }
+
+    .schedule-main {
+      flex: 1;
     }
 
     .footer-note {
@@ -417,31 +422,62 @@
     </div>
 
     <div class="grid">
+      <!-- LEFT COLUMN -->
       <div class="stack">
         <section class="card">
           <div class="section-head">
             <div>
-              <h2>Tasks</h2>
-              <div class="sub">One place for daily to-dos.</div>
+              <h2>Business Tasks</h2>
+              <div class="sub">Work, Alchemy Body Werks, content, and priorities.</div>
             </div>
-            <button class="ghost" id="resetTasksBtn">Reset</button>
+            <button class="ghost" id="resetBusinessTasksBtn">Reset</button>
           </div>
           <div class="input-row">
-            <input id="taskInput" type="text" placeholder="Add a task" />
-            <select id="taskCategory">
-              <option value="Daily">Daily</option>
-              <option value="Work">Work</option>
-              <option value="Home">Home</option>
-              <option value="Personal">Personal</option>
-            </select>
-            <button id="addTaskBtn">Add</button>
+            <input id="businessTaskInput" type="text" placeholder="Add a business task" />
+            <button id="addBusinessTaskBtn">Add</button>
           </div>
-          <div class="task-list" id="taskList"></div>
+          <div class="task-list" id="businessTaskList"></div>
         </section>
 
         <section class="card">
-          <h2>Schedule</h2>
-          <div class="sub">Keep your day visible at a glance.</div>
+          <div class="section-head">
+            <div>
+              <h2>Personal Tasks</h2>
+              <div class="sub">Life, wellness, home, and routines.</div>
+            </div>
+            <button class="ghost" id="resetPersonalTasksBtn">Reset</button>
+          </div>
+          <div class="input-row">
+            <input id="personalTaskInput" type="text" placeholder="Add a personal task" />
+            <button id="addPersonalTaskBtn">Add</button>
+          </div>
+          <div class="task-list" id="personalTaskList"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Appointments</h2>
+              <div class="sub">Meetings, calls, reminders, and time-based events.</div>
+            </div>
+            <button class="ghost" id="resetAppointmentsBtn">Reset</button>
+          </div>
+          <div class="input-row">
+            <input id="appointmentTime" type="time" />
+            <input id="appointmentText" type="text" placeholder="Appointment details" />
+            <button id="addAppointmentBtn">Add</button>
+          </div>
+          <div class="schedule-list" id="appointmentList"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
+              <h2>Schedule</h2>
+              <div class="sub">Keep your day visible at a glance.</div>
+            </div>
+            <button class="ghost" id="resetScheduleBtn">Reset</button>
+          </div>
           <div class="input-row">
             <input id="scheduleTime" type="time" />
             <input id="scheduleText" type="text" placeholder="What is happening?" />
@@ -451,6 +487,7 @@
         </section>
       </div>
 
+      <!-- MIDDLE COLUMN -->
       <div class="stack">
         <section class="card">
           <h2>Finances</h2>
@@ -734,6 +771,7 @@
         </section>
       </div>
 
+      <!-- RIGHT COLUMN -->
       <div class="stack">
         <section class="card">
           <h2>Breathing</h2>
@@ -782,12 +820,16 @@
         </section>
 
         <section class="card">
-          <h2>Cleaning Focus</h2>
-          <div class="sub">A short list for upkeep without overwhelm.</div>
+          <div class="section-head">
+            <div>
+              <h2>Cleaning Focus</h2>
+              <div class="sub">A short list for upkeep without overwhelm.</div>
+            </div>
+            <button class="ghost" id="resetCleaningBtn">Reset</button>
+          </div>
           <div class="input-row">
             <input id="cleaningInput" type="text" placeholder="Add a cleaning task" />
             <button id="addCleaningBtn">Add</button>
-            <button class="ghost" id="resetCleaningBtn">Reset</button>
           </div>
           <div class="task-list" id="cleaningList"></div>
         </section>
@@ -809,7 +851,9 @@
     });
 
     const storageKeys = {
-      tasks: 'simpleDashboardTasks',
+      businessTasks: 'simpleDashboardBusinessTasks',
+      personalTasks: 'simpleDashboardPersonalTasks',
+      appointments: 'simpleDashboardAppointments',
       schedule: 'simpleDashboardSchedule',
       finances: 'simpleDashboardFinances',
       water: 'simpleDashboardWater',
@@ -824,30 +868,51 @@
       sleep: 'simpleDashboardSleep'
     };
 
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+    }
+
+    function save(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function load(key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
     const defaultCleaning = [
-      { text: 'Make bed', done: false },
-      { text: 'Wipe kitchen counters', done: false },
-      { text: '15-minute tidy', done: false },
-      { text: 'Check one laundry load', done: false }
+      { id: uid(), text: 'Make bed', done: false },
+      { id: uid(), text: 'Wipe kitchen counters', done: false },
+      { id: uid(), text: '15-minute tidy', done: false },
+      { id: uid(), text: 'Check one laundry load', done: false }
     ];
 
-    let tasks = load(storageKeys.tasks, [
-      { id: uid(), text: 'Review today’s priorities', category: 'Daily', done: false },
-      { id: uid(), text: 'Journal', category: 'Daily', done: false },
-      { id: uid(), text: 'Read', category: 'Daily', done: false },
-      { id: uid(), text: 'Shower', category: 'Daily', done: false },
-      { id: uid(), text: 'Brush teeth', category: 'Daily', done: false },
-      { id: uid(), text: 'Check email', category: 'Work', done: false },
-      { id: uid(), text: 'Check social media', category: 'Work', done: false },
-      { id: uid(), text: 'Learn something', category: 'Personal', done: false },
-      { id: uid(), text: 'Yoga & Meditation', category: 'Personal', done: false },
-      { id: uid(), text: 'Pay bills', category: 'Home', done: false }
+    let businessTasks = load(storageKeys.businessTasks, [
+      { id: uid(), text: 'Check email', done: false },
+      { id: uid(), text: 'Check social media', done: false },
+      { id: uid(), text: 'Create content', done: false },
+      { id: uid(), text: 'Follow up on orders', done: false }
     ]);
 
+    let personalTasks = load(storageKeys.personalTasks, [
+      { id: uid(), text: 'Journal', done: false },
+      { id: uid(), text: 'Read', done: false },
+      { id: uid(), text: 'Shower', done: false },
+      { id: uid(), text: 'Brush teeth', done: false },
+      { id: uid(), text: 'Learn something', done: false },
+      { id: uid(), text: 'Yoga & Meditation', done: false },
+      { id: uid(), text: 'Pay bills', done: false }
+    ]);
+
+    let appointments = load(storageKeys.appointments, []);
     let scheduleItems = load(storageKeys.schedule, [
       { id: uid(), time: '08:00', text: 'Start the day' }
     ]);
-
     let finances = load(storageKeys.finances, []);
     let water = load(storageKeys.water, { cups: 0, goal: 8 });
     let cleaning = load(storageKeys.cleaning, defaultCleaning);
@@ -857,26 +922,25 @@
       dinner: { meal: '', ingredients: '' }
     });
     let meraki = load(storageKeys.meraki, [
-      { text: 'Take a bath', done: false },
-      { text: 'Brush teeth', done: false },
-      { text: 'Do homework', done: false },
-      { text: 'Get on and off the bus', done: false },
-      { text: 'School', done: false }
+      { id: uid(), text: 'Take a bath', done: false },
+      { id: uid(), text: 'Brush teeth', done: false },
+      { id: uid(), text: 'Do homework', done: false },
+      { id: uid(), text: 'Get on and off the bus', done: false },
+      { id: uid(), text: 'School', done: false }
     ]);
     let family = load(storageKeys.family, [
-      { text: 'Family time', done: false },
-      { text: 'Take out trash', done: false },
-      { text: 'Feed cats', done: false },
-      { text: 'Clean cat litter', done: false }
+      { id: uid(), text: 'Family time', done: false },
+      { id: uid(), text: 'Take out trash', done: false },
+      { id: uid(), text: 'Feed cats', done: false },
+      { id: uid(), text: 'Clean cat litter', done: false }
     ]);
     let fitness = load(storageKeys.fitness, {
-      cardio: [
-        { exercise: 'Walking', time: '', notes: '' },
-        { exercise: 'Stretching', time: '', notes: '' }
-      ],
-      strength: [
-        { exercise: 'Squats', reps: '', notes: '' }
-      ]
+      cardioExercise: 'Walking',
+      cardioTime: '',
+      cardioNotes: '',
+      strengthExercise: 'Squats',
+      strengthReps: '',
+      strengthNotes: ''
     });
     let bodyLog = load(storageKeys.bodyLog, {
       weight: '',
@@ -901,7 +965,9 @@
     });
 
     const todayDate = document.getElementById('todayDate');
-    const taskList = document.getElementById('taskList');
+    const businessTaskList = document.getElementById('businessTaskList');
+    const personalTaskList = document.getElementById('personalTaskList');
+    const appointmentList = document.getElementById('appointmentList');
     const scheduleList = document.getElementById('scheduleList');
     const financeList = document.getElementById('financeList');
     const notesBox = document.getElementById('notesBox');
@@ -941,307 +1007,233 @@
     const sleepHours = document.getElementById('sleepHours');
     const sleepQuality = document.getElementById('sleepQuality');
     const sleepNotes = document.getElementById('sleepNotes');
-    const incomeTotal = document.getElementById('incomeTotal');
-    const expenseTotal = document.getElementById('expenseTotal');
-    const balanceTotal = document.getElementById('balanceTotal');
-    const entryCount = document.getElementById('entryCount');
+    const waterGoalSelect = document.getElementById('waterGoalSelect');
 
-    const bubble = document.getElementById('bubble');
-    const breathPhase = document.getElementById('breathPhase');
-    const breathInstruction = document.getElementById('breathInstruction');
-    const breathStatus = document.getElementById('breathStatus');
-    const breathToggleBtn = document.getElementById('breathToggleBtn');
-    const breathResetBtn = document.getElementById('breathResetBtn');
-
-    function uid() {
-      return Math.random().toString(36).slice(2, 10);
-    }
-
-    function load(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
-      } catch {
-        return fallback;
-      }
-    }
-
-    function save(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function formatCurrency(n) {
-      return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-      }).format(Number(n || 0));
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function formatTime(time) {
-      if (!time) return '';
-      const [hour, minute] = time.split(':');
-      const h = Number(hour);
-      const suffix = h >= 12 ? 'PM' : 'AM';
-      const normalized = h % 12 || 12;
-      return `${normalized}:${minute} ${suffix}`;
-    }
-
-    function renderDate() {
+    function formatDate() {
       const now = new Date();
-      todayDate.textContent = now.toLocaleDateString('en-US', {
+      todayDate.textContent = now.toLocaleDateString(undefined, {
         weekday: 'long',
         month: 'long',
         day: 'numeric'
       });
     }
 
-    function renderTasks() {
-      taskList.innerHTML = '';
-      if (!tasks.length) {
-        taskList.innerHTML = '<div class="mini">No tasks yet.</div>';
+    function sortByTime(items) {
+      return [...items].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    }
+
+    function renderTaskGroup(listElement, items, storageKey, resetRefName) {
+      listElement.innerHTML = '';
+
+      if (!items.length) {
+        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
         return;
       }
 
-      tasks.forEach(task => {
-        const item = document.createElement('div');
-        item.className = `task-item ${task.done ? 'done' : ''}`;
-        item.innerHTML = `
+      items.forEach((task) => {
+        const div = document.createElement('div');
+        div.className = 'task-item' + (task.done ? ' done' : '');
+
+        div.innerHTML = `
           <div class="task-top">
-            <div class="task-left">
+            <label class="task-left">
               <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
-              <div class="task-text">${escapeHtml(task.text)}</div>
-            </div>
-            <span class="pill">${escapeHtml(task.category)}</span>
-          </div>
-          <div style="display:flex; justify-content:flex-end; margin-top:10px;">
+              <span class="task-text">${escapeHtml(task.text)}</span>
+            </label>
             <button class="tiny-btn">Delete</button>
           </div>
         `;
 
-        item.querySelector('.check').addEventListener('change', () => {
-          task.done = !task.done;
-          save(storageKeys.tasks, tasks);
-          renderTasks();
+        const checkbox = div.querySelector('.check');
+        const deleteBtn = div.querySelector('.tiny-btn');
+
+        checkbox.addEventListener('change', () => {
+          task.done = checkbox.checked;
+          save(storageKey, items);
+          renderAll();
         });
 
-        item.querySelector('.tiny-btn').addEventListener('click', () => {
-          tasks = tasks.filter(t => t.id !== task.id);
-          save(storageKeys.tasks, tasks);
-          renderTasks();
+        deleteBtn.addEventListener('click', () => {
+          const index = items.findIndex(item => item.id === task.id);
+          if (index > -1) {
+            items.splice(index, 1);
+            save(storageKey, items);
+            renderAll();
+          }
         });
 
-        taskList.appendChild(item);
+        listElement.appendChild(div);
+      });
+    }
+
+    function renderBusinessTasks() {
+      renderTaskGroup(businessTaskList, businessTasks, storageKeys.businessTasks);
+    }
+
+    function renderPersonalTasks() {
+      renderTaskGroup(personalTaskList, personalTasks, storageKeys.personalTasks);
+    }
+
+    function renderSimpleTaskGroup(listElement, items, storageKey) {
+      listElement.innerHTML = '';
+
+      if (!items.length) {
+        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
+        return;
+      }
+
+      items.forEach((task) => {
+        const div = document.createElement('div');
+        div.className = 'task-item' + (task.done ? ' done' : '');
+
+        div.innerHTML = `
+          <div class="task-top">
+            <label class="task-left">
+              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
+              <span class="task-text">${escapeHtml(task.text)}</span>
+            </label>
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        const checkbox = div.querySelector('.check');
+        const deleteBtn = div.querySelector('.tiny-btn');
+
+        checkbox.addEventListener('change', () => {
+          task.done = checkbox.checked;
+          save(storageKey, items);
+          renderAll();
+        });
+
+        deleteBtn.addEventListener('click', () => {
+          const index = items.findIndex(item => item.id === task.id);
+          if (index > -1) {
+            items.splice(index, 1);
+            save(storageKey, items);
+            renderAll();
+          }
+        });
+
+        listElement.appendChild(div);
+      });
+    }
+
+    function renderAppointments() {
+      appointmentList.innerHTML = '';
+      const sorted = sortByTime(appointments);
+
+      if (!sorted.length) {
+        appointmentList.innerHTML = '<div class="mini">No appointments yet.</div>';
+        return;
+      }
+
+      sorted.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'schedule-item';
+        div.innerHTML = `
+          <div class="task-top">
+            <div class="schedule-layout schedule-main">
+              <div class="schedule-time">${escapeHtml(item.time)}</div>
+              <div>${escapeHtml(item.text)}</div>
+            </div>
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
+
+        div.querySelector('.tiny-btn').addEventListener('click', () => {
+          appointments = appointments.filter(appt => appt.id !== item.id);
+          save(storageKeys.appointments, appointments);
+          renderAppointments();
+        });
+
+        appointmentList.appendChild(div);
       });
     }
 
     function renderSchedule() {
       scheduleList.innerHTML = '';
-      if (!scheduleItems.length) {
+      const sorted = sortByTime(scheduleItems);
+
+      if (!sorted.length) {
         scheduleList.innerHTML = '<div class="mini">No schedule items yet.</div>';
         return;
       }
 
-      [...scheduleItems]
-        .sort((a, b) => a.time.localeCompare(b.time))
-        .forEach(item => {
-          const el = document.createElement('div');
-          el.className = 'schedule-item';
-          el.innerHTML = `
-            <div class="schedule-top">
-              <div class="schedule-layout">
-                <div class="schedule-time">${formatTime(item.time)}</div>
-                <div>${escapeHtml(item.text)}</div>
-              </div>
-              <button class="tiny-btn">Delete</button>
+      sorted.forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'schedule-item';
+        div.innerHTML = `
+          <div class="task-top">
+            <div class="schedule-layout schedule-main">
+              <div class="schedule-time">${escapeHtml(item.time)}</div>
+              <div>${escapeHtml(item.text)}</div>
             </div>
-          `;
+            <button class="tiny-btn">Delete</button>
+          </div>
+        `;
 
-          el.querySelector('.tiny-btn').addEventListener('click', () => {
-            scheduleItems = scheduleItems.filter(s => s.id !== item.id);
-            save(storageKeys.schedule, scheduleItems);
-            renderSchedule();
-          });
-
-          scheduleList.appendChild(el);
+        div.querySelector('.tiny-btn').addEventListener('click', () => {
+          scheduleItems = scheduleItems.filter(entry => entry.id !== item.id);
+          save(storageKeys.schedule, scheduleItems);
+          renderSchedule();
         });
+
+        scheduleList.appendChild(div);
+      });
     }
 
     function renderFinances() {
       financeList.innerHTML = '';
 
-      let income = 0;
-      let expenses = 0;
+      const income = finances
+        .filter(item => item.type === 'income')
+        .reduce((sum, item) => sum + Number(item.amount), 0);
 
-      finances.forEach(entry => {
-        if (entry.type === 'income') {
-          income += Number(entry.amount || 0);
-        } else {
-          expenses += Number(entry.amount || 0);
-        }
-      });
+      const expenses = finances
+        .filter(item => item.type === 'expense')
+        .reduce((sum, item) => sum + Number(item.amount), 0);
 
-      incomeTotal.textContent = formatCurrency(income);
-      expenseTotal.textContent = formatCurrency(expenses);
-      balanceTotal.textContent = formatCurrency(income - expenses);
-      entryCount.textContent = String(finances.length);
+      document.getElementById('incomeTotal').textContent = formatCurrency(income);
+      document.getElementById('expenseTotal').textContent = formatCurrency(expenses);
+      document.getElementById('balanceTotal').textContent = formatCurrency(income - expenses);
+      document.getElementById('entryCount').textContent = finances.length;
 
       if (!finances.length) {
         financeList.innerHTML = '<div class="mini">No finance entries yet.</div>';
         return;
       }
 
-      [...finances]
-        .reverse()
-        .forEach(entry => {
-          const item = document.createElement('div');
-          item.className = 'finance-item';
-          item.innerHTML = `
-            <div class="finance-top">
-              <div>
-                <div style="font-weight:600;">${escapeHtml(entry.desc)}</div>
-                <div class="mini">${entry.type === 'income' ? 'Income' : 'Expense'} • ${formatCurrency(entry.amount)}</div>
-              </div>
+      [...finances].reverse().forEach((item) => {
+        const div = document.createElement('div');
+        div.className = 'finance-item';
+        div.innerHTML = `
+          <div class="finance-top">
+            <div>
+              <div><strong>${escapeHtml(item.desc)}</strong></div>
+              <div class="mini">${item.type === 'income' ? 'Income' : 'Expense'}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="pill">${formatCurrency(item.amount)}</span>
               <button class="tiny-btn">Delete</button>
             </div>
-          `;
+          </div>
+        `;
 
-          item.querySelector('.tiny-btn').addEventListener('click', () => {
-            finances = finances.filter(f => f.id !== entry.id);
-            save(storageKeys.finances, finances);
-            renderFinances();
-          });
-
-          financeList.appendChild(item);
+        div.querySelector('.tiny-btn').addEventListener('click', () => {
+          finances = finances.filter(entry => entry.id !== item.id);
+          save(storageKeys.finances, finances);
+          renderFinances();
         });
+
+        financeList.appendChild(div);
+      });
     }
 
     function renderWater() {
-      const cups = Number(water.cups || 0);
-      const goal = Number(water.goal || 8);
-      const pct = Math.max(0, Math.min(100, (cups / goal) * 100));
-
-      waterFill.style.width = `${pct}%`;
-      waterText.textContent = `${cups} / ${goal} cups`;
-
-      const goalSelect = document.getElementById('waterGoalSelect');
-      goalSelect.value = String(goal);
-    }
-
-    function renderCleaning() {
-      cleaningList.innerHTML = '';
-      if (!cleaning.length) {
-        cleaningList.innerHTML = '<div class="mini">No cleaning tasks yet.</div>';
-        return;
-      }
-
-      cleaning.forEach((itemData, index) => {
-        const item = document.createElement('div');
-        item.className = `task-item ${itemData.done ? 'done' : ''}`;
-        item.innerHTML = `
-          <div class="task-top">
-            <div class="task-left">
-              <input class="check" type="checkbox" ${itemData.done ? 'checked' : ''} />
-              <div class="task-text">${escapeHtml(itemData.text)}</div>
-            </div>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        item.querySelector('.check').addEventListener('change', () => {
-          cleaning[index].done = !cleaning[index].done;
-          save(storageKeys.cleaning, cleaning);
-          renderCleaning();
-        });
-
-        item.querySelector('.tiny-btn').addEventListener('click', () => {
-          cleaning.splice(index, 1);
-          save(storageKeys.cleaning, cleaning);
-          renderCleaning();
-        });
-
-        cleaningList.appendChild(item);
-      });
-    }
-
-    function renderMeraki() {
-      merakiList.innerHTML = '';
-      if (!meraki.length) {
-        merakiList.innerHTML = '<div class="mini">No routine tasks yet.</div>';
-        return;
-      }
-
-      meraki.forEach((itemData, index) => {
-        const item = document.createElement('div');
-        item.className = `task-item ${itemData.done ? 'done' : ''}`;
-        item.innerHTML = `
-          <div class="task-top">
-            <div class="task-left">
-              <input class="check" type="checkbox" ${itemData.done ? 'checked' : ''} />
-              <div class="task-text">${escapeHtml(itemData.text)}</div>
-            </div>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        item.querySelector('.check').addEventListener('change', () => {
-          meraki[index].done = !meraki[index].done;
-          save(storageKeys.meraki, meraki);
-          renderMeraki();
-        });
-
-        item.querySelector('.tiny-btn').addEventListener('click', () => {
-          meraki.splice(index, 1);
-          save(storageKeys.meraki, meraki);
-          renderMeraki();
-        });
-
-        merakiList.appendChild(item);
-      });
-    }
-
-    function renderFamily() {
-      familyList.innerHTML = '';
-      if (!family.length) {
-        familyList.innerHTML = '<div class="mini">No family tasks yet.</div>';
-        return;
-      }
-
-      family.forEach((itemData, index) => {
-        const item = document.createElement('div');
-        item.className = `task-item ${itemData.done ? 'done' : ''}`;
-        item.innerHTML = `
-          <div class="task-top">
-            <div class="task-left">
-              <input class="check" type="checkbox" ${itemData.done ? 'checked' : ''} />
-              <div class="task-text">${escapeHtml(itemData.text)}</div>
-            </div>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        item.querySelector('.check').addEventListener('change', () => {
-          family[index].done = !family[index].done;
-          save(storageKeys.family, family);
-          renderFamily();
-        });
-
-        item.querySelector('.tiny-btn').addEventListener('click', () => {
-          family.splice(index, 1);
-          save(storageKeys.family, family);
-          renderFamily();
-        });
-
-        familyList.appendChild(item);
-      });
+      waterGoalSelect.value = String(water.goal);
+      const percent = Math.max(0, Math.min(100, (water.cups / water.goal) * 100));
+      waterFill.style.width = `${percent}%`;
+      waterText.textContent = `${water.cups} / ${water.goal} cups`;
     }
 
     function renderMeals() {
@@ -1252,6 +1244,192 @@
       dinnerMeal.value = meals.dinner.meal || '';
       dinnerIngredients.value = meals.dinner.ingredients || '';
     }
+
+    function renderFitness() {
+      cardioExercise.value = fitness.cardioExercise || '';
+      cardioTime.value = fitness.cardioTime || '';
+      cardioNotes.value = fitness.cardioNotes || '';
+      strengthExercise.value = fitness.strengthExercise || '';
+      strengthReps.value = fitness.strengthReps || '';
+      strengthNotes.value = fitness.strengthNotes || '';
+    }
+
+    function renderBodyLog() {
+      logWeight.value = bodyLog.weight || '';
+      logBodyFat.value = bodyLog.bodyFat || '';
+      logWaist.value = bodyLog.waist || '';
+      logHips.value = bodyLog.hips || '';
+      logChest.value = bodyLog.chest || '';
+      logArms.value = bodyLog.arms || '';
+      logThighs.value = bodyLog.thighs || '';
+      logNotes.value = bodyLog.notes || '';
+    }
+
+    function renderMedication() {
+      morningMedicationName.value = medication.morning.name || '';
+      morningMedicationTime.value = medication.morning.time || '';
+      morningMedicationTaken.checked = !!medication.morning.taken;
+      nightMedicationName.value = medication.night.name || '';
+      nightMedicationTime.value = medication.night.time || '';
+      nightMedicationTaken.checked = !!medication.night.taken;
+    }
+
+    function renderSleep() {
+      sleepBedtime.value = sleep.bedtime || '';
+      sleepWakeTime.value = sleep.wakeTime || '';
+      sleepHours.value = sleep.hours || '';
+      sleepQuality.value = sleep.quality || '';
+      sleepNotes.value = sleep.notes || '';
+    }
+
+    function renderNotes() {
+      notesBox.value = localStorage.getItem(storageKeys.notes) || '';
+    }
+
+    function renderCleaning() {
+      renderSimpleTaskGroup(cleaningList, cleaning, storageKeys.cleaning);
+    }
+
+    function renderMeraki() {
+      renderSimpleTaskGroup(merakiList, meraki, storageKeys.meraki);
+    }
+
+    function renderFamily() {
+      renderSimpleTaskGroup(familyList, family, storageKeys.family);
+    }
+
+    function renderAll() {
+      formatDate();
+      renderBusinessTasks();
+      renderPersonalTasks();
+      renderAppointments();
+      renderSchedule();
+      renderFinances();
+      renderWater();
+      renderMeals();
+      renderFitness();
+      renderBodyLog();
+      renderMedication();
+      renderSleep();
+      renderNotes();
+      renderCleaning();
+      renderMeraki();
+      renderFamily();
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(value) || 0);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function addTask(inputId, collection, storageKey, renderFn) {
+      const input = document.getElementById(inputId);
+      const text = input.value.trim();
+      if (!text) return;
+
+      collection.push({
+        id: uid(),
+        text,
+        done: false
+      });
+
+      save(storageKey, collection);
+      input.value = '';
+      renderFn();
+    }
+
+    function addScheduleItem(timeId, textId, collection, storageKey, renderFn) {
+      const time = document.getElementById(timeId).value;
+      const text = document.getElementById(textId).value.trim();
+      if (!time || !text) return;
+
+      collection.push({
+        id: uid(),
+        time,
+        text
+      });
+
+      save(storageKey, collection);
+      document.getElementById(timeId).value = '';
+      document.getElementById(textId).value = '';
+      renderFn();
+    }
+
+    document.getElementById('addBusinessTaskBtn').addEventListener('click', () => {
+      addTask('businessTaskInput', businessTasks, storageKeys.businessTasks, renderBusinessTasks);
+    });
+
+    document.getElementById('addPersonalTaskBtn').addEventListener('click', () => {
+      addTask('personalTaskInput', personalTasks, storageKeys.personalTasks, renderPersonalTasks);
+    });
+
+    document.getElementById('addAppointmentBtn').addEventListener('click', () => {
+      addScheduleItem('appointmentTime', 'appointmentText', appointments, storageKeys.appointments, renderAppointments);
+    });
+
+    document.getElementById('addScheduleBtn').addEventListener('click', () => {
+      addScheduleItem('scheduleTime', 'scheduleText', scheduleItems, storageKeys.schedule, renderSchedule);
+    });
+
+    document.getElementById('addFinanceBtn').addEventListener('click', () => {
+      const desc = document.getElementById('financeDesc').value.trim();
+      const amount = parseFloat(document.getElementById('financeAmount').value);
+      const type = document.getElementById('financeType').value;
+
+      if (!desc || isNaN(amount)) return;
+
+      finances.push({
+        id: uid(),
+        desc,
+        amount,
+        type
+      });
+
+      save(storageKeys.finances, finances);
+      document.getElementById('financeDesc').value = '';
+      document.getElementById('financeAmount').value = '';
+      document.getElementById('financeType').value = 'expense';
+      renderFinances();
+    });
+
+    document.getElementById('waterAddBtn').addEventListener('click', () => {
+      water.cups += 1;
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    document.getElementById('waterMinusBtn').addEventListener('click', () => {
+      water.cups = Math.max(0, water.cups - 1);
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    document.getElementById('waterResetBtn').addEventListener('click', () => {
+      water.cups = 0;
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    waterGoalSelect.addEventListener('change', () => {
+      water.goal = Number(waterGoalSelect.value);
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    notesBox.addEventListener('input', () => {
+      localStorage.setItem(storageKeys.notes, notesBox.value);
+    });
 
     function saveMeals() {
       meals = {
@@ -1271,45 +1449,23 @@
       save(storageKeys.meals, meals);
     }
 
-    function renderFitness() {
-      cardioExercise.value = fitness.cardio?.[0]?.exercise || '';
-      cardioTime.value = fitness.cardio?.[0]?.time || '';
-      cardioNotes.value = fitness.cardio?.[0]?.notes || '';
-      strengthExercise.value = fitness.strength?.[0]?.exercise || '';
-      strengthReps.value = fitness.strength?.[0]?.reps || '';
-      strengthNotes.value = fitness.strength?.[0]?.notes || '';
-    }
+    [breakfastMeal, breakfastIngredients, lunchMeal, lunchIngredients, dinnerMeal, dinnerIngredients]
+      .forEach(el => el.addEventListener('input', saveMeals));
 
     function saveFitness() {
       fitness = {
-        cardio: [
-          {
-            exercise: cardioExercise.value,
-            time: cardioTime.value,
-            notes: cardioNotes.value
-          }
-        ],
-        strength: [
-          {
-            exercise: strengthExercise.value,
-            reps: strengthReps.value,
-            notes: strengthNotes.value
-          }
-        ]
+        cardioExercise: cardioExercise.value,
+        cardioTime: cardioTime.value,
+        cardioNotes: cardioNotes.value,
+        strengthExercise: strengthExercise.value,
+        strengthReps: strengthReps.value,
+        strengthNotes: strengthNotes.value
       };
       save(storageKeys.fitness, fitness);
     }
 
-    function renderBodyLog() {
-      logWeight.value = bodyLog.weight || '';
-      logBodyFat.value = bodyLog.bodyFat || '';
-      logWaist.value = bodyLog.waist || '';
-      logHips.value = bodyLog.hips || '';
-      logChest.value = bodyLog.chest || '';
-      logArms.value = bodyLog.arms || '';
-      logThighs.value = bodyLog.thighs || '';
-      logNotes.value = bodyLog.notes || '';
-    }
+    [cardioExercise, cardioTime, cardioNotes, strengthExercise, strengthReps, strengthNotes]
+      .forEach(el => el.addEventListener('input', saveFitness));
 
     function saveBodyLog() {
       bodyLog = {
@@ -1325,14 +1481,8 @@
       save(storageKeys.bodyLog, bodyLog);
     }
 
-    function renderMedication() {
-      morningMedicationName.value = medication.morning.name || '';
-      morningMedicationTime.value = medication.morning.time || '';
-      morningMedicationTaken.checked = Boolean(medication.morning.taken);
-      nightMedicationName.value = medication.night.name || '';
-      nightMedicationTime.value = medication.night.time || '';
-      nightMedicationTaken.checked = Boolean(medication.night.taken);
-    }
+    [logWeight, logBodyFat, logWaist, logHips, logChest, logArms, logThighs, logNotes]
+      .forEach(el => el.addEventListener('input', saveBodyLog));
 
     function saveMedication() {
       medication = {
@@ -1350,13 +1500,14 @@
       save(storageKeys.medication, medication);
     }
 
-    function renderSleep() {
-      sleepBedtime.value = sleep.bedtime || '';
-      sleepWakeTime.value = sleep.wakeTime || '';
-      sleepHours.value = sleep.hours || '';
-      sleepQuality.value = sleep.quality || '';
-      sleepNotes.value = sleep.notes || '';
-    }
+    [
+      morningMedicationName,
+      morningMedicationTime,
+      morningMedicationTaken,
+      nightMedicationName,
+      nightMedicationTime,
+      nightMedicationTaken
+    ].forEach(el => el.addEventListener('input', saveMedication));
 
     function saveSleep() {
       sleep = {
@@ -1369,204 +1520,43 @@
       save(storageKeys.sleep, sleep);
     }
 
-    let breathRunning = false;
-    let breathTimer = null;
-    let breathTimeout = null;
-
-    function updateBreathUI(phase) {
-      if (phase === 'inhale') {
-        breathPhase.textContent = 'Breathe In';
-        breathInstruction.textContent = 'for 5.5 seconds';
-        bubble.style.transform = 'scale(1.12)';
-        breathStatus.textContent = 'Inhale slowly';
-      } else {
-        breathPhase.textContent = 'Breathe Out';
-        breathInstruction.textContent = 'for 5.5 seconds';
-        bubble.style.transform = 'scale(0.92)';
-        breathStatus.textContent = 'Exhale slowly';
-      }
-    }
-
-    function runBreathCycle() {
-      if (!breathRunning) return;
-
-      updateBreathUI('inhale');
-
-      breathTimeout = setTimeout(() => {
-        if (!breathRunning) return;
-        updateBreathUI('exhale');
-
-        breathTimer = setTimeout(() => {
-          runBreathCycle();
-        }, 5500);
-      }, 5500);
-    }
-
-    function startBreathing() {
-      if (breathRunning) return;
-      breathRunning = true;
-      breathToggleBtn.textContent = 'Pause';
-      runBreathCycle();
-    }
-
-    function stopBreathing(showPaused = true) {
-      breathRunning = false;
-      clearTimeout(breathTimer);
-      clearTimeout(breathTimeout);
-      breathTimer = null;
-      breathTimeout = null;
-      breathToggleBtn.textContent = 'Start';
-      if (showPaused) {
-        breathStatus.textContent = 'Paused';
-      }
-    }
-
-    function resetBreathing() {
-      stopBreathing(false);
-      bubble.style.transform = 'scale(0.92)';
-      breathPhase.textContent = 'Breathe In';
-      breathInstruction.textContent = 'for 5.5 seconds';
-      breathStatus.textContent = 'Ready to begin';
-    }
-
-    function setViewportHeight() {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    }
-
-    document.getElementById('addTaskBtn').addEventListener('click', () => {
-      const input = document.getElementById('taskInput');
-      const category = document.getElementById('taskCategory');
-      const text = input.value.trim();
-      if (!text) return;
-
-      tasks.push({
-        id: uid(),
-        text,
-        category: category.value,
-        done: false
-      });
-      save(storageKeys.tasks, tasks);
-      input.value = '';
-      renderTasks();
-    });
-
-    document.getElementById('resetTasksBtn').addEventListener('click', () => {
-      tasks = tasks.map(task => ({ ...task, done: false }));
-      save(storageKeys.tasks, tasks);
-      renderTasks();
-    });
-
-    document.getElementById('addScheduleBtn').addEventListener('click', () => {
-      const time = document.getElementById('scheduleTime').value;
-      const text = document.getElementById('scheduleText').value.trim();
-      if (!time || !text) return;
-
-      scheduleItems.push({
-        id: uid(),
-        time,
-        text
-      });
-      save(storageKeys.schedule, scheduleItems);
-      document.getElementById('scheduleTime').value = '';
-      document.getElementById('scheduleText').value = '';
-      renderSchedule();
-    });
-
-    document.getElementById('addFinanceBtn').addEventListener('click', () => {
-      const desc = document.getElementById('financeDesc').value.trim();
-      const amount = Number(document.getElementById('financeAmount').value);
-      const type = document.getElementById('financeType').value;
-
-      if (!desc || !amount) return;
-
-      finances.push({
-        id: uid(),
-        desc,
-        amount,
-        type
-      });
-
-      save(storageKeys.finances, finances);
-      document.getElementById('financeDesc').value = '';
-      document.getElementById('financeAmount').value = '';
-      document.getElementById('financeType').value = 'expense';
-      renderFinances();
-    });
-
-    document.getElementById('waterAddBtn').addEventListener('click', () => {
-      water.cups = Number(water.cups || 0) + 1;
-      save(storageKeys.water, water);
-      renderWater();
-    });
-
-    document.getElementById('waterMinusBtn').addEventListener('click', () => {
-      water.cups = Math.max(0, Number(water.cups || 0) - 1);
-      save(storageKeys.water, water);
-      renderWater();
-    });
-
-    document.getElementById('waterResetBtn').addEventListener('click', () => {
-      water.cups = 0;
-      save(storageKeys.water, water);
-      renderWater();
-    });
-
-    document.getElementById('waterGoalSelect').addEventListener('change', (e) => {
-      water.goal = Number(e.target.value);
-      save(storageKeys.water, water);
-      renderWater();
-    });
+    [sleepBedtime, sleepWakeTime, sleepHours, sleepQuality, sleepNotes]
+      .forEach(el => el.addEventListener('input', saveSleep));
 
     document.getElementById('addCleaningBtn').addEventListener('click', () => {
-      const input = document.getElementById('cleaningInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      cleaning.push({ text, done: false });
-      save(storageKeys.cleaning, cleaning);
-      input.value = '';
-      renderCleaning();
-    });
-
-    document.getElementById('resetCleaningBtn').addEventListener('click', () => {
-      cleaning = cleaning.map(item => ({ ...item, done: false }));
-      save(storageKeys.cleaning, cleaning);
-      renderCleaning();
+      addTask('cleaningInput', cleaning, storageKeys.cleaning, renderCleaning);
     });
 
     document.getElementById('addMerakiBtn').addEventListener('click', () => {
-      const input = document.getElementById('merakiInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      meraki.push({ text, done: false });
-      save(storageKeys.meraki, meraki);
-      input.value = '';
-      renderMeraki();
-    });
-
-    document.getElementById('resetMerakiBtn').addEventListener('click', () => {
-      meraki = meraki.map(item => ({ ...item, done: false }));
-      save(storageKeys.meraki, meraki);
-      renderMeraki();
+      addTask('merakiInput', meraki, storageKeys.meraki, renderMeraki);
     });
 
     document.getElementById('addFamilyBtn').addEventListener('click', () => {
-      const input = document.getElementById('familyInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      family.push({ text, done: false });
-      save(storageKeys.family, family);
-      input.value = '';
-      renderFamily();
+      addTask('familyInput', family, storageKeys.family, renderFamily);
     });
 
-    document.getElementById('resetFamilyBtn').addEventListener('click', () => {
-      family = family.map(item => ({ ...item, done: false }));
-      save(storageKeys.family, family);
-      renderFamily();
+    document.getElementById('resetBusinessTasksBtn').addEventListener('click', () => {
+      businessTasks = [];
+      save(storageKeys.businessTasks, businessTasks);
+      renderBusinessTasks();
+    });
+
+    document.getElementById('resetPersonalTasksBtn').addEventListener('click', () => {
+      personalTasks = [];
+      save(storageKeys.personalTasks, personalTasks);
+      renderPersonalTasks();
+    });
+
+    document.getElementById('resetAppointmentsBtn').addEventListener('click', () => {
+      appointments = [];
+      save(storageKeys.appointments, appointments);
+      renderAppointments();
+    });
+
+    document.getElementById('resetScheduleBtn').addEventListener('click', () => {
+      scheduleItems = [];
+      save(storageKeys.schedule, scheduleItems);
+      renderSchedule();
     });
 
     document.getElementById('resetMealsBtn').addEventListener('click', () => {
@@ -1581,8 +1571,12 @@
 
     document.getElementById('resetFitnessBtn').addEventListener('click', () => {
       fitness = {
-        cardio: [{ exercise: '', time: '', notes: '' }],
-        strength: [{ exercise: '', reps: '', notes: '' }]
+        cardioExercise: '',
+        cardioTime: '',
+        cardioNotes: '',
+        strengthExercise: '',
+        strengthReps: '',
+        strengthNotes: ''
       };
       save(storageKeys.fitness, fitness);
       renderFitness();
@@ -1624,72 +1618,77 @@
       renderSleep();
     });
 
-    notesBox.value = load(storageKeys.notes, '');
-    notesBox.addEventListener('input', () => {
-      save(storageKeys.notes, notesBox.value);
+    document.getElementById('resetMerakiBtn').addEventListener('click', () => {
+      meraki = [];
+      save(storageKeys.meraki, meraki);
+      renderMeraki();
     });
 
-    [
-      breakfastMeal,
-      breakfastIngredients,
-      lunchMeal,
-      lunchIngredients,
-      dinnerMeal,
-      dinnerIngredients
-    ].forEach(el => {
-      el.addEventListener('input', saveMeals);
+    document.getElementById('resetFamilyBtn').addEventListener('click', () => {
+      family = [];
+      save(storageKeys.family, family);
+      renderFamily();
     });
 
-    [
-      cardioExercise,
-      cardioTime,
-      cardioNotes,
-      strengthExercise,
-      strengthReps,
-      strengthNotes
-    ].forEach(el => {
-      el.addEventListener('input', saveFitness);
+    document.getElementById('resetCleaningBtn').addEventListener('click', () => {
+      cleaning = [];
+      save(storageKeys.cleaning, cleaning);
+      renderCleaning();
     });
 
-    [
-      logWeight,
-      logBodyFat,
-      logWaist,
-      logHips,
-      logChest,
-      logArms,
-      logThighs,
-      logNotes
-    ].forEach(el => {
-      el.addEventListener('input', saveBodyLog);
-    });
+    // Breathing bubble
+    const bubble = document.getElementById('bubble');
+    const breathPhase = document.getElementById('breathPhase');
+    const breathInstruction = document.getElementById('breathInstruction');
+    const breathStatus = document.getElementById('breathStatus');
+    const breathToggleBtn = document.getElementById('breathToggleBtn');
+    const breathResetBtn = document.getElementById('breathResetBtn');
 
-    [
-      morningMedicationName,
-      morningMedicationTime,
-      morningMedicationTaken,
-      nightMedicationName,
-      nightMedicationTime,
-      nightMedicationTaken
-    ].forEach(el => {
-      el.addEventListener('input', saveMedication);
-      el.addEventListener('change', saveMedication);
-    });
+    let breathing = false;
+    let breathInterval = null;
+    let inhale = true;
 
-    [
-      sleepBedtime,
-      sleepWakeTime,
-      sleepHours,
-      sleepQuality,
-      sleepNotes
-    ].forEach(el => {
-      el.addEventListener('input', saveSleep);
-      el.addEventListener('change', saveSleep);
-    });
+    function applyBreathVisual() {
+      bubble.style.transform = inhale ? 'scale(1.05)' : 'scale(0.92)';
+      breathPhase.textContent = inhale ? 'Breathe In' : 'Breathe Out';
+      breathInstruction.textContent = 'for 5.5 seconds';
+      breathStatus.textContent = inhale ? 'Inhale gently' : 'Exhale slowly';
+    }
+
+    function startBreathing() {
+      if (breathing) return;
+      breathing = true;
+      inhale = true;
+      applyBreathVisual();
+
+      breathInterval = setInterval(() => {
+        inhale = !inhale;
+        applyBreathVisual();
+      }, 5500);
+
+      breathToggleBtn.textContent = 'Pause';
+    }
+
+    function stopBreathing() {
+      breathing = false;
+      clearInterval(breathInterval);
+      breathInterval = null;
+      breathStatus.textContent = 'Paused';
+      breathToggleBtn.textContent = 'Start';
+    }
+
+    function resetBreathing() {
+      stopBreathing();
+      inhale = true;
+      bubble.style.transform = 'scale(0.92)';
+      breathPhase.textContent = 'Breathe In';
+      breathInstruction.textContent = 'for 5.5 seconds';
+      breathStatus.textContent = 'Ready to begin';
+    }
 
     breathToggleBtn.addEventListener('click', () => {
-      if (breathRunning) {
-        stopBreathing(true);
+      if (breathing) {
+        stopBreathing();
       } else {
         startBreathing();
       }
@@ -1697,30 +1696,7 @@
 
     breathResetBtn.addEventListener('click', resetBreathing);
 
-    window.addEventListener('resize', setViewportHeight);
-    window.addEventListener('orientationchange', setViewportHeight);
-
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && breathRunning) {
-        stopBreathing(true);
-      }
-    });
-
-    setViewportHeight();
-    renderDate();
-    renderTasks();
-    renderSchedule();
-    renderFinances();
-    renderWater();
-    renderCleaning();
-    renderMeraki();
-    renderFamily();
-    renderMeals();
-    renderFitness();
-    renderBodyLog();
-    renderMedication();
-    renderSleep();
-    resetBreathing();
+    renderAll();
   </script>
 </body>
 </html>
