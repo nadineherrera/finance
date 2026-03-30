@@ -708,6 +708,50 @@
         <section class="card">
           <div class="section-head">
             <div>
+              <h2>Journal</h2>
+              <div class="sub">Capture dreams, reflections, and your mood.</div>
+            </div>
+            <button class="ghost" id="resetJournalBtn">Reset</button>
+          </div>
+          <div class="stack" style="gap: 12px;">
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Mood</strong>
+              </div>
+              <select id="moodPicker">
+                <option value="">How are you feeling?</option>
+                <option value="Calm">Calm</option>
+                <option value="Good">Good</option>
+                <option value="Focused">Focused</option>
+                <option value="Tired">Tired</option>
+                <option value="Overwhelmed">Overwhelmed</option>
+                <option value="Anxious">Anxious</option>
+                <option value="Heavy">Heavy</option>
+                <option value="Hopeful">Hopeful</option>
+                <option value="Grateful">Grateful</option>
+                <option value="Inspired">Inspired</option>
+              </select>
+            </div>
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Dream Journal</strong>
+              </div>
+              <input id="dreamTitle" type="text" placeholder="Dream title or theme" style="margin-bottom: 8px;" />
+              <textarea id="dreamEntry" placeholder="Write your dream here..."></textarea>
+            </div>
+            <div class="task-item">
+              <div class="section-head" style="margin-bottom: 8px;">
+                <strong>Journal Entry</strong>
+              </div>
+              <input id="journalTitle" type="text" placeholder="Entry title" style="margin-bottom: 8px;" />
+              <textarea id="journalEntry" placeholder="Write your thoughts here..."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-head">
+            <div>
               <h2>Meraki Routine</h2>
               <div class="sub">Keep Meraki’s daily routine visible and easy to reset.</div>
             </div>
@@ -865,7 +909,8 @@
       fitness: 'simpleDashboardFitness',
       bodyLog: 'simpleDashboardBodyLog',
       medication: 'simpleDashboardMedication',
-      sleep: 'simpleDashboardSleep'
+      sleep: 'simpleDashboardSleep',
+      journal: 'simpleDashboardJournal'
     };
 
     function uid() {
@@ -963,31 +1008,92 @@
       quality: '',
       notes: ''
     });
+    let journal = load(storageKeys.journal, {
+      mood: '',
+      dreamTitle: '',
+      dreamEntry: '',
+      journalTitle: '',
+      journalEntry: ''
+    });
+    let notes = load(storageKeys.notes, '');
+    let breathingActive = false;
+    let breathState = 'inhale';
+    let breathInterval = null;
 
     const todayDate = document.getElementById('todayDate');
+
+    const businessTaskInput = document.getElementById('businessTaskInput');
+    const addBusinessTaskBtn = document.getElementById('addBusinessTaskBtn');
     const businessTaskList = document.getElementById('businessTaskList');
+    const resetBusinessTasksBtn = document.getElementById('resetBusinessTasksBtn');
+
+    const personalTaskInput = document.getElementById('personalTaskInput');
+    const addPersonalTaskBtn = document.getElementById('addPersonalTaskBtn');
     const personalTaskList = document.getElementById('personalTaskList');
+    const resetPersonalTasksBtn = document.getElementById('resetPersonalTasksBtn');
+
+    const appointmentTime = document.getElementById('appointmentTime');
+    const appointmentText = document.getElementById('appointmentText');
+    const addAppointmentBtn = document.getElementById('addAppointmentBtn');
     const appointmentList = document.getElementById('appointmentList');
+    const resetAppointmentsBtn = document.getElementById('resetAppointmentsBtn');
+
+    const scheduleTime = document.getElementById('scheduleTime');
+    const scheduleText = document.getElementById('scheduleText');
+    const addScheduleBtn = document.getElementById('addScheduleBtn');
     const scheduleList = document.getElementById('scheduleList');
+    const resetScheduleBtn = document.getElementById('resetScheduleBtn');
+
+    const financeDesc = document.getElementById('financeDesc');
+    const financeAmount = document.getElementById('financeAmount');
+    const financeType = document.getElementById('financeType');
+    const addFinanceBtn = document.getElementById('addFinanceBtn');
     const financeList = document.getElementById('financeList');
-    const notesBox = document.getElementById('notesBox');
-    const waterFill = document.getElementById('waterFill');
+    const incomeTotal = document.getElementById('incomeTotal');
+    const expenseTotal = document.getElementById('expenseTotal');
+    const balanceTotal = document.getElementById('balanceTotal');
+    const entryCount = document.getElementById('entryCount');
+
     const waterText = document.getElementById('waterText');
+    const waterFill = document.getElementById('waterFill');
+    const waterGoalSelect = document.getElementById('waterGoalSelect');
+    const waterAddBtn = document.getElementById('waterAddBtn');
+    const waterMinusBtn = document.getElementById('waterMinusBtn');
+    const waterResetBtn = document.getElementById('waterResetBtn');
+
+    const notesBox = document.getElementById('notesBox');
+
+    const cleaningInput = document.getElementById('cleaningInput');
+    const addCleaningBtn = document.getElementById('addCleaningBtn');
     const cleaningList = document.getElementById('cleaningList');
+    const resetCleaningBtn = document.getElementById('resetCleaningBtn');
+
     const breakfastMeal = document.getElementById('breakfastMeal');
     const breakfastIngredients = document.getElementById('breakfastIngredients');
     const lunchMeal = document.getElementById('lunchMeal');
     const lunchIngredients = document.getElementById('lunchIngredients');
     const dinnerMeal = document.getElementById('dinnerMeal');
     const dinnerIngredients = document.getElementById('dinnerIngredients');
+    const resetMealsBtn = document.getElementById('resetMealsBtn');
+
+    const merakiInput = document.getElementById('merakiInput');
+    const addMerakiBtn = document.getElementById('addMerakiBtn');
     const merakiList = document.getElementById('merakiList');
+    const resetMerakiBtn = document.getElementById('resetMerakiBtn');
+
+    const familyInput = document.getElementById('familyInput');
+    const addFamilyBtn = document.getElementById('addFamilyBtn');
     const familyList = document.getElementById('familyList');
+    const resetFamilyBtn = document.getElementById('resetFamilyBtn');
+
     const cardioExercise = document.getElementById('cardioExercise');
     const cardioTime = document.getElementById('cardioTime');
     const cardioNotes = document.getElementById('cardioNotes');
     const strengthExercise = document.getElementById('strengthExercise');
     const strengthReps = document.getElementById('strengthReps');
     const strengthNotes = document.getElementById('strengthNotes');
+    const resetFitnessBtn = document.getElementById('resetFitnessBtn');
+
     const logWeight = document.getElementById('logWeight');
     const logBodyFat = document.getElementById('logBodyFat');
     const logWaist = document.getElementById('logWaist');
@@ -996,20 +1102,37 @@
     const logArms = document.getElementById('logArms');
     const logThighs = document.getElementById('logThighs');
     const logNotes = document.getElementById('logNotes');
+    const resetBodyLogBtn = document.getElementById('resetBodyLogBtn');
+
     const morningMedicationName = document.getElementById('morningMedicationName');
     const morningMedicationTime = document.getElementById('morningMedicationTime');
     const morningMedicationTaken = document.getElementById('morningMedicationTaken');
     const nightMedicationName = document.getElementById('nightMedicationName');
     const nightMedicationTime = document.getElementById('nightMedicationTime');
     const nightMedicationTaken = document.getElementById('nightMedicationTaken');
+    const resetMedicationBtn = document.getElementById('resetMedicationBtn');
+
     const sleepBedtime = document.getElementById('sleepBedtime');
     const sleepWakeTime = document.getElementById('sleepWakeTime');
     const sleepHours = document.getElementById('sleepHours');
     const sleepQuality = document.getElementById('sleepQuality');
     const sleepNotes = document.getElementById('sleepNotes');
-    const waterGoalSelect = document.getElementById('waterGoalSelect');
+    const resetSleepBtn = document.getElementById('resetSleepBtn');
 
-    function formatDate() {
+    const moodPicker = document.getElementById('moodPicker');
+    const dreamTitle = document.getElementById('dreamTitle');
+    const dreamEntry = document.getElementById('dreamEntry');
+    const journalTitle = document.getElementById('journalTitle');
+    const journalEntry = document.getElementById('journalEntry');
+
+    const bubble = document.getElementById('bubble');
+    const breathPhase = document.getElementById('breathPhase');
+    const breathInstruction = document.getElementById('breathInstruction');
+    const breathStatus = document.getElementById('breathStatus');
+    const breathToggleBtn = document.getElementById('breathToggleBtn');
+    const breathResetBtn = document.getElementById('breathResetBtn');
+
+    function formatToday() {
       const now = new Date();
       todayDate.textContent = now.toLocaleDateString(undefined, {
         weekday: 'long',
@@ -1018,222 +1141,185 @@
       });
     }
 
-    function sortByTime(items) {
-      return [...items].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    function createTaskItem(task, onToggle, onDelete) {
+      const item = document.createElement('div');
+      item.className = `task-item ${task.done ? 'done' : ''}`;
+
+      item.innerHTML = `
+        <div class="task-top">
+          <label class="task-left">
+            <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
+            <span class="task-text">${task.text}</span>
+          </label>
+          <button class="tiny-btn">Delete</button>
+        </div>
+      `;
+
+      const checkbox = item.querySelector('.check');
+      const deleteBtn = item.querySelector('.tiny-btn');
+
+      checkbox.addEventListener('change', () => onToggle(task.id));
+      deleteBtn.addEventListener('click', () => onDelete(task.id));
+
+      return item;
     }
 
-    function renderTaskGroup(listElement, items, storageKey, resetRefName) {
-      listElement.innerHTML = '';
-
-      if (!items.length) {
-        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
-        return;
-      }
-
-      items.forEach((task) => {
-        const div = document.createElement('div');
-        div.className = 'task-item' + (task.done ? ' done' : '');
-
-        div.innerHTML = `
-          <div class="task-top">
-            <label class="task-left">
-              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
-              <span class="task-text">${escapeHtml(task.text)}</span>
-            </label>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        const checkbox = div.querySelector('.check');
-        const deleteBtn = div.querySelector('.tiny-btn');
-
-        checkbox.addEventListener('change', () => {
-          task.done = checkbox.checked;
-          save(storageKey, items);
-          renderAll();
-        });
-
-        deleteBtn.addEventListener('click', () => {
-          const index = items.findIndex(item => item.id === task.id);
-          if (index > -1) {
-            items.splice(index, 1);
-            save(storageKey, items);
+    function renderTaskCollection(listEl, collection, saveKey, setCollection) {
+      listEl.innerHTML = '';
+      collection.forEach(task => {
+        listEl.appendChild(createTaskItem(
+          task,
+          id => {
+            const updated = collection.map(item =>
+              item.id === id ? { ...item, done: !item.done } : item
+            );
+            setCollection(updated);
+            save(saveKey, updated);
+            renderAll();
+          },
+          id => {
+            const updated = collection.filter(item => item.id !== id);
+            setCollection(updated);
+            save(saveKey, updated);
             renderAll();
           }
-        });
-
-        listElement.appendChild(div);
+        ));
       });
     }
 
     function renderBusinessTasks() {
-      renderTaskGroup(businessTaskList, businessTasks, storageKeys.businessTasks);
+      renderTaskCollection(
+        businessTaskList,
+        businessTasks,
+        storageKeys.businessTasks,
+        updated => businessTasks = updated
+      );
     }
 
     function renderPersonalTasks() {
-      renderTaskGroup(personalTaskList, personalTasks, storageKeys.personalTasks);
+      renderTaskCollection(
+        personalTaskList,
+        personalTasks,
+        storageKeys.personalTasks,
+        updated => personalTasks = updated
+      );
     }
 
-    function renderSimpleTaskGroup(listElement, items, storageKey) {
-      listElement.innerHTML = '';
+    function renderMeraki() {
+      renderTaskCollection(
+        merakiList,
+        meraki,
+        storageKeys.meraki,
+        updated => meraki = updated
+      );
+    }
 
-      if (!items.length) {
-        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
-        return;
-      }
+    function renderFamily() {
+      renderTaskCollection(
+        familyList,
+        family,
+        storageKeys.family,
+        updated => family = updated
+      );
+    }
 
-      items.forEach((task) => {
-        const div = document.createElement('div');
-        div.className = 'task-item' + (task.done ? ' done' : '');
+    function renderCleaning() {
+      renderTaskCollection(
+        cleaningList,
+        cleaning,
+        storageKeys.cleaning,
+        updated => cleaning = updated
+      );
+    }
 
-        div.innerHTML = `
-          <div class="task-top">
-            <label class="task-left">
-              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
-              <span class="task-text">${escapeHtml(task.text)}</span>
-            </label>
-            <button class="tiny-btn">Delete</button>
+    function createScheduleItem(item, onDelete) {
+      const card = document.createElement('div');
+      card.className = 'schedule-item';
+      card.innerHTML = `
+        <div class="schedule-layout">
+          <div class="schedule-time">${item.time || '—'}</div>
+          <div class="schedule-main">
+            <div>${item.text}</div>
           </div>
-        `;
-
-        const checkbox = div.querySelector('.check');
-        const deleteBtn = div.querySelector('.tiny-btn');
-
-        checkbox.addEventListener('change', () => {
-          task.done = checkbox.checked;
-          save(storageKey, items);
-          renderAll();
-        });
-
-        deleteBtn.addEventListener('click', () => {
-          const index = items.findIndex(item => item.id === task.id);
-          if (index > -1) {
-            items.splice(index, 1);
-            save(storageKey, items);
-            renderAll();
-          }
-        });
-
-        listElement.appendChild(div);
-      });
+          <button class="tiny-btn">Delete</button>
+        </div>
+      `;
+      card.querySelector('.tiny-btn').addEventListener('click', () => onDelete(item.id));
+      return card;
     }
 
     function renderAppointments() {
       appointmentList.innerHTML = '';
-      const sorted = sortByTime(appointments);
-
-      if (!sorted.length) {
-        appointmentList.innerHTML = '<div class="mini">No appointments yet.</div>';
-        return;
-      }
-
-      sorted.forEach((item) => {
-        const div = document.createElement('div');
-        div.className = 'schedule-item';
-        div.innerHTML = `
-          <div class="task-top">
-            <div class="schedule-layout schedule-main">
-              <div class="schedule-time">${escapeHtml(item.time)}</div>
-              <div>${escapeHtml(item.text)}</div>
-            </div>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        div.querySelector('.tiny-btn').addEventListener('click', () => {
-          appointments = appointments.filter(appt => appt.id !== item.id);
-          save(storageKeys.appointments, appointments);
-          renderAppointments();
+      appointments
+        .slice()
+        .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
+        .forEach(item => {
+          appointmentList.appendChild(createScheduleItem(item, id => {
+            appointments = appointments.filter(entry => entry.id !== id);
+            save(storageKeys.appointments, appointments);
+            renderAppointments();
+          }));
         });
-
-        appointmentList.appendChild(div);
-      });
     }
 
     function renderSchedule() {
       scheduleList.innerHTML = '';
-      const sorted = sortByTime(scheduleItems);
-
-      if (!sorted.length) {
-        scheduleList.innerHTML = '<div class="mini">No schedule items yet.</div>';
-        return;
-      }
-
-      sorted.forEach((item) => {
-        const div = document.createElement('div');
-        div.className = 'schedule-item';
-        div.innerHTML = `
-          <div class="task-top">
-            <div class="schedule-layout schedule-main">
-              <div class="schedule-time">${escapeHtml(item.time)}</div>
-              <div>${escapeHtml(item.text)}</div>
-            </div>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        div.querySelector('.tiny-btn').addEventListener('click', () => {
-          scheduleItems = scheduleItems.filter(entry => entry.id !== item.id);
-          save(storageKeys.schedule, scheduleItems);
-          renderSchedule();
+      scheduleItems
+        .slice()
+        .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
+        .forEach(item => {
+          scheduleList.appendChild(createScheduleItem(item, id => {
+            scheduleItems = scheduleItems.filter(entry => entry.id !== id);
+            save(storageKeys.schedule, scheduleItems);
+            renderSchedule();
+          }));
         });
-
-        scheduleList.appendChild(div);
-      });
     }
 
     function renderFinances() {
       financeList.innerHTML = '';
+      let income = 0;
+      let expenses = 0;
 
-      const income = finances
-        .filter(item => item.type === 'income')
-        .reduce((sum, item) => sum + Number(item.amount), 0);
+      finances.forEach(entry => {
+        if (entry.type === 'income') income += entry.amount;
+        else expenses += entry.amount;
 
-      const expenses = finances
-        .filter(item => item.type === 'expense')
-        .reduce((sum, item) => sum + Number(item.amount), 0);
-
-      document.getElementById('incomeTotal').textContent = formatCurrency(income);
-      document.getElementById('expenseTotal').textContent = formatCurrency(expenses);
-      document.getElementById('balanceTotal').textContent = formatCurrency(income - expenses);
-      document.getElementById('entryCount').textContent = finances.length;
-
-      if (!finances.length) {
-        financeList.innerHTML = '<div class="mini">No finance entries yet.</div>';
-        return;
-      }
-
-      [...finances].reverse().forEach((item) => {
-        const div = document.createElement('div');
-        div.className = 'finance-item';
-        div.innerHTML = `
+        const row = document.createElement('div');
+        row.className = 'finance-item';
+        row.innerHTML = `
           <div class="finance-top">
             <div>
-              <div><strong>${escapeHtml(item.desc)}</strong></div>
-              <div class="mini">${item.type === 'income' ? 'Income' : 'Expense'}</div>
+              <div><strong>${entry.desc}</strong></div>
+              <div class="mini">${entry.type === 'income' ? 'Income' : 'Expense'}</div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span class="pill">${formatCurrency(item.amount)}</span>
+              <span class="pill">${entry.type === 'income' ? '+' : '-'}$${entry.amount.toFixed(2)}</span>
               <button class="tiny-btn">Delete</button>
             </div>
           </div>
         `;
-
-        div.querySelector('.tiny-btn').addEventListener('click', () => {
-          finances = finances.filter(entry => entry.id !== item.id);
+        row.querySelector('.tiny-btn').addEventListener('click', () => {
+          finances = finances.filter(item => item.id !== entry.id);
           save(storageKeys.finances, finances);
           renderFinances();
         });
-
-        financeList.appendChild(div);
+        financeList.appendChild(row);
       });
+
+      incomeTotal.textContent = `$${income.toFixed(2)}`;
+      expenseTotal.textContent = `$${expenses.toFixed(2)}`;
+      balanceTotal.textContent = `$${(income - expenses).toFixed(2)}`;
+      entryCount.textContent = finances.length.toString();
     }
 
     function renderWater() {
-      waterGoalSelect.value = String(water.goal);
-      const percent = Math.max(0, Math.min(100, (water.cups / water.goal) * 100));
+      const goal = Number(water.goal) || 8;
+      const cups = Math.max(0, Number(water.cups) || 0);
+      const percent = Math.min(100, (cups / goal) * 100);
+      waterText.textContent = `${cups} / ${goal} cups`;
       waterFill.style.width = `${percent}%`;
-      waterText.textContent = `${water.cups} / ${water.goal} cups`;
+      waterGoalSelect.value = String(goal);
     }
 
     function renderMeals() {
@@ -1282,154 +1368,13 @@
       sleepNotes.value = sleep.notes || '';
     }
 
-    function renderNotes() {
-      notesBox.value = localStorage.getItem(storageKeys.notes) || '';
+    function renderJournal() {
+      moodPicker.value = journal.mood || '';
+      dreamTitle.value = journal.dreamTitle || '';
+      dreamEntry.value = journal.dreamEntry || '';
+      journalTitle.value = journal.journalTitle || '';
+      journalEntry.value = journal.journalEntry || '';
     }
-
-    function renderCleaning() {
-      renderSimpleTaskGroup(cleaningList, cleaning, storageKeys.cleaning);
-    }
-
-    function renderMeraki() {
-      renderSimpleTaskGroup(merakiList, meraki, storageKeys.meraki);
-    }
-
-    function renderFamily() {
-      renderSimpleTaskGroup(familyList, family, storageKeys.family);
-    }
-
-    function renderAll() {
-      formatDate();
-      renderBusinessTasks();
-      renderPersonalTasks();
-      renderAppointments();
-      renderSchedule();
-      renderFinances();
-      renderWater();
-      renderMeals();
-      renderFitness();
-      renderBodyLog();
-      renderMedication();
-      renderSleep();
-      renderNotes();
-      renderCleaning();
-      renderMeraki();
-      renderFamily();
-    }
-
-    function formatCurrency(value) {
-      return new Intl.NumberFormat(undefined, {
-        style: 'currency',
-        currency: 'USD'
-      }).format(Number(value) || 0);
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function addTask(inputId, collection, storageKey, renderFn) {
-      const input = document.getElementById(inputId);
-      const text = input.value.trim();
-      if (!text) return;
-
-      collection.push({
-        id: uid(),
-        text,
-        done: false
-      });
-
-      save(storageKey, collection);
-      input.value = '';
-      renderFn();
-    }
-
-    function addScheduleItem(timeId, textId, collection, storageKey, renderFn) {
-      const time = document.getElementById(timeId).value;
-      const text = document.getElementById(textId).value.trim();
-      if (!time || !text) return;
-
-      collection.push({
-        id: uid(),
-        time,
-        text
-      });
-
-      save(storageKey, collection);
-      document.getElementById(timeId).value = '';
-      document.getElementById(textId).value = '';
-      renderFn();
-    }
-
-    document.getElementById('addBusinessTaskBtn').addEventListener('click', () => {
-      addTask('businessTaskInput', businessTasks, storageKeys.businessTasks, renderBusinessTasks);
-    });
-
-    document.getElementById('addPersonalTaskBtn').addEventListener('click', () => {
-      addTask('personalTaskInput', personalTasks, storageKeys.personalTasks, renderPersonalTasks);
-    });
-
-    document.getElementById('addAppointmentBtn').addEventListener('click', () => {
-      addScheduleItem('appointmentTime', 'appointmentText', appointments, storageKeys.appointments, renderAppointments);
-    });
-
-    document.getElementById('addScheduleBtn').addEventListener('click', () => {
-      addScheduleItem('scheduleTime', 'scheduleText', scheduleItems, storageKeys.schedule, renderSchedule);
-    });
-
-    document.getElementById('addFinanceBtn').addEventListener('click', () => {
-      const desc = document.getElementById('financeDesc').value.trim();
-      const amount = parseFloat(document.getElementById('financeAmount').value);
-      const type = document.getElementById('financeType').value;
-
-      if (!desc || isNaN(amount)) return;
-
-      finances.push({
-        id: uid(),
-        desc,
-        amount,
-        type
-      });
-
-      save(storageKeys.finances, finances);
-      document.getElementById('financeDesc').value = '';
-      document.getElementById('financeAmount').value = '';
-      document.getElementById('financeType').value = 'expense';
-      renderFinances();
-    });
-
-    document.getElementById('waterAddBtn').addEventListener('click', () => {
-      water.cups += 1;
-      save(storageKeys.water, water);
-      renderWater();
-    });
-
-    document.getElementById('waterMinusBtn').addEventListener('click', () => {
-      water.cups = Math.max(0, water.cups - 1);
-      save(storageKeys.water, water);
-      renderWater();
-    });
-
-    document.getElementById('waterResetBtn').addEventListener('click', () => {
-      water.cups = 0;
-      save(storageKeys.water, water);
-      renderWater();
-    });
-
-    waterGoalSelect.addEventListener('change', () => {
-      water.goal = Number(waterGoalSelect.value);
-      save(storageKeys.water, water);
-      renderWater();
-    });
-
-    notesBox.addEventListener('input', () => {
-      localStorage.setItem(storageKeys.notes, notesBox.value);
-    });
 
     function saveMeals() {
       meals = {
@@ -1449,9 +1394,6 @@
       save(storageKeys.meals, meals);
     }
 
-    [breakfastMeal, breakfastIngredients, lunchMeal, lunchIngredients, dinnerMeal, dinnerIngredients]
-      .forEach(el => el.addEventListener('input', saveMeals));
-
     function saveFitness() {
       fitness = {
         cardioExercise: cardioExercise.value,
@@ -1463,9 +1405,6 @@
       };
       save(storageKeys.fitness, fitness);
     }
-
-    [cardioExercise, cardioTime, cardioNotes, strengthExercise, strengthReps, strengthNotes]
-      .forEach(el => el.addEventListener('input', saveFitness));
 
     function saveBodyLog() {
       bodyLog = {
@@ -1480,9 +1419,6 @@
       };
       save(storageKeys.bodyLog, bodyLog);
     }
-
-    [logWeight, logBodyFat, logWaist, logHips, logChest, logArms, logThighs, logNotes]
-      .forEach(el => el.addEventListener('input', saveBodyLog));
 
     function saveMedication() {
       medication = {
@@ -1500,15 +1436,6 @@
       save(storageKeys.medication, medication);
     }
 
-    [
-      morningMedicationName,
-      morningMedicationTime,
-      morningMedicationTaken,
-      nightMedicationName,
-      nightMedicationTime,
-      nightMedicationTaken
-    ].forEach(el => el.addEventListener('input', saveMedication));
-
     function saveSleep() {
       sleep = {
         bedtime: sleepBedtime.value,
@@ -1520,46 +1447,295 @@
       save(storageKeys.sleep, sleep);
     }
 
+    function saveJournal() {
+      journal = {
+        mood: moodPicker.value,
+        dreamTitle: dreamTitle.value,
+        dreamEntry: dreamEntry.value,
+        journalTitle: journalTitle.value,
+        journalEntry: journalEntry.value
+      };
+      save(storageKeys.journal, journal);
+    }
+
+    function resetBreathingUI() {
+      breathState = 'inhale';
+      bubble.style.transform = 'scale(0.92)';
+      breathPhase.textContent = 'Breathe In';
+      breathInstruction.textContent = 'for 5 to 6 seconds';
+      breathStatus.textContent = 'Ready to begin';
+      breathToggleBtn.textContent = 'Start';
+    }
+
+    function applyBreathState() {
+      if (breathState === 'inhale') {
+        bubble.style.transform = 'scale(1.06)';
+        breathPhase.textContent = 'Breathe In';
+        breathInstruction.textContent = 'for 5 to 6 seconds';
+        breathStatus.textContent = 'Inhale gently';
+      } else {
+        bubble.style.transform = 'scale(0.92)';
+        breathPhase.textContent = 'Breathe Out';
+        breathInstruction.textContent = 'for 5 to 6 seconds';
+        breathStatus.textContent = 'Exhale slowly';
+      }
+    }
+
+    function startBreathing() {
+      if (breathInterval) clearInterval(breathInterval);
+      breathingActive = true;
+      breathToggleBtn.textContent = 'Pause';
+      applyBreathState();
+      breathInterval = setInterval(() => {
+        breathState = breathState === 'inhale' ? 'exhale' : 'inhale';
+        applyBreathState();
+      }, 5500);
+    }
+
+    function stopBreathing() {
+      breathingActive = false;
+      if (breathInterval) clearInterval(breathInterval);
+      breathInterval = null;
+      breathToggleBtn.textContent = 'Start';
+      breathStatus.textContent = 'Paused';
+    }
+
+    function renderAll() {
+      formatToday();
+      renderBusinessTasks();
+      renderPersonalTasks();
+      renderAppointments();
+      renderSchedule();
+      renderFinances();
+      renderWater();
+      renderCleaning();
+      renderMeals();
+      renderMeraki();
+      renderFamily();
+      renderFitness();
+      renderBodyLog();
+      renderMedication();
+      renderSleep();
+      renderJournal();
+      notesBox.value = notes;
+    }
+
+    function addTask(inputEl, collection, saveKey, setter, renderer) {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      const updated = [...collection, { id: uid(), text, done: false }];
+      setter(updated);
+      save(saveKey, updated);
+      inputEl.value = '';
+      renderer();
+    }
+
+    addBusinessTaskBtn.addEventListener('click', () => {
+      addTask(
+        businessTaskInput,
+        businessTasks,
+        storageKeys.businessTasks,
+        updated => businessTasks = updated,
+        renderBusinessTasks
+      );
+    });
+
+    addPersonalTaskBtn.addEventListener('click', () => {
+      addTask(
+        personalTaskInput,
+        personalTasks,
+        storageKeys.personalTasks,
+        updated => personalTasks = updated,
+        renderPersonalTasks
+      );
+    });
+
+    addMerakiBtn.addEventListener('click', () => {
+      addTask(
+        merakiInput,
+        meraki,
+        storageKeys.meraki,
+        updated => meraki = updated,
+        renderMeraki
+      );
+    });
+
+    addFamilyBtn.addEventListener('click', () => {
+      addTask(
+        familyInput,
+        family,
+        storageKeys.family,
+        updated => family = updated,
+        renderFamily
+      );
+    });
+
+    addCleaningBtn.addEventListener('click', () => {
+      addTask(
+        cleaningInput,
+        cleaning,
+        storageKeys.cleaning,
+        updated => cleaning = updated,
+        renderCleaning
+      );
+    });
+
+    [businessTaskInput, personalTaskInput, merakiInput, familyInput, cleaningInput].forEach((inputEl, index) => {
+      const buttons = [
+        addBusinessTaskBtn,
+        addPersonalTaskBtn,
+        addMerakiBtn,
+        addFamilyBtn,
+        addCleaningBtn
+      ];
+      inputEl.addEventListener('keydown', event => {
+        if (event.key === 'Enter') buttons[index].click();
+      });
+    });
+
+    addAppointmentBtn.addEventListener('click', () => {
+      const text = appointmentText.value.trim();
+      if (!text) return;
+      appointments.push({ id: uid(), time: appointmentTime.value, text });
+      save(storageKeys.appointments, appointments);
+      appointmentTime.value = '';
+      appointmentText.value = '';
+      renderAppointments();
+    });
+
+    addScheduleBtn.addEventListener('click', () => {
+      const text = scheduleText.value.trim();
+      if (!text) return;
+      scheduleItems.push({ id: uid(), time: scheduleTime.value, text });
+      save(storageKeys.schedule, scheduleItems);
+      scheduleTime.value = '';
+      scheduleText.value = '';
+      renderSchedule();
+    });
+
+    [appointmentText, scheduleText].forEach((inputEl, index) => {
+      const buttons = [addAppointmentBtn, addScheduleBtn];
+      inputEl.addEventListener('keydown', event => {
+        if (event.key === 'Enter') buttons[index].click();
+      });
+    });
+
+    addFinanceBtn.addEventListener('click', () => {
+      const desc = financeDesc.value.trim();
+      const amount = Number(financeAmount.value);
+      if (!desc || !amount) return;
+      finances.unshift({
+        id: uid(),
+        desc,
+        amount,
+        type: financeType.value
+      });
+      save(storageKeys.finances, finances);
+      financeDesc.value = '';
+      financeAmount.value = '';
+      financeType.value = 'expense';
+      renderFinances();
+    });
+
+    notesBox.addEventListener('input', () => {
+      notes = notesBox.value;
+      save(storageKeys.notes, notes);
+    });
+
+    [breakfastMeal, breakfastIngredients, lunchMeal, lunchIngredients, dinnerMeal, dinnerIngredients]
+      .forEach(el => el.addEventListener('input', saveMeals));
+
+    [cardioExercise, cardioTime, cardioNotes, strengthExercise, strengthReps, strengthNotes]
+      .forEach(el => el.addEventListener('input', saveFitness));
+
+    [logWeight, logBodyFat, logWaist, logHips, logChest, logArms, logThighs, logNotes]
+      .forEach(el => el.addEventListener('input', saveBodyLog));
+
+    [
+      morningMedicationName,
+      morningMedicationTime,
+      morningMedicationTaken,
+      nightMedicationName,
+      nightMedicationTime,
+      nightMedicationTaken
+    ].forEach(el => el.addEventListener('input', saveMedication));
+
     [sleepBedtime, sleepWakeTime, sleepHours, sleepQuality, sleepNotes]
       .forEach(el => el.addEventListener('input', saveSleep));
 
-    document.getElementById('addCleaningBtn').addEventListener('click', () => {
-      addTask('cleaningInput', cleaning, storageKeys.cleaning, renderCleaning);
+    [moodPicker, dreamTitle, dreamEntry, journalTitle, journalEntry]
+      .forEach(el => el.addEventListener('input', saveJournal));
+
+    moodPicker.addEventListener('change', saveJournal);
+
+    waterGoalSelect.addEventListener('change', () => {
+      water.goal = Number(waterGoalSelect.value);
+      save(storageKeys.water, water);
+      renderWater();
     });
 
-    document.getElementById('addMerakiBtn').addEventListener('click', () => {
-      addTask('merakiInput', meraki, storageKeys.meraki, renderMeraki);
+    waterAddBtn.addEventListener('click', () => {
+      water.cups = Number(water.cups || 0) + 1;
+      save(storageKeys.water, water);
+      renderWater();
     });
 
-    document.getElementById('addFamilyBtn').addEventListener('click', () => {
-      addTask('familyInput', family, storageKeys.family, renderFamily);
+    waterMinusBtn.addEventListener('click', () => {
+      water.cups = Math.max(0, Number(water.cups || 0) - 1);
+      save(storageKeys.water, water);
+      renderWater();
     });
 
-    document.getElementById('resetBusinessTasksBtn').addEventListener('click', () => {
+    waterResetBtn.addEventListener('click', () => {
+      water = { cups: 0, goal: Number(waterGoalSelect.value) || 8 };
+      save(storageKeys.water, water);
+      renderWater();
+    });
+
+    breathToggleBtn.addEventListener('click', () => {
+      if (breathingActive) {
+        stopBreathing();
+      } else {
+        startBreathing();
+      }
+    });
+
+    breathResetBtn.addEventListener('click', () => {
+      stopBreathing();
+      resetBreathingUI();
+    });
+
+    resetBusinessTasksBtn.addEventListener('click', () => {
       businessTasks = [];
       save(storageKeys.businessTasks, businessTasks);
       renderBusinessTasks();
     });
 
-    document.getElementById('resetPersonalTasksBtn').addEventListener('click', () => {
+    resetPersonalTasksBtn.addEventListener('click', () => {
       personalTasks = [];
       save(storageKeys.personalTasks, personalTasks);
       renderPersonalTasks();
     });
 
-    document.getElementById('resetAppointmentsBtn').addEventListener('click', () => {
+    resetAppointmentsBtn.addEventListener('click', () => {
       appointments = [];
       save(storageKeys.appointments, appointments);
       renderAppointments();
     });
 
-    document.getElementById('resetScheduleBtn').addEventListener('click', () => {
+    resetScheduleBtn.addEventListener('click', () => {
       scheduleItems = [];
       save(storageKeys.schedule, scheduleItems);
       renderSchedule();
     });
 
-    document.getElementById('resetMealsBtn').addEventListener('click', () => {
+    resetCleaningBtn.addEventListener('click', () => {
+      cleaning = defaultCleaning.map(item => ({ ...item, id: uid() }));
+      save(storageKeys.cleaning, cleaning);
+      renderCleaning();
+    });
+
+    resetMealsBtn.addEventListener('click', () => {
       meals = {
         breakfast: { meal: '', ingredients: '' },
         lunch: { meal: '', ingredients: '' },
@@ -1569,7 +1745,19 @@
       renderMeals();
     });
 
-    document.getElementById('resetFitnessBtn').addEventListener('click', () => {
+    resetMerakiBtn.addEventListener('click', () => {
+      meraki = [];
+      save(storageKeys.meraki, meraki);
+      renderMeraki();
+    });
+
+    resetFamilyBtn.addEventListener('click', () => {
+      family = [];
+      save(storageKeys.family, family);
+      renderFamily();
+    });
+
+    resetFitnessBtn.addEventListener('click', () => {
       fitness = {
         cardioExercise: '',
         cardioTime: '',
@@ -1582,7 +1770,7 @@
       renderFitness();
     });
 
-    document.getElementById('resetBodyLogBtn').addEventListener('click', () => {
+    resetBodyLogBtn.addEventListener('click', () => {
       bodyLog = {
         weight: '',
         bodyFat: '',
@@ -1597,7 +1785,7 @@
       renderBodyLog();
     });
 
-    document.getElementById('resetMedicationBtn').addEventListener('click', () => {
+    resetMedicationBtn.addEventListener('click', () => {
       medication = {
         morning: { name: '', time: '', taken: false },
         night: { name: '', time: '', taken: false }
@@ -1606,7 +1794,7 @@
       renderMedication();
     });
 
-    document.getElementById('resetSleepBtn').addEventListener('click', () => {
+    resetSleepBtn.addEventListener('click', () => {
       sleep = {
         bedtime: '',
         wakeTime: '',
@@ -1618,85 +1806,20 @@
       renderSleep();
     });
 
-    document.getElementById('resetMerakiBtn').addEventListener('click', () => {
-      meraki = [];
-      save(storageKeys.meraki, meraki);
-      renderMeraki();
+    document.getElementById('resetJournalBtn').addEventListener('click', () => {
+      journal = {
+        mood: '',
+        dreamTitle: '',
+        dreamEntry: '',
+        journalTitle: '',
+        journalEntry: ''
+      };
+      save(storageKeys.journal, journal);
+      renderJournal();
     });
-
-    document.getElementById('resetFamilyBtn').addEventListener('click', () => {
-      family = [];
-      save(storageKeys.family, family);
-      renderFamily();
-    });
-
-    document.getElementById('resetCleaningBtn').addEventListener('click', () => {
-      cleaning = [];
-      save(storageKeys.cleaning, cleaning);
-      renderCleaning();
-    });
-
-    // Breathing bubble
-    const bubble = document.getElementById('bubble');
-    const breathPhase = document.getElementById('breathPhase');
-    const breathInstruction = document.getElementById('breathInstruction');
-    const breathStatus = document.getElementById('breathStatus');
-    const breathToggleBtn = document.getElementById('breathToggleBtn');
-    const breathResetBtn = document.getElementById('breathResetBtn');
-
-    let breathing = false;
-    let breathInterval = null;
-    let inhale = true;
-
-    function applyBreathVisual() {
-      bubble.style.transform = inhale ? 'scale(1.05)' : 'scale(0.92)';
-      breathPhase.textContent = inhale ? 'Breathe In' : 'Breathe Out';
-      breathInstruction.textContent = 'for 5.5 seconds';
-      breathStatus.textContent = inhale ? 'Inhale gently' : 'Exhale slowly';
-    }
-
-    function startBreathing() {
-      if (breathing) return;
-      breathing = true;
-      inhale = true;
-      applyBreathVisual();
-
-      breathInterval = setInterval(() => {
-        inhale = !inhale;
-        applyBreathVisual();
-      }, 5500);
-
-      breathToggleBtn.textContent = 'Pause';
-    }
-
-    function stopBreathing() {
-      breathing = false;
-      clearInterval(breathInterval);
-      breathInterval = null;
-      breathStatus.textContent = 'Paused';
-      breathToggleBtn.textContent = 'Start';
-    }
-
-    function resetBreathing() {
-      stopBreathing();
-      inhale = true;
-      bubble.style.transform = 'scale(0.92)';
-      breathPhase.textContent = 'Breathe In';
-      breathInstruction.textContent = 'for 5.5 seconds';
-      breathStatus.textContent = 'Ready to begin';
-    }
-
-    breathToggleBtn.addEventListener('click', () => {
-      if (breathing) {
-        stopBreathing();
-      } else {
-        startBreathing();
-      }
-    });
-
-    breathResetBtn.addEventListener('click', resetBreathing);
 
     renderAll();
+    resetBreathingUI();
   </script>
 </body>
 </html>
