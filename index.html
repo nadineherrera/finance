@@ -1800,11 +1800,11 @@
           signUpBtn.style.display = 'none';
 
           try {
-            await loadUserDataFromCloud();
-          } catch (error) {
-            console.error('Cloud load error:', error);
-            authStatus.textContent = 'Signed in, but cloud data could not load.';
-          }
+  await loadUserDataFromCloud();
+} catch (error) {
+  console.error('Cloud load error:', error);
+  authStatus.textContent = `Cloud load failed: ${error.message || error}`;
+}
         } else {
           authStatus.textContent = 'Not signed in';
           signOutBtn.style.display = 'none';
