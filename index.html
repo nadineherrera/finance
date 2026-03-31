@@ -968,8 +968,7 @@
       getFirestore,
       doc,
       setDoc,
-      getDoc,
-      onSnapshot
+      getDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     // Replace this block with the exact Web App config from Firebase Console if needed.
@@ -995,8 +994,7 @@
       onAuthStateChanged,
       doc,
       setDoc,
-      getDoc,
-      onSnapshot
+      getDoc
     };
   </script>
 
@@ -1055,24 +1053,16 @@
     let currentUser = null;
 
     async function saveCloudDoc(key, value) {
-  if (!currentUser || !window.db || !window.firebaseHelpers) return;
-
-  const { doc, setDoc } = window.firebaseHelpers;
-
-  await setDoc(
-    doc(window.db, 'users', currentUser.uid, 'dashboard', key),
-    { value }
-  );
-}
+      if (!currentUser || !window.db || !window.firebaseHelpers) return;
+      const { doc, setDoc } = window.firebaseHelpers;
+      await setDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key), value);
+    }
 
     async function loadCloudDoc(key, fallback) {
       if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
       const { doc, getDoc } = window.firebaseHelpers;
       const snap = await getDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key));
       return snap.exists() ? snap.data() : fallback;
-
-      const data = snap.data();
-  return data?.value ?? fallback;
     }
 
     function save(key, value) {
@@ -1728,152 +1718,102 @@
       renderAll();
     }
 
-   let unsubscribeDashboardListeners = [];
-
-function clearDashboardListeners() {
-  unsubscribeDashboardListeners.forEach(unsub => {
-    try { unsub(); } catch (e) {}
-  });
-  unsubscribeDashboardListeners = [];
-}
-
-function startTaskSyncListeners() {
-  if (!currentUser || !window.db || !window.firebaseHelpers) return;
-
-  clearDashboardListeners();
-
-  const { doc, onSnapshot } = window.firebaseHelpers;
-
-  const taskKeys = [
-    storageKeys.businessTasks,
-    storageKeys.personalTasks,
-    storageKeys.meraki,
-    storageKeys.family,
-    storageKeys.cleaning
-  ];
-
-  taskKeys.forEach((key) => {
-    const ref = doc(window.db, 'users', currentUser.uid, 'dashboard', key);
-
-    const unsub = onSnapshot(ref, (snap) => {
-      if (!snap.exists()) return;
-
-      const data = snap.data()?.value;
-      if (!Array.isArray(data)) return;
-
-      if (key === storageKeys.businessTasks) businessTasks = data;
-      if (key === storageKeys.personalTasks) personalTasks = data;
-      if (key === storageKeys.meraki) meraki = data;
-      if (key === storageKeys.family) family = data;
-      if (key === storageKeys.cleaning) cleaning = data;
-
-      localStorage.setItem(key, JSON.stringify(data));
-      renderAll();
-    });
-
-    unsubscribeDashboardListeners.push(unsub);
-  });
-}
-
     async function setupAuth() {
-  if (!window.firebaseAuth || !window.firebaseHelpers || !window.db) {
-    authStatus.textContent = 'Firebase is still loading. Please refresh and try again.';
-    console.error('Firebase helpers not available yet.', {
-      firebaseAuth: !!window.firebaseAuth,
-      firebaseHelpers: !!window.firebaseHelpers,
-      db: !!window.db
-    });
-    return;
-  }
-
-  const auth = window.firebaseAuth;
-  const {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-  } = window.firebaseHelpers;
-
-  if (!setupAuth.initialized) {
-    signUpBtn.addEventListener('click', async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value;
-
-      if (!email || !password) {
-        authStatus.textContent = 'Enter an email and password.';
+      if (!window.firebaseAuth || !window.firebaseHelpers || !window.db) {
+        authStatus.textContent = 'Firebase is still loading. Please refresh and try again.';
+        console.error('Firebase helpers not available yet.', {
+          firebaseAuth: !!window.firebaseAuth,
+          firebaseHelpers: !!window.firebaseHelpers,
+          db: !!window.db
+        });
         return;
       }
 
-      authStatus.textContent = 'Creating account...';
+      const auth = window.firebaseAuth;
+      const {
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged
+      } = window.firebaseHelpers;
 
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        authStatus.textContent = 'Account created successfully.';
-      } catch (error) {
-        console.error('Create account error:', error);
-        authStatus.textContent = `Firebase: ${error.message || 'Unable to create account.'}`;
+      if (!setupAuth.initialized) {
+        signUpBtn.addEventListener('click', async () => {
+          const email = authEmail.value.trim();
+          const password = authPassword.value;
+
+          if (!email || !password) {
+            authStatus.textContent = 'Enter an email and password.';
+            return;
+          }
+
+          authStatus.textContent = 'Creating account...';
+
+          try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            authStatus.textContent = 'Account created successfully.';
+          } catch (error) {
+            console.error('Create account error:', error);
+            authStatus.textContent = `Firebase: ${error.message || 'Unable to create account.'}`;
+          }
+        });
+
+        signInBtn.addEventListener('click', async () => {
+          const email = authEmail.value.trim();
+          const password = authPassword.value;
+
+          if (!email || !password) {
+            authStatus.textContent = 'Enter an email and password.';
+            return;
+          }
+
+          authStatus.textContent = 'Signing in...';
+
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+            authStatus.textContent = 'Signed in.';
+          } catch (error) {
+            console.error('Sign in error:', error);
+            authStatus.textContent = `Firebase: ${error.message || 'Unable to sign in.'}`;
+          }
+        });
+
+        signOutBtn.addEventListener('click', async () => {
+          try {
+            await signOut(auth);
+          } catch (error) {
+            console.error('Sign out error:', error);
+            authStatus.textContent = `Firebase: ${error.message || 'Unable to sign out.'}`;
+          }
+        });
+
+        setupAuth.initialized = true;
       }
-    });
 
-    signInBtn.addEventListener('click', async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value;
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
 
-      if (!email || !password) {
-        authStatus.textContent = 'Enter an email and password.';
-        return;
-      }
+        if (user) {
+          authStatus.textContent = `Signed in as ${user.email}`;
+          signOutBtn.style.display = '';
+          signInBtn.style.display = 'none';
+          signUpBtn.style.display = 'none';
 
-      authStatus.textContent = 'Signing in...';
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        authStatus.textContent = 'Signed in.';
-      } catch (error) {
-        console.error('Sign in error:', error);
-        authStatus.textContent = `Firebase: ${error.message || 'Unable to sign in.'}`;
-      }
-    });
-
-    signOutBtn.addEventListener('click', async () => {
-      try {
-        clearDashboardListeners();
-        await signOut(auth);
-      } catch (error) {
-        console.error('Sign out error:', error);
-        authStatus.textContent = `Firebase: ${error.message || 'Unable to sign out.'}`;
-      }
-    });
-
-    setupAuth.initialized = true;
-  }
-
-  onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-
-    if (user) {
-      authStatus.textContent = `Signed in as ${user.email}`;
-      signOutBtn.style.display = '';
-      signInBtn.style.display = 'none';
-      signUpBtn.style.display = 'none';
-
-      try {
-        await loadUserDataFromCloud();
-        startTaskSyncListeners();
-      } catch (error) {
-        console.error('Cloud load error:', error);
-        authStatus.textContent = 'Signed in, but cloud data could not load.';
-      }
-    } else {
-      clearDashboardListeners();
-      authStatus.textContent = 'Not signed in';
-      signOutBtn.style.display = 'none';
-      signInBtn.style.display = '';
-      signUpBtn.style.display = '';
-      renderAll();
+          try {
+            await loadUserDataFromCloud();
+          } catch (error) {
+            console.error('Cloud load error:', error);
+            authStatus.textContent = 'Signed in, but cloud data could not load.';
+          }
+        } else {
+          authStatus.textContent = 'Not signed in';
+          signOutBtn.style.display = 'none';
+          signInBtn.style.display = '';
+          signUpBtn.style.display = '';
+          renderAll();
+        }
+      });
     }
-  });
-}
 
     addBusinessTaskBtn.addEventListener('click', () => {
       addTask(
