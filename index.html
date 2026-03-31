@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-  <meta name="apple-mobile-web-app-title" content="Finance" />
-  <meta name="application-name" content="Finance" />
+  <meta name="apple-mobile-web-app-title" content="Dashboard" />
+  <meta name="application-name" content="Dashboard" />
   <meta name="format-detection" content="telephone=no" />
 
   <link rel="icon" href="icons/favicon.ico" />
@@ -65,7 +65,7 @@
       min-height: 100svh;
     }
 
-    .app {
+    .page {
       max-width: 1180px;
       margin: 0 auto;
       padding:
@@ -73,6 +73,11 @@
         calc(14px + var(--safe-right))
         calc(36px + var(--safe-bottom))
         calc(14px + var(--safe-left));
+    }
+
+    .auth-wrap {
+      max-width: 560px;
+      margin: 0 auto 18px;
     }
 
     .topbar {
@@ -391,17 +396,12 @@
       padding-bottom: calc(4px + var(--safe-bottom));
     }
 
-    .auth-wrap {
-      max-width: 560px;
-      margin: 0 auto 18px;
-    }
-
     @media (max-width: 980px) {
       .grid { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 560px) {
-      .app {
+      .page {
         padding:
           calc(12px + var(--safe-top))
           calc(10px + var(--safe-right))
@@ -417,8 +417,7 @@
   </style>
 </head>
 <body>
-
-  <div class="app">
+  <div class="page">
     <div class="auth-wrap">
       <section class="card" id="authCard">
         <div class="section-head">
@@ -441,7 +440,7 @@
       </section>
     </div>
 
-    <div class="app" id="appShell">
+    <div id="appShell">
       <div class="topbar">
         <div class="title-wrap">
           <h1>My Daily Dashboard</h1>
@@ -809,14 +808,14 @@
                   <strong>Dream Journal</strong>
                 </div>
                 <input id="dreamTitle" type="text" placeholder="Dream title or theme" style="margin-bottom: 8px;" />
-                <textarea id="dreamEntry" placeholder="Write your dream here..."></textarea>
+                <textarea id="dreamEntry" placeholder="Write your dream here."></textarea>
               </div>
               <div class="task-item">
                 <div class="section-head" style="margin-bottom: 8px;">
                   <strong>Journal Entry</strong>
                 </div>
                 <input id="journalTitle" type="text" placeholder="Entry title" style="margin-bottom: 8px;" />
-                <textarea id="journalEntry" placeholder="Write your thoughts here..."></textarea>
+                <textarea id="journalEntry" placeholder="Write your thoughts here."></textarea>
               </div>
             </div>
           </section>
@@ -972,14 +971,14 @@
       getDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+    // Replace this block with the exact Web App config from Firebase Console if needed.
     const firebaseConfig = {
-     apiKey: "AIzaSyB7A82VMGP00juZFGQO4UzNtdBVSJ4WsYo",
-  authDomain: "my-dashboard-7e226.firebaseapp.com",
-  projectId: "my-dashboard-7e226",
-  storageBucket: "my-dashboard-7e226.firebasestorage.app",
-  messagingSenderId: "285644854859",
-  appId: "1:285644854859:web:9ea327fb231d7002a81fce",
-  measurementId: "G-YYV7PEZY0K"
+      apiKey: "AIzaSyB7A82VMGP00juZFGQO4UzNtdBVSJ4WsYo",
+      authDomain: "my-dashboard-7e226.firebaseapp.com",
+      projectId: "my-dashboard-7e226",
+      storageBucket: "my-dashboard-7e226.firebasestorage.app",
+      messagingSenderId: "285644854859",
+      appId: "1:285644854859:web:9ea327fb231d7002a81fce"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -1075,21 +1074,14 @@
       }
     }
 
-    const defaultCleaning = [
-      { id: uid(), text: 'Make bed', done: false },
-      { id: uid(), text: 'Wipe kitchen counters', done: false },
-      { id: uid(), text: '15-minute tidy', done: false },
-      { id: uid(), text: 'Check one laundry load', done: false }
-    ];
-
-    let businessTasks = loadLocal(storageKeys.businessTasks, [
+    const defaultBusinessTasks = [
       { id: uid(), text: 'Check email', done: false },
       { id: uid(), text: 'Check social media', done: false },
       { id: uid(), text: 'Create content', done: false },
       { id: uid(), text: 'Follow up on orders', done: false }
-    ]);
+    ];
 
-    let personalTasks = loadLocal(storageKeys.personalTasks, [
+    const defaultPersonalTasks = [
       { id: uid(), text: 'Journal', done: false },
       { id: uid(), text: 'Read', done: false },
       { id: uid(), text: 'Shower', done: false },
@@ -1097,8 +1089,32 @@
       { id: uid(), text: 'Learn something', done: false },
       { id: uid(), text: 'Yoga & Meditation', done: false },
       { id: uid(), text: 'Pay bills', done: false }
-    ]);
+    ];
 
+    const defaultCleaning = [
+      { id: uid(), text: 'Make bed', done: false },
+      { id: uid(), text: 'Wipe kitchen counters', done: false },
+      { id: uid(), text: '15-minute tidy', done: false },
+      { id: uid(), text: 'Check one laundry load', done: false }
+    ];
+
+    const defaultMeraki = [
+      { id: uid(), text: 'Take a bath', done: false },
+      { id: uid(), text: 'Brush teeth', done: false },
+      { id: uid(), text: 'Do homework', done: false },
+      { id: uid(), text: 'Get on and off the bus', done: false },
+      { id: uid(), text: 'School', done: false }
+    ];
+
+    const defaultFamily = [
+      { id: uid(), text: 'Family time', done: false },
+      { id: uid(), text: 'Take out trash', done: false },
+      { id: uid(), text: 'Feed cats', done: false },
+      { id: uid(), text: 'Clean cat litter', done: false }
+    ];
+
+    let businessTasks = loadLocal(storageKeys.businessTasks, defaultBusinessTasks);
+    let personalTasks = loadLocal(storageKeys.personalTasks, defaultPersonalTasks);
     let appointments = loadLocal(storageKeys.appointments, []);
     let scheduleItems = loadLocal(storageKeys.schedule, [
       { id: uid(), time: '08:00', text: 'Start the day' }
@@ -1111,19 +1127,8 @@
       lunch: { meal: '', ingredients: '' },
       dinner: { meal: '', ingredients: '' }
     });
-    let meraki = loadLocal(storageKeys.meraki, [
-      { id: uid(), text: 'Take a bath', done: false },
-      { id: uid(), text: 'Brush teeth', done: false },
-      { id: uid(), text: 'Do homework', done: false },
-      { id: uid(), text: 'Get on and off the bus', done: false },
-      { id: uid(), text: 'School', done: false }
-    ]);
-    let family = loadLocal(storageKeys.family, [
-      { id: uid(), text: 'Family time', done: false },
-      { id: uid(), text: 'Take out trash', done: false },
-      { id: uid(), text: 'Feed cats', done: false },
-      { id: uid(), text: 'Clean cat litter', done: false }
-    ]);
+    let meraki = loadLocal(storageKeys.meraki, defaultMeraki);
+    let family = loadLocal(storageKeys.family, defaultFamily);
     let fitness = loadLocal(storageKeys.fitness, {
       cardioExercise: 'Walking',
       cardioTime: '',
@@ -1306,7 +1311,6 @@
     function createTaskItem(task, onToggle, onDelete) {
       const item = document.createElement('div');
       item.className = `task-item ${task.done ? 'done' : ''}`;
-
       item.innerHTML = `
         <div class="task-top">
           <label class="task-left">
@@ -1316,7 +1320,6 @@
           <button class="tiny-btn">Delete</button>
         </div>
       `;
-
       item.querySelector('.check').addEventListener('change', onToggle);
       item.querySelector('.tiny-btn').addEventListener('click', onDelete);
       return item;
@@ -1716,6 +1719,16 @@
     }
 
     async function setupAuth() {
+      if (!window.firebaseAuth || !window.firebaseHelpers || !window.db) {
+        authStatus.textContent = 'Firebase is still loading. Please refresh and try again.';
+        console.error('Firebase helpers not available yet.', {
+          firebaseAuth: !!window.firebaseAuth,
+          firebaseHelpers: !!window.firebaseHelpers,
+          db: !!window.db
+        });
+        return;
+      }
+
       const auth = window.firebaseAuth;
       const {
         createUserWithEmailAndPassword,
@@ -1724,43 +1737,58 @@
         onAuthStateChanged
       } = window.firebaseHelpers;
 
-      signUpBtn.addEventListener('click', async () => {
-        const email = authEmail.value.trim();
-        const password = authPassword.value;
-        if (!email || !password) {
-          authStatus.textContent = 'Enter an email and password.';
-          return;
-        }
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          authStatus.textContent = 'Account created.';
-        } catch (error) {
-          authStatus.textContent = error.message;
-        }
-      });
+      if (!setupAuth.initialized) {
+        signUpBtn.addEventListener('click', async () => {
+          const email = authEmail.value.trim();
+          const password = authPassword.value;
 
-      signInBtn.addEventListener('click', async () => {
-        const email = authEmail.value.trim();
-        const password = authPassword.value;
-        if (!email || !password) {
-          authStatus.textContent = 'Enter an email and password.';
-          return;
-        }
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          authStatus.textContent = 'Signed in.';
-        } catch (error) {
-          authStatus.textContent = error.message;
-        }
-      });
+          if (!email || !password) {
+            authStatus.textContent = 'Enter an email and password.';
+            return;
+          }
 
-      signOutBtn.addEventListener('click', async () => {
-        try {
-          await signOut(auth);
-        } catch (error) {
-          authStatus.textContent = error.message;
-        }
-      });
+          authStatus.textContent = 'Creating account...';
+
+          try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            authStatus.textContent = 'Account created successfully.';
+          } catch (error) {
+            console.error('Create account error:', error);
+            authStatus.textContent = `Firebase: ${error.message || 'Unable to create account.'}`;
+          }
+        });
+
+        signInBtn.addEventListener('click', async () => {
+          const email = authEmail.value.trim();
+          const password = authPassword.value;
+
+          if (!email || !password) {
+            authStatus.textContent = 'Enter an email and password.';
+            return;
+          }
+
+          authStatus.textContent = 'Signing in...';
+
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+            authStatus.textContent = 'Signed in.';
+          } catch (error) {
+            console.error('Sign in error:', error);
+            authStatus.textContent = `Firebase: ${error.message || 'Unable to sign in.'}`;
+          }
+        });
+
+        signOutBtn.addEventListener('click', async () => {
+          try {
+            await signOut(auth);
+          } catch (error) {
+            console.error('Sign out error:', error);
+            authStatus.textContent = `Firebase: ${error.message || 'Unable to sign out.'}`;
+          }
+        });
+
+        setupAuth.initialized = true;
+      }
 
       onAuthStateChanged(auth, async (user) => {
         currentUser = user;
@@ -1770,7 +1798,13 @@
           signOutBtn.style.display = '';
           signInBtn.style.display = 'none';
           signUpBtn.style.display = 'none';
-          await loadUserDataFromCloud();
+
+          try {
+            await loadUserDataFromCloud();
+          } catch (error) {
+            console.error('Cloud load error:', error);
+            authStatus.textContent = 'Signed in, but cloud data could not load.';
+          }
         } else {
           authStatus.textContent = 'Not signed in';
           signOutBtn.style.display = 'none';
@@ -1951,13 +1985,13 @@
     breathResetBtn.addEventListener('click', resetBreathingUI);
 
     resetBusinessTasksBtn.addEventListener('click', () => {
-      businessTasks = [];
+      businessTasks = defaultBusinessTasks.map(item => ({ ...item, id: uid() }));
       save(storageKeys.businessTasks, businessTasks);
       renderBusinessTasks();
     });
 
     resetPersonalTasksBtn.addEventListener('click', () => {
-      personalTasks = [];
+      personalTasks = defaultPersonalTasks.map(item => ({ ...item, id: uid() }));
       save(storageKeys.personalTasks, personalTasks);
       renderPersonalTasks();
     });
@@ -1991,13 +2025,13 @@
     });
 
     resetMerakiBtn.addEventListener('click', () => {
-      meraki = [];
+      meraki = defaultMeraki.map(item => ({ ...item, id: uid() }));
       save(storageKeys.meraki, meraki);
       renderMeraki();
     });
 
     resetFamilyBtn.addEventListener('click', () => {
-      family = [];
+      family = defaultFamily.map(item => ({ ...item, id: uid() }));
       save(storageKeys.family, family);
       renderFamily();
     });
@@ -2063,141 +2097,21 @@
       renderJournal();
     });
 
-    async function saveCloudDoc(key, value) {
-  if (!currentUser || !window.db || !window.firebaseHelpers) return;
-  const { doc, setDoc } = window.firebaseHelpers;
-  await setDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key), value);
-}
+    renderAll();
+    resetBreathingUI();
 
-async function loadCloudDoc(key, fallback) {
-  if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
-  const { doc, getDoc } = window.firebaseHelpers;
-  const snap = await getDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key));
-  return snap.exists() ? snap.data() : fallback;
-}
-
-async function loadUserDataFromCloud() {
-  journal = await loadCloudDoc(storageKeys.journal, journal);
-  localStorage.setItem(storageKeys.journal, JSON.stringify(journal));
-  renderAll();
-}
-
-async function setupAuth() {
-  if (!window.firebaseAuth || !window.firebaseHelpers || !window.db) {
-    authStatus.textContent = 'Firebase is still loading. Please refresh and try again.';
-    console.error('Firebase helpers not available yet.', {
-      firebaseAuth: !!window.firebaseAuth,
-      firebaseHelpers: !!window.firebaseHelpers,
-      db: !!window.db
-    });
-    return;
-  }
-
-  const auth = window.firebaseAuth;
-  const {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-  } = window.firebaseHelpers;
-
-  if (!setupAuth.initialized) {
-    signUpBtn.addEventListener('click', async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value;
-
-      if (!email || !password) {
-        authStatus.textContent = 'Enter an email and password.';
-        return;
-      }
-
-      authStatus.textContent = 'Creating account...';
-
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        authStatus.textContent = 'Account created successfully.';
-      } catch (error) {
-        console.error('Create account error:', error);
-        authStatus.textContent = error.message || 'Unable to create account.';
+    window.addEventListener('load', () => {
+      if (window.firebaseAuth && window.firebaseHelpers && window.db) {
+        setupAuth();
+      } else {
+        authStatus.textContent = 'Firebase did not finish loading. Refresh the page and try again.';
+        console.error('Firebase globals missing:', {
+          firebaseAuth: !!window.firebaseAuth,
+          firebaseHelpers: !!window.firebaseHelpers,
+          db: !!window.db
+        });
       }
     });
-
-    signInBtn.addEventListener('click', async () => {
-      const email = authEmail.value.trim();
-      const password = authPassword.value;
-
-      if (!email || !password) {
-        authStatus.textContent = 'Enter an email and password.';
-        return;
-      }
-
-      authStatus.textContent = 'Signing in...';
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        authStatus.textContent = 'Signed in.';
-      } catch (error) {
-        console.error('Sign in error:', error);
-        authStatus.textContent = error.message || 'Unable to sign in.';
-      }
-    });
-
-    signOutBtn.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        console.error('Sign out error:', error);
-        authStatus.textContent = error.message || 'Unable to sign out.';
-      }
-    });
-
-    setupAuth.initialized = true;
-  }
-
-  onAuthStateChanged(auth, async (user) => {
-    currentUser = user;
-
-    if (user) {
-      authStatus.textContent = `Signed in as ${user.email}`;
-      signOutBtn.style.display = '';
-      signInBtn.style.display = 'none';
-      signUpBtn.style.display = 'none';
-
-      if (appShell) appShell.style.display = '';
-
-      try {
-        await loadUserDataFromCloud();
-      } catch (error) {
-        console.error('Cloud load error:', error);
-        authStatus.textContent = 'Signed in, but cloud data could not load.';
-      }
-    } else {
-      authStatus.textContent = 'Not signed in';
-      signOutBtn.style.display = 'none';
-      signInBtn.style.display = '';
-      signUpBtn.style.display = '';
-
-      if (appShell) appShell.style.display = '';
-      renderAll();
-    }
-  });
-}
-
-   resetBreathingUI();
-renderAll();
-
-window.addEventListener('load', () => {
-  if (window.firebaseAuth && window.firebaseHelpers && window.db) {
-    setupAuth();
-  } else {
-    authStatus.textContent = 'Firebase did not finish loading. Refresh the page and try again.';
-    console.error('Firebase globals missing:', {
-      firebaseAuth: !!window.firebaseAuth,
-      firebaseHelpers: !!window.firebaseHelpers,
-      db: !!window.db
-    });
-  }
-});
   </script>
 </body>
 </html>
