@@ -393,12 +393,7 @@
 
     .auth-wrap {
       max-width: 560px;
-      margin: 20px auto 0;
-      padding:
-        calc(18px + var(--safe-top))
-        calc(14px + var(--safe-right))
-        0
-        calc(14px + var(--safe-left));
+      margin: 0 auto 18px;
     }
 
     @media (max-width: 980px) {
@@ -406,7 +401,7 @@
     }
 
     @media (max-width: 560px) {
-      .app, .auth-wrap {
+      .app {
         padding:
           calc(12px + var(--safe-top))
           calc(10px + var(--safe-right))
@@ -423,580 +418,585 @@
 </head>
 <body>
 
-  <div class="auth-wrap" id="authCard">
-    <section class="card">
-      <h2>Sign In</h2>
-      <div class="sub">Use the same email and password on each device to sync your journal across devices.</div>
-      <div class="stack" style="gap: 12px;">
-        <input id="authEmail" type="email" placeholder="Email address" />
-        <input id="authPassword" type="password" placeholder="Password" />
-        <div class="input-row" style="margin-bottom: 0;">
-          <button id="signUpBtn" class="ghost">Create Account</button>
-          <button id="signInBtn">Sign In</button>
-          <button id="signOutBtn" class="ghost" style="display:none;">Sign Out</button>
+  <div class="app">
+    <div class="auth-wrap">
+      <section class="card" id="authCard">
+        <div class="section-head">
+          <div>
+            <h2>Sign In</h2>
+            <div class="sub">Use the same login on each device to sync your dashboard.</div>
+          </div>
+          <button class="ghost" id="signOutBtn" style="display:none;">Sign Out</button>
         </div>
-        <div class="mini" id="authStatus">Not signed in</div>
-      </div>
-    </section>
-  </div>
 
-  <div class="app" id="appShell" style="display:none;">
-    <div class="topbar">
-      <div class="title-wrap">
-        <h1>My Daily Dashboard</h1>
-        <p>Simple, phone-friendly, and easy to keep up with.</p>
-      </div>
-      <div class="today-chip" id="todayDate"></div>
-    </div>
-
-    <div class="grid">
-      <!-- LEFT COLUMN -->
-      <div class="stack">
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Business Tasks</h2>
-              <div class="sub">Work, Alchemy Body Werks, content, and priorities.</div>
-            </div>
-            <button class="ghost" id="resetBusinessTasksBtn">Reset</button>
-          </div>
-
-          <div class="stack" style="gap: 10px; margin-bottom: 12px;">
-            <a
-              href="https://docs.google.com/spreadsheets/d/1D6q7TkxJlTKZwOfIoh4IgEDrMtr-i8Sv5vNR5IICSnc/edit?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              style="
-                display:inline-flex;
-                align-items:center;
-                justify-content:center;
-                width:100%;
-                text-decoration:none;
-                background:var(--accent);
-                color:white;
-                padding:12px 16px;
-                border-radius:14px;
-                font-weight:500;
-              "
-            >
-              Inventory
-            </a>
-
-            <a
-              href="https://docs.google.com/spreadsheets/d/120xRbdgAryktRwWyVW3E3DTeYD628CKT9T9a6UoDs3U/edit?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              style="
-                display:inline-flex;
-                align-items:center;
-                justify-content:center;
-                width:100%;
-                text-decoration:none;
-                background:var(--text);
-                color:white;
-                padding:12px 16px;
-                border-radius:14px;
-                font-weight:500;
-              "
-            >
-              Recipes
-            </a>
-          </div>
-
-          <div class="input-row">
-            <input id="businessTaskInput" type="text" placeholder="Add a business task" />
-            <button id="addBusinessTaskBtn">Add</button>
-          </div>
-          <div class="task-list" id="businessTaskList"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Personal Tasks</h2>
-              <div class="sub">Life, wellness, home, and routines.</div>
-            </div>
-            <button class="ghost" id="resetPersonalTasksBtn">Reset</button>
-          </div>
-          <div class="input-row">
-            <input id="personalTaskInput" type="text" placeholder="Add a personal task" />
-            <button id="addPersonalTaskBtn">Add</button>
-          </div>
-          <div class="task-list" id="personalTaskList"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Appointments</h2>
-              <div class="sub">Meetings, calls, reminders, and time-based events.</div>
-            </div>
-            <button class="ghost" id="resetAppointmentsBtn">Reset</button>
-          </div>
-          <div class="input-row">
-            <input id="appointmentTime" type="time" />
-            <input id="appointmentText" type="text" placeholder="Appointment details" />
-            <button id="addAppointmentBtn">Add</button>
-          </div>
-          <div class="schedule-list" id="appointmentList"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Schedule</h2>
-              <div class="sub">Keep your day visible at a glance.</div>
-            </div>
-            <button class="ghost" id="resetScheduleBtn">Reset</button>
-          </div>
-          <div class="input-row">
-            <input id="scheduleTime" type="time" />
-            <input id="scheduleText" type="text" placeholder="What is happening?" />
-            <button id="addScheduleBtn">Add</button>
-          </div>
-          <div class="schedule-list" id="scheduleList"></div>
-        </section>
-      </div>
-
-      <!-- MIDDLE COLUMN -->
-      <div class="stack">
-        <section class="card">
-          <h2>Finances</h2>
-          <div class="sub">A light tracker for money in and money out.</div>
-
-          <div class="input-row" style="margin-bottom:12px;">
-            <a
-              href="https://docs.google.com/spreadsheets/d/1422qrl3-yqWdeeFNaFKcL1P4vprcy7xTNRCPIR62xdI/edit?usp=sharing"
-              target="_blank"
-              rel="noopener noreferrer"
-              style="
-                display:inline-flex;
-                align-items:center;
-                justify-content:center;
-                width:100%;
-                text-decoration:none;
-                background:var(--accent);
-                color:white;
-                padding:12px 16px;
-                border-radius:14px;
-                font-weight:500;
-              "
-            >
-              Finance Tracker
-            </a>
-          </div>
-
-          <div class="finance-summary">
-            <div class="summary-box">
-              <div class="label">Income</div>
-              <div class="value" id="incomeTotal">$0.00</div>
-            </div>
-            <div class="summary-box">
-              <div class="label">Expenses</div>
-              <div class="value" id="expenseTotal">$0.00</div>
-            </div>
-            <div class="summary-box">
-              <div class="label">Balance</div>
-              <div class="value" id="balanceTotal">$0.00</div>
-            </div>
-            <div class="summary-box">
-              <div class="label">Entries</div>
-              <div class="value" id="entryCount">0</div>
-            </div>
-          </div>
-
-          <div class="finance-row">
-            <input id="financeDesc" type="text" placeholder="Description" />
-            <input id="financeAmount" type="number" step="0.01" placeholder="Amount" />
-            <select id="financeType">
-              <option value="expense">Expense</option>
-              <option value="income">Income</option>
-            </select>
-            <button id="addFinanceBtn">Add</button>
-          </div>
-
-          <div class="finance-list" id="financeList"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Meal Planning</h2>
-              <div class="sub">Plan breakfast, lunch, and dinner with ingredients in one place.</div>
-            </div>
-            <button class="ghost" id="resetMealsBtn">Reset</button>
-          </div>
-          <div class="stack" style="gap: 12px;">
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Breakfast</strong>
-              </div>
-              <input id="breakfastMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
-              <textarea id="breakfastIngredients" placeholder="Ingredients"></textarea>
-            </div>
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Lunch</strong>
-              </div>
-              <input id="lunchMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
-              <textarea id="lunchIngredients" placeholder="Ingredients"></textarea>
-            </div>
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Dinner</strong>
-              </div>
-              <input id="dinnerMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
-              <textarea id="dinnerIngredients" placeholder="Ingredients"></textarea>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Fitness</h2>
-              <div class="sub">Track cardio and strength training in one place.</div>
-            </div>
-            <button class="ghost" id="resetFitnessBtn">Reset</button>
-          </div>
-          <div class="stack" style="gap: 12px;">
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Cardio</strong>
-              </div>
-              <div class="input-row" style="margin-bottom: 8px;">
-                <input id="cardioExercise" type="text" placeholder="Exercise" />
-                <input id="cardioTime" type="text" placeholder="Time or distance" />
-              </div>
-              <textarea id="cardioNotes" placeholder="Notes"></textarea>
-            </div>
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Strength Training</strong>
-              </div>
-              <div class="input-row" style="margin-bottom: 8px;">
-                <input id="strengthExercise" type="text" placeholder="Exercise" />
-                <input id="strengthReps" type="text" placeholder="Sets / reps / time" />
-              </div>
-              <textarea id="strengthNotes" placeholder="Notes"></textarea>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Body Log</h2>
-              <div class="sub">Track weight, body fat, and measurements.</div>
-            </div>
-            <button class="ghost" id="resetBodyLogBtn">Reset</button>
-          </div>
-          <div class="stack" style="gap: 10px;">
-            <div class="input-row" style="margin-bottom: 0;">
-              <input id="logWeight" type="text" placeholder="Weight" />
-              <input id="logBodyFat" type="text" placeholder="Body fat %" />
-            </div>
-            <div class="input-row" style="margin-bottom: 0;">
-              <input id="logWaist" type="text" placeholder="Waist" />
-              <input id="logHips" type="text" placeholder="Hips" />
-            </div>
-            <div class="input-row" style="margin-bottom: 0;">
-              <input id="logChest" type="text" placeholder="Chest" />
-              <input id="logArms" type="text" placeholder="Arms" />
-            </div>
-            <div class="input-row" style="margin-bottom: 0;">
-              <input id="logThighs" type="text" placeholder="Thighs" />
-              <input id="logNotes" type="text" placeholder="Extra notes" />
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Medication</h2>
-              <div class="sub">Track medication reminders for morning and night.</div>
-            </div>
-            <button class="ghost" id="resetMedicationBtn">Reset</button>
-          </div>
-          <div class="stack" style="gap: 12px;">
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Morning Medication</strong>
-              </div>
-              <div class="input-row" style="margin-bottom: 8px;">
-                <input id="morningMedicationName" type="text" placeholder="Medication or reminder" />
-                <input id="morningMedicationTime" type="time" />
-              </div>
-              <label class="task-left" style="margin-top: 4px;">
-                <input class="check" id="morningMedicationTaken" type="checkbox" />
-                <span class="task-text">Taken</span>
-              </label>
-            </div>
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Night Medication</strong>
-              </div>
-              <div class="input-row" style="margin-bottom: 8px;">
-                <input id="nightMedicationName" type="text" placeholder="Medication or reminder" />
-                <input id="nightMedicationTime" type="time" />
-              </div>
-              <label class="task-left" style="margin-top: 4px;">
-                <input class="check" id="nightMedicationTaken" type="checkbox" />
-                <span class="task-text">Taken</span>
-              </label>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Sleep Tracker</h2>
-              <div class="sub">Log your sleep schedule and how rested you feel.</div>
-            </div>
-            <button class="ghost" id="resetSleepBtn">Reset</button>
-          </div>
-          <div class="stack" style="gap: 10px;">
-            <div class="input-row" style="margin-bottom: 0;">
-              <input id="sleepBedtime" type="time" />
-              <input id="sleepWakeTime" type="time" />
-            </div>
-            <div class="input-row" style="margin-bottom: 0;">
-              <input id="sleepHours" type="text" placeholder="Total hours slept" />
-              <select id="sleepQuality">
-                <option value="">Sleep quality</option>
-                <option value="Great">Great</option>
-                <option value="Good">Good</option>
-                <option value="Okay">Okay</option>
-                <option value="Poor">Poor</option>
-              </select>
-            </div>
-            <textarea id="sleepNotes" placeholder="Sleep notes"></textarea>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Journal</h2>
-              <div class="sub">Capture dreams, reflections, and your mood.</div>
-            </div>
-            <button class="ghost" id="resetJournalBtn">Reset</button>
-          </div>
-          <div class="stack" style="gap: 12px;">
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Mood</strong>
-              </div>
-              <select id="moodPicker">
-                <option value="">How are you feeling?</option>
-                <option value="Calm">Calm</option>
-                <option value="Good">Good</option>
-                <option value="Focused">Focused</option>
-                <option value="Tired">Tired</option>
-                <option value="Overwhelmed">Overwhelmed</option>
-                <option value="Anxious">Anxious</option>
-                <option value="Heavy">Heavy</option>
-                <option value="Hopeful">Hopeful</option>
-                <option value="Grateful">Grateful</option>
-                <option value="Inspired">Inspired</option>
-              </select>
-            </div>
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Dream Journal</strong>
-              </div>
-              <input id="dreamTitle" type="text" placeholder="Dream title or theme" style="margin-bottom: 8px;" />
-              <textarea id="dreamEntry" placeholder="Write your dream here..."></textarea>
-            </div>
-            <div class="task-item">
-              <div class="section-head" style="margin-bottom: 8px;">
-                <strong>Journal Entry</strong>
-              </div>
-              <input id="journalTitle" type="text" placeholder="Entry title" style="margin-bottom: 8px;" />
-              <textarea id="journalEntry" placeholder="Write your thoughts here..."></textarea>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Meraki Routine</h2>
-              <div class="sub">Keep Meraki’s daily routine visible and easy to reset.</div>
-            </div>
-            <button class="ghost" id="resetMerakiBtn">Reset</button>
-          </div>
-          <div class="input-row">
-            <input id="merakiInput" type="text" placeholder="Add a routine task" />
-            <button id="addMerakiBtn">Add</button>
-          </div>
-          <div class="task-list" id="merakiList"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Family</h2>
-              <div class="sub">Track shared family priorities and home responsibilities.</div>
-            </div>
-            <button class="ghost" id="resetFamilyBtn">Reset</button>
-          </div>
-          <div class="input-row">
-            <input id="familyInput" type="text" placeholder="Add a family task" />
-            <button id="addFamilyBtn">Add</button>
-          </div>
-          <div class="task-list" id="familyList"></div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Home Cleaning</h2>
-              <div class="sub">Home cleaning system.</div>
-            </div>
-          </div>
+        <div class="stack" style="gap:12px;">
+          <input id="authEmail" type="email" placeholder="Email" />
+          <input id="authPassword" type="password" placeholder="Password" />
           <div class="input-row" style="margin-bottom:0;">
-            <a
-              href="https://nadineherrera.github.io/homecleaning/"
-              target="_blank"
-              rel="noopener noreferrer"
-              style="
-                display:inline-flex;
-                align-items:center;
-                justify-content:center;
-                width:100%;
-                text-decoration:none;
-                background:var(--text);
-                color:white;
-                padding:12px 16px;
-                border-radius:14px;
-              "
-            >
-              Open Home Cleaning System
-            </a>
+            <button id="signInBtn">Sign In</button>
+            <button class="ghost" id="signUpBtn">Create Account</button>
           </div>
-        </section>
-
-        <section class="card">
-          <h2>Notes</h2>
-          <div class="sub">A simple space for reminders or thoughts.</div>
-          <textarea id="notesBox" placeholder="Write anything you want to remember..."></textarea>
-        </section>
-      </div>
-
-      <!-- RIGHT COLUMN -->
-      <div class="stack">
-        <section class="card">
-          <h2>Breathing</h2>
-          <div class="sub">A calm 5 to 6 second inhale and 5 to 6 second exhale rhythm.</div>
-          <div class="bubble-card">
-            <div class="bubble" id="bubble">
-              <div class="bubble-inner">
-                <div class="breath-phase" id="breathPhase">Breathe In</div>
-                <div class="muted" id="breathInstruction">for 5 to 6 seconds</div>
-              </div>
-            </div>
-            <div class="mini" id="breathStatus">Ready to begin</div>
-            <div class="input-row" style="margin:0; justify-content:center;">
-              <button class="gold" id="breathToggleBtn">Start</button>
-              <button class="ghost" id="breathResetBtn">Reset</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2>Water Tracker</h2>
-          <div class="sub">Track cups of water through the day.</div>
-          <div class="water-wrap">
-            <div>
-              <div class="section-head" style="margin-bottom:8px;">
-                <span class="mini">Progress</span>
-                <span class="pill" id="waterText">0 / 8 cups</span>
-              </div>
-              <div class="water-bar">
-                <div class="water-fill" id="waterFill"></div>
-              </div>
-            </div>
-            <div class="input-row" style="margin-bottom: 4px;">
-              <select id="waterGoalSelect">
-                <option value="8">8 cups</option>
-                <option value="11">11 cups</option>
-                <option value="15">15 cups</option>
-              </select>
-            </div>
-            <div class="water-actions">
-              <button id="waterAddBtn">+ 1 cup</button>
-              <button class="ghost" id="waterMinusBtn">- 1 cup</button>
-              <button class="ghost" id="waterResetBtn">Reset</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="card">
-          <div class="section-head">
-            <div>
-              <h2>Cleaning Focus</h2>
-              <div class="sub">A short list for upkeep without overwhelm.</div>
-            </div>
-            <button class="ghost" id="resetCleaningBtn">Reset</button>
-          </div>
-          <div class="input-row">
-            <input id="cleaningInput" type="text" placeholder="Add a cleaning task" />
-            <button id="addCleaningBtn">Add</button>
-          </div>
-          <div class="task-list" id="cleaningList"></div>
-        </section>
-      </div>
+          <div class="mini" id="authStatus">Not signed in</div>
+        </div>
+      </section>
     </div>
 
-    <div class="footer-note">Journal syncs when signed in. Other sections are still saved on this device.</div>
+    <div class="app" id="appShell">
+      <div class="topbar">
+        <div class="title-wrap">
+          <h1>My Daily Dashboard</h1>
+          <p>Simple, phone-friendly, and easy to keep up with.</p>
+        </div>
+        <div class="today-chip" id="todayDate"></div>
+      </div>
+
+      <div class="grid">
+        <!-- LEFT COLUMN -->
+        <div class="stack">
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Business Tasks</h2>
+                <div class="sub">Work, Alchemy Body Werks, content, and priorities.</div>
+              </div>
+              <button class="ghost" id="resetBusinessTasksBtn">Reset</button>
+            </div>
+
+            <div class="stack" style="gap: 10px; margin-bottom: 12px;">
+              <a
+                href="https://docs.google.com/spreadsheets/d/1D6q7TkxJlTKZwOfIoh4IgEDrMtr-i8Sv5vNR5IICSnc/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display:inline-flex;
+                  align-items:center;
+                  justify-content:center;
+                  width:100%;
+                  text-decoration:none;
+                  background:var(--accent);
+                  color:white;
+                  padding:12px 16px;
+                  border-radius:14px;
+                  font-weight:500;
+                "
+              >
+                Inventory
+              </a>
+
+              <a
+                href="https://docs.google.com/spreadsheets/d/120xRbdgAryktRwWyVW3E3DTeYD628CKT9T9a6UoDs3U/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display:inline-flex;
+                  align-items:center;
+                  justify-content:center;
+                  width:100%;
+                  text-decoration:none;
+                  background:var(--text);
+                  color:white;
+                  padding:12px 16px;
+                  border-radius:14px;
+                  font-weight:500;
+                "
+              >
+                Recipes
+              </a>
+            </div>
+
+            <div class="input-row">
+              <input id="businessTaskInput" type="text" placeholder="Add a business task" />
+              <button id="addBusinessTaskBtn">Add</button>
+            </div>
+            <div class="task-list" id="businessTaskList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Personal Tasks</h2>
+                <div class="sub">Life, wellness, home, and routines.</div>
+              </div>
+              <button class="ghost" id="resetPersonalTasksBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="personalTaskInput" type="text" placeholder="Add a personal task" />
+              <button id="addPersonalTaskBtn">Add</button>
+            </div>
+            <div class="task-list" id="personalTaskList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Appointments</h2>
+                <div class="sub">Meetings, calls, reminders, and time-based events.</div>
+              </div>
+              <button class="ghost" id="resetAppointmentsBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="appointmentTime" type="time" />
+              <input id="appointmentText" type="text" placeholder="Appointment details" />
+              <button id="addAppointmentBtn">Add</button>
+            </div>
+            <div class="schedule-list" id="appointmentList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Schedule</h2>
+                <div class="sub">Keep your day visible at a glance.</div>
+              </div>
+              <button class="ghost" id="resetScheduleBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="scheduleTime" type="time" />
+              <input id="scheduleText" type="text" placeholder="What is happening?" />
+              <button id="addScheduleBtn">Add</button>
+            </div>
+            <div class="schedule-list" id="scheduleList"></div>
+          </section>
+        </div>
+
+        <!-- MIDDLE COLUMN -->
+        <div class="stack">
+          <section class="card">
+            <h2>Finances</h2>
+            <div class="sub">A light tracker for money in and money out.</div>
+
+            <div class="input-row" style="margin-bottom:12px;">
+              <a
+                href="https://docs.google.com/spreadsheets/d/1422qrl3-yqWdeeFNaFKcL1P4vprcy7xTNRCPIR62xdI/edit?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display:inline-flex;
+                  align-items:center;
+                  justify-content:center;
+                  width:100%;
+                  text-decoration:none;
+                  background:var(--accent);
+                  color:white;
+                  padding:12px 16px;
+                  border-radius:14px;
+                  font-weight:500;
+                "
+              >
+                Open Full Finance Tracker
+              </a>
+            </div>
+
+            <div class="finance-summary">
+              <div class="summary-box">
+                <div class="label">Income</div>
+                <div class="value" id="incomeTotal">$0.00</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">Expenses</div>
+                <div class="value" id="expenseTotal">$0.00</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">Balance</div>
+                <div class="value" id="balanceTotal">$0.00</div>
+              </div>
+              <div class="summary-box">
+                <div class="label">Entries</div>
+                <div class="value" id="entryCount">0</div>
+              </div>
+            </div>
+
+            <div class="finance-row">
+              <input id="financeDesc" type="text" placeholder="Description" />
+              <input id="financeAmount" type="number" step="0.01" placeholder="Amount" />
+              <select id="financeType">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+              <button id="addFinanceBtn">Add</button>
+            </div>
+
+            <div class="finance-list" id="financeList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Meal Planning</h2>
+                <div class="sub">Plan breakfast, lunch, and dinner with ingredients in one place.</div>
+              </div>
+              <button class="ghost" id="resetMealsBtn">Reset</button>
+            </div>
+            <div class="stack" style="gap: 12px;">
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Breakfast</strong>
+                </div>
+                <input id="breakfastMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
+                <textarea id="breakfastIngredients" placeholder="Ingredients"></textarea>
+              </div>
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Lunch</strong>
+                </div>
+                <input id="lunchMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
+                <textarea id="lunchIngredients" placeholder="Ingredients"></textarea>
+              </div>
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Dinner</strong>
+                </div>
+                <input id="dinnerMeal" type="text" placeholder="Meal idea" style="margin-bottom: 8px;" />
+                <textarea id="dinnerIngredients" placeholder="Ingredients"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Fitness</h2>
+                <div class="sub">Track cardio and strength training in one place.</div>
+              </div>
+              <button class="ghost" id="resetFitnessBtn">Reset</button>
+            </div>
+            <div class="stack" style="gap: 12px;">
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Cardio</strong>
+                </div>
+                <div class="input-row" style="margin-bottom: 8px;">
+                  <input id="cardioExercise" type="text" placeholder="Exercise" />
+                  <input id="cardioTime" type="text" placeholder="Time or distance" />
+                </div>
+                <textarea id="cardioNotes" placeholder="Notes"></textarea>
+              </div>
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Strength Training</strong>
+                </div>
+                <div class="input-row" style="margin-bottom: 8px;">
+                  <input id="strengthExercise" type="text" placeholder="Exercise" />
+                  <input id="strengthReps" type="text" placeholder="Sets / reps / time" />
+                </div>
+                <textarea id="strengthNotes" placeholder="Notes"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Body Log</h2>
+                <div class="sub">Track weight, body fat, and measurements.</div>
+              </div>
+              <button class="ghost" id="resetBodyLogBtn">Reset</button>
+            </div>
+            <div class="stack" style="gap: 10px;">
+              <div class="input-row" style="margin-bottom: 0;">
+                <input id="logWeight" type="text" placeholder="Weight" />
+                <input id="logBodyFat" type="text" placeholder="Body fat %" />
+              </div>
+              <div class="input-row" style="margin-bottom: 0;">
+                <input id="logWaist" type="text" placeholder="Waist" />
+                <input id="logHips" type="text" placeholder="Hips" />
+              </div>
+              <div class="input-row" style="margin-bottom: 0;">
+                <input id="logChest" type="text" placeholder="Chest" />
+                <input id="logArms" type="text" placeholder="Arms" />
+              </div>
+              <div class="input-row" style="margin-bottom: 0;">
+                <input id="logThighs" type="text" placeholder="Thighs" />
+                <input id="logNotes" type="text" placeholder="Extra notes" />
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Medication</h2>
+                <div class="sub">Track medication reminders for morning and night.</div>
+              </div>
+              <button class="ghost" id="resetMedicationBtn">Reset</button>
+            </div>
+            <div class="stack" style="gap: 12px;">
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Morning Medication</strong>
+                </div>
+                <div class="input-row" style="margin-bottom: 8px;">
+                  <input id="morningMedicationName" type="text" placeholder="Medication or reminder" />
+                  <input id="morningMedicationTime" type="time" />
+                </div>
+                <label class="task-left" style="margin-top: 4px;">
+                  <input class="check" id="morningMedicationTaken" type="checkbox" />
+                  <span class="task-text">Taken</span>
+                </label>
+              </div>
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Night Medication</strong>
+                </div>
+                <div class="input-row" style="margin-bottom: 8px;">
+                  <input id="nightMedicationName" type="text" placeholder="Medication or reminder" />
+                  <input id="nightMedicationTime" type="time" />
+                </div>
+                <label class="task-left" style="margin-top: 4px;">
+                  <input class="check" id="nightMedicationTaken" type="checkbox" />
+                  <span class="task-text">Taken</span>
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Sleep Tracker</h2>
+                <div class="sub">Log your sleep schedule and how rested you feel.</div>
+              </div>
+              <button class="ghost" id="resetSleepBtn">Reset</button>
+            </div>
+            <div class="stack" style="gap: 10px;">
+              <div class="input-row" style="margin-bottom: 0;">
+                <input id="sleepBedtime" type="time" />
+                <input id="sleepWakeTime" type="time" />
+              </div>
+              <div class="input-row" style="margin-bottom: 0;">
+                <input id="sleepHours" type="text" placeholder="Total hours slept" />
+                <select id="sleepQuality">
+                  <option value="">Sleep quality</option>
+                  <option value="Great">Great</option>
+                  <option value="Good">Good</option>
+                  <option value="Okay">Okay</option>
+                  <option value="Poor">Poor</option>
+                </select>
+              </div>
+              <textarea id="sleepNotes" placeholder="Sleep notes"></textarea>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Journal</h2>
+                <div class="sub">Capture dreams, reflections, and your mood.</div>
+              </div>
+              <button class="ghost" id="resetJournalBtn">Reset</button>
+            </div>
+            <div class="stack" style="gap: 12px;">
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Mood</strong>
+                </div>
+                <select id="moodPicker">
+                  <option value="">How are you feeling?</option>
+                  <option value="Calm">Calm</option>
+                  <option value="Good">Good</option>
+                  <option value="Focused">Focused</option>
+                  <option value="Tired">Tired</option>
+                  <option value="Overwhelmed">Overwhelmed</option>
+                  <option value="Anxious">Anxious</option>
+                  <option value="Heavy">Heavy</option>
+                  <option value="Hopeful">Hopeful</option>
+                  <option value="Grateful">Grateful</option>
+                  <option value="Inspired">Inspired</option>
+                </select>
+              </div>
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Dream Journal</strong>
+                </div>
+                <input id="dreamTitle" type="text" placeholder="Dream title or theme" style="margin-bottom: 8px;" />
+                <textarea id="dreamEntry" placeholder="Write your dream here..."></textarea>
+              </div>
+              <div class="task-item">
+                <div class="section-head" style="margin-bottom: 8px;">
+                  <strong>Journal Entry</strong>
+                </div>
+                <input id="journalTitle" type="text" placeholder="Entry title" style="margin-bottom: 8px;" />
+                <textarea id="journalEntry" placeholder="Write your thoughts here..."></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Meraki Routine</h2>
+                <div class="sub">Keep Meraki’s daily routine visible and easy to reset.</div>
+              </div>
+              <button class="ghost" id="resetMerakiBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="merakiInput" type="text" placeholder="Add a routine task" />
+              <button id="addMerakiBtn">Add</button>
+            </div>
+            <div class="task-list" id="merakiList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Family</h2>
+                <div class="sub">Track shared family priorities and home responsibilities.</div>
+              </div>
+              <button class="ghost" id="resetFamilyBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="familyInput" type="text" placeholder="Add a family task" />
+              <button id="addFamilyBtn">Add</button>
+            </div>
+            <div class="task-list" id="familyList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Home Cleaning</h2>
+                <div class="sub">Home cleaning system.</div>
+              </div>
+            </div>
+            <div class="input-row" style="margin-bottom:0;">
+              <a
+                href="https://nadineherrera.github.io/homecleaning/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="
+                  display:inline-flex;
+                  align-items:center;
+                  justify-content:center;
+                  width:100%;
+                  text-decoration:none;
+                  background:var(--text);
+                  color:white;
+                  padding:12px 16px;
+                  border-radius:14px;
+                "
+              >
+                Open Home Cleaning System
+              </a>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Notes</h2>
+            <div class="sub">A simple space for reminders or thoughts.</div>
+            <textarea id="notesBox" placeholder="Write anything you want to remember..."></textarea>
+          </section>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="stack">
+          <section class="card">
+            <h2>Breathing</h2>
+            <div class="sub">A calm 5.5 second inhale and 5.5 second exhale rhythm.</div>
+            <div class="bubble-card">
+              <div class="bubble" id="bubble">
+                <div class="bubble-inner">
+                  <div class="breath-phase" id="breathPhase">Breathe In</div>
+                  <div class="muted" id="breathInstruction">for 5.5 seconds</div>
+                </div>
+              </div>
+              <div class="mini" id="breathStatus">Ready to begin</div>
+              <div class="input-row" style="margin:0; justify-content:center;">
+                <button class="gold" id="breathToggleBtn">Start</button>
+                <button class="ghost" id="breathResetBtn">Reset</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Water Tracker</h2>
+            <div class="sub">Track cups of water through the day.</div>
+            <div class="water-wrap">
+              <div>
+                <div class="section-head" style="margin-bottom:8px;">
+                  <span class="mini">Progress</span>
+                  <span class="pill" id="waterText">0 / 8 cups</span>
+                </div>
+                <div class="water-bar">
+                  <div class="water-fill" id="waterFill"></div>
+                </div>
+              </div>
+              <div class="input-row" style="margin-bottom: 4px;">
+                <select id="waterGoalSelect">
+                  <option value="8">8 cups</option>
+                  <option value="11">11 cups</option>
+                  <option value="15">15 cups</option>
+                </select>
+              </div>
+              <div class="water-actions">
+                <button id="waterAddBtn">+ 1 cup</button>
+                <button class="ghost" id="waterMinusBtn">- 1 cup</button>
+                <button class="ghost" id="waterResetBtn">Reset</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Cleaning Focus</h2>
+                <div class="sub">A short list for upkeep without overwhelm.</div>
+              </div>
+              <button class="ghost" id="resetCleaningBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="cleaningInput" type="text" placeholder="Add a cleaning task" />
+              <button id="addCleaningBtn">Add</button>
+            </div>
+            <div class="task-list" id="cleaningList"></div>
+          </section>
+        </div>
+      </div>
+
+      <div class="footer-note">When signed in, your dashboard syncs across devices. It also saves locally on this device.</div>
+    </div>
   </div>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyB7A82VMGP00juZFGQ04UzNtdBVSJ4WsYo",
-    authDomain: "my-dashboard-7e226.firebaseapp.com",
-    projectId: "my-dashboard-7e226",
-    storageBucket: "my-dashboard-7e226.firebasestorage.app",
-    messagingSenderId: "285644854859",
-    appId: "1:285644854859:web:9ea327fb231d7002a81fce"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyB7A82VMGP00juZFGQ04UzNtdBVSJ4WsYo",
+      authDomain: "my-dashboard-7e226.firebaseapp.com",
+      projectId: "my-dashboard-7e226",
+      storageBucket: "my-dashboard-7e226.firebasestorage.app",
+      messagingSenderId: "285644854859",
+      appId: "1:285644854859:web:9ea327fb231d7002a81fce"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  window.firebaseAuth = auth;
-  window.db = db;
-  window.firebaseHelpers = {
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged,
-    doc,
-    setDoc,
-    getDoc
-  };
-
-  console.log("Firebase module loaded");
-</script>
+    window.firebaseAuth = auth;
+    window.db = db;
+    window.firebaseHelpers = {
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged,
+      doc,
+      setDoc,
+      getDoc
+    };
+  </script>
 
   <script>
     const isStandalone =
@@ -1032,19 +1032,6 @@
       return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
     }
 
-    function save(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function load(key, fallback) {
-      try {
-        const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : fallback;
-      } catch (error) {
-        return fallback;
-      }
-    }
-
     function escapeHtml(str) {
       return String(str ?? '')
         .replaceAll('&', '&amp;')
@@ -1054,6 +1041,39 @@
         .replaceAll("'", '&#39;');
     }
 
+    function loadLocal(key, fallback) {
+      try {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    let currentUser = null;
+
+    async function saveCloudDoc(key, value) {
+      if (!currentUser || !window.db || !window.firebaseHelpers) return;
+      const { doc, setDoc } = window.firebaseHelpers;
+      await setDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key), value);
+    }
+
+    async function loadCloudDoc(key, fallback) {
+      if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
+      const { doc, getDoc } = window.firebaseHelpers;
+      const snap = await getDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key));
+      return snap.exists() ? snap.data() : fallback;
+    }
+
+    function save(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+      if (currentUser) {
+        saveCloudDoc(key, value).catch(error => {
+          console.error(`Cloud save failed for ${key}:`, error);
+        });
+      }
+    }
+
     const defaultCleaning = [
       { id: uid(), text: 'Make bed', done: false },
       { id: uid(), text: 'Wipe kitchen counters', done: false },
@@ -1061,14 +1081,14 @@
       { id: uid(), text: 'Check one laundry load', done: false }
     ];
 
-    let businessTasks = load(storageKeys.businessTasks, [
+    let businessTasks = loadLocal(storageKeys.businessTasks, [
       { id: uid(), text: 'Check email', done: false },
       { id: uid(), text: 'Check social media', done: false },
       { id: uid(), text: 'Create content', done: false },
       { id: uid(), text: 'Follow up on orders', done: false }
     ]);
 
-    let personalTasks = load(storageKeys.personalTasks, [
+    let personalTasks = loadLocal(storageKeys.personalTasks, [
       { id: uid(), text: 'Journal', done: false },
       { id: uid(), text: 'Read', done: false },
       { id: uid(), text: 'Shower', done: false },
@@ -1078,32 +1098,32 @@
       { id: uid(), text: 'Pay bills', done: false }
     ]);
 
-    let appointments = load(storageKeys.appointments, []);
-    let scheduleItems = load(storageKeys.schedule, [
+    let appointments = loadLocal(storageKeys.appointments, []);
+    let scheduleItems = loadLocal(storageKeys.schedule, [
       { id: uid(), time: '08:00', text: 'Start the day' }
     ]);
-    let finances = load(storageKeys.finances, []);
-    let water = load(storageKeys.water, { cups: 0, goal: 8 });
-    let cleaning = load(storageKeys.cleaning, defaultCleaning);
-    let meals = load(storageKeys.meals, {
+    let finances = loadLocal(storageKeys.finances, []);
+    let water = loadLocal(storageKeys.water, { cups: 0, goal: 8 });
+    let cleaning = loadLocal(storageKeys.cleaning, defaultCleaning);
+    let meals = loadLocal(storageKeys.meals, {
       breakfast: { meal: '', ingredients: '' },
       lunch: { meal: '', ingredients: '' },
       dinner: { meal: '', ingredients: '' }
     });
-    let meraki = load(storageKeys.meraki, [
+    let meraki = loadLocal(storageKeys.meraki, [
       { id: uid(), text: 'Take a bath', done: false },
       { id: uid(), text: 'Brush teeth', done: false },
       { id: uid(), text: 'Do homework', done: false },
       { id: uid(), text: 'Get on and off the bus', done: false },
       { id: uid(), text: 'School', done: false }
     ]);
-    let family = load(storageKeys.family, [
+    let family = loadLocal(storageKeys.family, [
       { id: uid(), text: 'Family time', done: false },
       { id: uid(), text: 'Take out trash', done: false },
       { id: uid(), text: 'Feed cats', done: false },
       { id: uid(), text: 'Clean cat litter', done: false }
     ]);
-    let fitness = load(storageKeys.fitness, {
+    let fitness = loadLocal(storageKeys.fitness, {
       cardioExercise: 'Walking',
       cardioTime: '',
       cardioNotes: '',
@@ -1111,7 +1131,7 @@
       strengthReps: '',
       strengthNotes: ''
     });
-    let bodyLog = load(storageKeys.bodyLog, {
+    let bodyLog = loadLocal(storageKeys.bodyLog, {
       weight: '',
       bodyFat: '',
       waist: '',
@@ -1121,29 +1141,29 @@
       thighs: '',
       notes: ''
     });
-    let medication = load(storageKeys.medication, {
+    let medication = loadLocal(storageKeys.medication, {
       morning: { name: '', time: '', taken: false },
       night: { name: '', time: '', taken: false }
     });
-    let sleep = load(storageKeys.sleep, {
+    let sleep = loadLocal(storageKeys.sleep, {
       bedtime: '',
       wakeTime: '',
       hours: '',
       quality: '',
       notes: ''
     });
-    let journal = load(storageKeys.journal, {
+    let journal = loadLocal(storageKeys.journal, {
       mood: '',
       dreamTitle: '',
       dreamEntry: '',
       journalTitle: '',
       journalEntry: ''
     });
-    let notes = load(storageKeys.notes, '');
-    let breathingActive = false;
-    let breathState = 'inhale';
+    let notes = loadLocal(storageKeys.notes, '');
+
+    let breathing = false;
     let breathInterval = null;
-    let currentUser = null;
+    let inhale = true;
 
     const authCard = document.getElementById('authCard');
     const appShell = document.getElementById('appShell');
@@ -1258,6 +1278,7 @@
     const dreamEntry = document.getElementById('dreamEntry');
     const journalTitle = document.getElementById('journalTitle');
     const journalEntry = document.getElementById('journalEntry');
+    const resetJournalBtn = document.getElementById('resetJournalBtn');
 
     const bubble = document.getElementById('bubble');
     const breathPhase = document.getElementById('breathPhase');
@@ -1266,177 +1287,150 @@
     const breathToggleBtn = document.getElementById('breathToggleBtn');
     const breathResetBtn = document.getElementById('breathResetBtn');
 
-    function formatDate() {
-      const now = new Date();
-      todayDate.textContent = now.toLocaleDateString(undefined, {
+    function formatToday() {
+      todayDate.textContent = new Date().toLocaleDateString(undefined, {
         weekday: 'long',
         month: 'long',
         day: 'numeric'
       });
     }
 
-    function sortByTime(items) {
-      return [...items].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+    function formatCurrency(value) {
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(value) || 0);
     }
 
-    function renderTaskGroup(listElement, items, storageKey) {
-      listElement.innerHTML = '';
+    function createTaskItem(task, onToggle, onDelete) {
+      const item = document.createElement('div');
+      item.className = `task-item ${task.done ? 'done' : ''}`;
 
-      if (!items.length) {
-        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
-        return;
-      }
+      item.innerHTML = `
+        <div class="task-top">
+          <label class="task-left">
+            <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
+            <span class="task-text">${escapeHtml(task.text)}</span>
+          </label>
+          <button class="tiny-btn">Delete</button>
+        </div>
+      `;
 
-      items.forEach((task) => {
-        const div = document.createElement('div');
-        div.className = 'task-item' + (task.done ? ' done' : '');
+      item.querySelector('.check').addEventListener('change', onToggle);
+      item.querySelector('.tiny-btn').addEventListener('click', onDelete);
+      return item;
+    }
 
-        div.innerHTML = `
-          <div class="task-top">
-            <label class="task-left">
-              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
-              <span class="task-text">${escapeHtml(task.text)}</span>
-            </label>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        const checkbox = div.querySelector('.check');
-        const deleteBtn = div.querySelector('.tiny-btn');
-
-        checkbox.addEventListener('change', () => {
-          task.done = checkbox.checked;
-          save(storageKey, items);
-          renderAll();
-        });
-
-        deleteBtn.addEventListener('click', () => {
-          const index = items.findIndex(item => item.id === task.id);
-          if (index > -1) {
-            items.splice(index, 1);
-            save(storageKey, items);
+    function renderTaskCollection(listEl, collection, saveKey, setCollection) {
+      listEl.innerHTML = '';
+      collection.forEach(task => {
+        listEl.appendChild(createTaskItem(
+          task,
+          () => {
+            const updated = collection.map(item =>
+              item.id === task.id ? { ...item, done: !item.done } : item
+            );
+            setCollection(updated);
+            save(saveKey, updated);
+            renderAll();
+          },
+          () => {
+            const updated = collection.filter(item => item.id !== task.id);
+            setCollection(updated);
+            save(saveKey, updated);
             renderAll();
           }
-        });
-
-        listElement.appendChild(div);
+        ));
       });
     }
 
     function renderBusinessTasks() {
-      renderTaskGroup(businessTaskList, businessTasks, storageKeys.businessTasks);
+      renderTaskCollection(
+        businessTaskList,
+        businessTasks,
+        storageKeys.businessTasks,
+        updated => businessTasks = updated
+      );
     }
 
     function renderPersonalTasks() {
-      renderTaskGroup(personalTaskList, personalTasks, storageKeys.personalTasks);
+      renderTaskCollection(
+        personalTaskList,
+        personalTasks,
+        storageKeys.personalTasks,
+        updated => personalTasks = updated
+      );
     }
 
-    function renderSimpleTaskGroup(listElement, items, storageKey) {
-      listElement.innerHTML = '';
+    function renderMeraki() {
+      renderTaskCollection(
+        merakiList,
+        meraki,
+        storageKeys.meraki,
+        updated => meraki = updated
+      );
+    }
 
-      if (!items.length) {
-        listElement.innerHTML = '<div class="mini">Nothing here yet.</div>';
-        return;
-      }
+    function renderFamily() {
+      renderTaskCollection(
+        familyList,
+        family,
+        storageKeys.family,
+        updated => family = updated
+      );
+    }
 
-      items.forEach((task) => {
-        const div = document.createElement('div');
-        div.className = 'task-item' + (task.done ? ' done' : '');
+    function renderCleaning() {
+      renderTaskCollection(
+        cleaningList,
+        cleaning,
+        storageKeys.cleaning,
+        updated => cleaning = updated
+      );
+    }
 
-        div.innerHTML = `
-          <div class="task-top">
-            <label class="task-left">
-              <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
-              <span class="task-text">${escapeHtml(task.text)}</span>
-            </label>
-            <button class="tiny-btn">Delete</button>
+    function createScheduleItem(item, onDelete) {
+      const card = document.createElement('div');
+      card.className = 'schedule-item';
+      card.innerHTML = `
+        <div class="schedule-layout">
+          <div class="schedule-time">${escapeHtml(item.time || '—')}</div>
+          <div class="schedule-main">
+            <div>${escapeHtml(item.text)}</div>
           </div>
-        `;
-
-        const checkbox = div.querySelector('.check');
-        const deleteBtn = div.querySelector('.tiny-btn');
-
-        checkbox.addEventListener('change', () => {
-          task.done = checkbox.checked;
-          save(storageKey, items);
-          renderAll();
-        });
-
-        deleteBtn.addEventListener('click', () => {
-          const index = items.findIndex(item => item.id === task.id);
-          if (index > -1) {
-            items.splice(index, 1);
-            save(storageKey, items);
-            renderAll();
-          }
-        });
-
-        listElement.appendChild(div);
-      });
+          <button class="tiny-btn">Delete</button>
+        </div>
+      `;
+      card.querySelector('.tiny-btn').addEventListener('click', onDelete);
+      return card;
     }
 
     function renderAppointments() {
       appointmentList.innerHTML = '';
-      const sorted = sortByTime(appointments);
-
-      if (!sorted.length) {
-        appointmentList.innerHTML = '<div class="mini">No appointments yet.</div>';
-        return;
-      }
-
-      sorted.forEach((item) => {
-        const div = document.createElement('div');
-        div.className = 'schedule-item';
-        div.innerHTML = `
-          <div class="task-top">
-            <div class="schedule-layout schedule-main">
-              <div class="schedule-time">${escapeHtml(item.time || '—')}</div>
-              <div>${escapeHtml(item.text)}</div>
-            </div>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        div.querySelector('.tiny-btn').addEventListener('click', () => {
-          appointments = appointments.filter(appt => appt.id !== item.id);
-          save(storageKeys.appointments, appointments);
-          renderAppointments();
+      appointments
+        .slice()
+        .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
+        .forEach(item => {
+          appointmentList.appendChild(createScheduleItem(item, () => {
+            appointments = appointments.filter(entry => entry.id !== item.id);
+            save(storageKeys.appointments, appointments);
+            renderAppointments();
+          }));
         });
-
-        appointmentList.appendChild(div);
-      });
     }
 
     function renderSchedule() {
       scheduleList.innerHTML = '';
-      const sorted = sortByTime(scheduleItems);
-
-      if (!sorted.length) {
-        scheduleList.innerHTML = '<div class="mini">No schedule items yet.</div>';
-        return;
-      }
-
-      sorted.forEach((item) => {
-        const div = document.createElement('div');
-        div.className = 'schedule-item';
-        div.innerHTML = `
-          <div class="task-top">
-            <div class="schedule-layout schedule-main">
-              <div class="schedule-time">${escapeHtml(item.time || '—')}</div>
-              <div>${escapeHtml(item.text)}</div>
-            </div>
-            <button class="tiny-btn">Delete</button>
-          </div>
-        `;
-
-        div.querySelector('.tiny-btn').addEventListener('click', () => {
-          scheduleItems = scheduleItems.filter(entry => entry.id !== item.id);
-          save(storageKeys.schedule, scheduleItems);
-          renderSchedule();
+      scheduleItems
+        .slice()
+        .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
+        .forEach(item => {
+          scheduleList.appendChild(createScheduleItem(item, () => {
+            scheduleItems = scheduleItems.filter(entry => entry.id !== item.id);
+            save(storageKeys.schedule, scheduleItems);
+            renderSchedule();
+          }));
         });
-
-        scheduleList.appendChild(div);
-      });
     }
 
     function renderFinances() {
@@ -1444,41 +1438,45 @@
       let income = 0;
       let expenses = 0;
 
-      finances.forEach((entry) => {
-        if (entry.type === 'income') {
-          income += entry.amount;
-        } else {
-          expenses += entry.amount;
-        }
+      finances.forEach(entry => {
+        if (entry.type === 'income') income += Number(entry.amount) || 0;
+        else expenses += Number(entry.amount) || 0;
 
-        const div = document.createElement('div');
-        div.className = 'finance-item';
-        div.innerHTML = `
+        const row = document.createElement('div');
+        row.className = 'finance-item';
+        row.innerHTML = `
           <div class="finance-top">
             <div>
               <div><strong>${escapeHtml(entry.desc)}</strong></div>
               <div class="mini">${escapeHtml(entry.type)}</div>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span class="pill">${entry.type === 'income' ? '+' : '-'}$${Number(entry.amount).toFixed(2)}</span>
+              <span class="pill">${formatCurrency(entry.amount)}</span>
               <button class="tiny-btn">Delete</button>
             </div>
           </div>
         `;
-
-        div.querySelector('.tiny-btn').addEventListener('click', () => {
+        row.querySelector('.tiny-btn').addEventListener('click', () => {
           finances = finances.filter(item => item.id !== entry.id);
           save(storageKeys.finances, finances);
           renderFinances();
         });
-
-        financeList.appendChild(div);
+        financeList.appendChild(row);
       });
 
-      incomeTotal.textContent = `$${income.toFixed(2)}`;
-      expenseTotal.textContent = `$${expenses.toFixed(2)}`;
-      balanceTotal.textContent = `$${(income - expenses).toFixed(2)}`;
+      incomeTotal.textContent = formatCurrency(income);
+      expenseTotal.textContent = formatCurrency(expenses);
+      balanceTotal.textContent = formatCurrency(income - expenses);
       entryCount.textContent = String(finances.length);
+    }
+
+    function renderWater() {
+      const goal = Number(water.goal) || 8;
+      const cups = Math.max(0, Number(water.cups) || 0);
+      const percent = Math.min(100, (cups / goal) * 100);
+      waterText.textContent = `${cups} / ${goal} cups`;
+      waterFill.style.width = `${percent}%`;
+      waterGoalSelect.value = String(goal);
     }
 
     function renderMeals() {
@@ -1535,51 +1533,8 @@
       journalEntry.value = journal.journalEntry || '';
     }
 
-    function renderWater() {
-      const goal = Number(water.goal) || 8;
-      const cups = Number(water.cups) || 0;
-      const percent = Math.max(0, Math.min(100, (cups / goal) * 100));
-      waterText.textContent = `${cups} / ${goal} cups`;
-      waterFill.style.width = `${percent}%`;
-      waterGoalSelect.value = String(goal);
-    }
-
-    function renderMeraki() {
-      renderSimpleTaskGroup(merakiList, meraki, storageKeys.meraki);
-    }
-
-    function renderFamily() {
-      renderSimpleTaskGroup(familyList, family, storageKeys.family);
-    }
-
-    function renderCleaning() {
-      renderSimpleTaskGroup(cleaningList, cleaning, storageKeys.cleaning);
-    }
-
-    async function saveCloudDoc(key, value) {
-      if (!currentUser || !window.db || !window.firebaseHelpers) return;
-      const { doc, setDoc } = window.firebaseHelpers;
-      await setDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key), value);
-    }
-
-    async function loadCloudDoc(key, fallback) {
-      if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
-      const { doc, getDoc } = window.firebaseHelpers;
-      const snap = await getDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key));
-      return snap.exists() ? snap.data() : fallback;
-    }
-
-    async function loadUserDataFromCloud() {
-      journal = await loadCloudDoc(storageKeys.journal, {
-        mood: '',
-        dreamTitle: '',
-        dreamEntry: '',
-        journalTitle: '',
-        journalEntry: ''
-      });
-
-      save(storageKeys.journal, journal);
-      renderJournal();
+    function renderNotes() {
+      notesBox.value = notes || '';
     }
 
     function saveMeals() {
@@ -1644,7 +1599,7 @@
       save(storageKeys.sleep, sleep);
     }
 
-    async function saveJournal() {
+    function saveJournal() {
       journal = {
         mood: moodPicker.value,
         dreamTitle: dreamTitle.value,
@@ -1652,101 +1607,147 @@
         journalTitle: journalTitle.value,
         journalEntry: journalEntry.value
       };
-
       save(storageKeys.journal, journal);
-
-      try {
-        await saveCloudDoc(storageKeys.journal, journal);
-      } catch (error) {
-        console.error('Journal cloud save failed:', error);
-      }
     }
 
-    function resetBreathingUI() {
-      breathState = 'inhale';
-      bubble.style.transform = 'scale(0.92)';
-      breathPhase.textContent = 'Breathe In';
-      breathInstruction.textContent = 'for 5 to 6 seconds';
-      breathStatus.textContent = 'Ready to begin';
-      breathToggleBtn.textContent = 'Start';
-    }
-
-    function applyBreathState() {
-      if (breathState === 'inhale') {
-        bubble.style.transform = 'scale(1.06)';
-        breathPhase.textContent = 'Breathe In';
-        breathInstruction.textContent = 'for 5 to 6 seconds';
-        breathStatus.textContent = 'Inhale gently';
-      } else {
-        bubble.style.transform = 'scale(0.92)';
-        breathPhase.textContent = 'Breathe Out';
-        breathInstruction.textContent = 'for 5 to 6 seconds';
-        breathStatus.textContent = 'Exhale slowly';
-      }
+    function applyBreathVisual() {
+      bubble.style.transform = inhale ? 'scale(1.05)' : 'scale(0.92)';
+      breathPhase.textContent = inhale ? 'Breathe In' : 'Breathe Out';
+      breathInstruction.textContent = 'for 5.5 seconds';
+      breathStatus.textContent = inhale ? 'Inhale gently' : 'Exhale slowly';
     }
 
     function startBreathing() {
-      if (breathInterval) clearInterval(breathInterval);
-      breathingActive = true;
-      breathToggleBtn.textContent = 'Pause';
-      applyBreathState();
+      if (breathing) return;
+      breathing = true;
+      inhale = true;
+      applyBreathVisual();
       breathInterval = setInterval(() => {
-        breathState = breathState === 'inhale' ? 'exhale' : 'inhale';
-        applyBreathState();
+        inhale = !inhale;
+        applyBreathVisual();
       }, 5500);
+      breathToggleBtn.textContent = 'Pause';
     }
 
     function stopBreathing() {
-      breathingActive = false;
-      if (breathInterval) clearInterval(breathInterval);
+      breathing = false;
+      clearInterval(breathInterval);
       breathInterval = null;
-      breathToggleBtn.textContent = 'Start';
       breathStatus.textContent = 'Paused';
+      breathToggleBtn.textContent = 'Start';
     }
 
-    function setSignedInUI(isSignedIn, email = '') {
-      authCard.style.display = isSignedIn ? 'none' : 'block';
-      appShell.style.display = isSignedIn ? 'block' : 'none';
-      signOutBtn.style.display = isSignedIn ? 'inline-flex' : 'none';
-      authStatus.textContent = isSignedIn ? `Signed in as ${email}` : 'Not signed in';
+    function resetBreathingUI() {
+      stopBreathing();
+      inhale = true;
+      bubble.style.transform = 'scale(0.92)';
+      breathPhase.textContent = 'Breathe In';
+      breathInstruction.textContent = 'for 5.5 seconds';
+      breathStatus.textContent = 'Ready to begin';
     }
 
-    function setupAuth() {
+    function renderAll() {
+      formatToday();
+      renderBusinessTasks();
+      renderPersonalTasks();
+      renderAppointments();
+      renderSchedule();
+      renderFinances();
+      renderWater();
+      renderCleaning();
+      renderMeals();
+      renderMeraki();
+      renderFamily();
+      renderFitness();
+      renderBodyLog();
+      renderMedication();
+      renderSleep();
+      renderJournal();
+      renderNotes();
+    }
+
+    function addTask(inputEl, collection, saveKey, setter, renderer) {
+      const text = inputEl.value.trim();
+      if (!text) return;
+      const updated = [...collection, { id: uid(), text, done: false }];
+      setter(updated);
+      save(saveKey, updated);
+      inputEl.value = '';
+      renderer();
+    }
+
+    async function loadUserDataFromCloud() {
+      businessTasks = await loadCloudDoc(storageKeys.businessTasks, businessTasks);
+      personalTasks = await loadCloudDoc(storageKeys.personalTasks, personalTasks);
+      appointments = await loadCloudDoc(storageKeys.appointments, appointments);
+      scheduleItems = await loadCloudDoc(storageKeys.schedule, scheduleItems);
+      finances = await loadCloudDoc(storageKeys.finances, finances);
+      water = await loadCloudDoc(storageKeys.water, water);
+      cleaning = await loadCloudDoc(storageKeys.cleaning, cleaning);
+      meals = await loadCloudDoc(storageKeys.meals, meals);
+      meraki = await loadCloudDoc(storageKeys.meraki, meraki);
+      family = await loadCloudDoc(storageKeys.family, family);
+      fitness = await loadCloudDoc(storageKeys.fitness, fitness);
+      bodyLog = await loadCloudDoc(storageKeys.bodyLog, bodyLog);
+      medication = await loadCloudDoc(storageKeys.medication, medication);
+      sleep = await loadCloudDoc(storageKeys.sleep, sleep);
+      journal = await loadCloudDoc(storageKeys.journal, journal);
+      notes = await loadCloudDoc(storageKeys.notes, notes);
+
+      localStorage.setItem(storageKeys.businessTasks, JSON.stringify(businessTasks));
+      localStorage.setItem(storageKeys.personalTasks, JSON.stringify(personalTasks));
+      localStorage.setItem(storageKeys.appointments, JSON.stringify(appointments));
+      localStorage.setItem(storageKeys.schedule, JSON.stringify(scheduleItems));
+      localStorage.setItem(storageKeys.finances, JSON.stringify(finances));
+      localStorage.setItem(storageKeys.water, JSON.stringify(water));
+      localStorage.setItem(storageKeys.cleaning, JSON.stringify(cleaning));
+      localStorage.setItem(storageKeys.meals, JSON.stringify(meals));
+      localStorage.setItem(storageKeys.meraki, JSON.stringify(meraki));
+      localStorage.setItem(storageKeys.family, JSON.stringify(family));
+      localStorage.setItem(storageKeys.fitness, JSON.stringify(fitness));
+      localStorage.setItem(storageKeys.bodyLog, JSON.stringify(bodyLog));
+      localStorage.setItem(storageKeys.medication, JSON.stringify(medication));
+      localStorage.setItem(storageKeys.sleep, JSON.stringify(sleep));
+      localStorage.setItem(storageKeys.journal, JSON.stringify(journal));
+      localStorage.setItem(storageKeys.notes, JSON.stringify(notes));
+
+      renderAll();
+    }
+
+    async function setupAuth() {
       const auth = window.firebaseAuth;
-      const helpers = window.firebaseHelpers;
-
-      if (!auth || !helpers) {
-        authStatus.textContent = 'Firebase auth not loaded';
-        return;
-      }
+      const {
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged
+      } = window.firebaseHelpers;
 
       signUpBtn.addEventListener('click', async () => {
+        const email = authEmail.value.trim();
+        const password = authPassword.value;
+        if (!email || !password) {
+          authStatus.textContent = 'Enter an email and password.';
+          return;
+        }
         try {
-          const cred = await helpers.createUserWithEmailAndPassword(
-            auth,
-            authEmail.value.trim(),
-            authPassword.value
-          );
-          currentUser = cred.user;
-          setSignedInUI(true, currentUser.email || '');
-          await loadUserDataFromCloud();
-          renderAll();
+          await createUserWithEmailAndPassword(auth, email, password);
+          authStatus.textContent = 'Account created.';
         } catch (error) {
           authStatus.textContent = error.message;
         }
       });
 
       signInBtn.addEventListener('click', async () => {
+        const email = authEmail.value.trim();
+        const password = authPassword.value;
+        if (!email || !password) {
+          authStatus.textContent = 'Enter an email and password.';
+          return;
+        }
         try {
-          const cred = await helpers.signInWithEmailAndPassword(
-            auth,
-            authEmail.value.trim(),
-            authPassword.value
-          );
-          currentUser = cred.user;
-          setSignedInUI(true, currentUser.email || '');
-          await loadUserDataFromCloud();
-          renderAll();
+          await signInWithEmailAndPassword(auth, email, password);
+          authStatus.textContent = 'Signed in.';
         } catch (error) {
           authStatus.textContent = error.message;
         }
@@ -1754,71 +1755,92 @@
 
       signOutBtn.addEventListener('click', async () => {
         try {
-          await helpers.signOut(auth);
+          await signOut(auth);
         } catch (error) {
           authStatus.textContent = error.message;
         }
       });
 
-      helpers.onAuthStateChanged(auth, async (user) => {
-        currentUser = user || null;
-        if (currentUser) {
-          setSignedInUI(true, currentUser.email || '');
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+
+        if (user) {
+          authStatus.textContent = `Signed in as ${user.email}`;
+          signOutBtn.style.display = '';
+          signInBtn.style.display = 'none';
+          signUpBtn.style.display = 'none';
           await loadUserDataFromCloud();
-          renderAll();
         } else {
-          setSignedInUI(false);
+          authStatus.textContent = 'Not signed in';
+          signOutBtn.style.display = 'none';
+          signInBtn.style.display = '';
+          signUpBtn.style.display = '';
+          renderAll();
         }
       });
     }
 
-    function renderAll() {
-      formatDate();
-      renderBusinessTasks();
-      renderPersonalTasks();
-      renderAppointments();
-      renderSchedule();
-      renderFinances();
-      renderMeals();
-      renderFitness();
-      renderBodyLog();
-      renderMedication();
-      renderSleep();
-      renderJournal();
-      renderWater();
-      renderMeraki();
-      renderFamily();
-      renderCleaning();
-      notesBox.value = notes;
-    }
-
-    function addTask(targetArray, inputEl, storageKey, renderFn) {
-      const value = inputEl.value.trim();
-      if (!value) return;
-      targetArray.push({ id: uid(), text: value, done: false });
-      save(storageKey, targetArray);
-      inputEl.value = '';
-      renderFn();
-    }
-
     addBusinessTaskBtn.addEventListener('click', () => {
-      addTask(businessTasks, businessTaskInput, storageKeys.businessTasks, renderBusinessTasks);
+      addTask(
+        businessTaskInput,
+        businessTasks,
+        storageKeys.businessTasks,
+        updated => businessTasks = updated,
+        renderBusinessTasks
+      );
     });
 
     addPersonalTaskBtn.addEventListener('click', () => {
-      addTask(personalTasks, personalTaskInput, storageKeys.personalTasks, renderPersonalTasks);
+      addTask(
+        personalTaskInput,
+        personalTasks,
+        storageKeys.personalTasks,
+        updated => personalTasks = updated,
+        renderPersonalTasks
+      );
     });
 
     addMerakiBtn.addEventListener('click', () => {
-      addTask(meraki, merakiInput, storageKeys.meraki, renderMeraki);
+      addTask(
+        merakiInput,
+        meraki,
+        storageKeys.meraki,
+        updated => meraki = updated,
+        renderMeraki
+      );
     });
 
     addFamilyBtn.addEventListener('click', () => {
-      addTask(family, familyInput, storageKeys.family, renderFamily);
+      addTask(
+        familyInput,
+        family,
+        storageKeys.family,
+        updated => family = updated,
+        renderFamily
+      );
     });
 
     addCleaningBtn.addEventListener('click', () => {
-      addTask(cleaning, cleaningInput, storageKeys.cleaning, renderCleaning);
+      addTask(
+        cleaningInput,
+        cleaning,
+        storageKeys.cleaning,
+        updated => cleaning = updated,
+        renderCleaning
+      );
+    });
+
+    [businessTaskInput, personalTaskInput, merakiInput, familyInput, cleaningInput].forEach((inputEl, index) => {
+      const buttons = [
+        addBusinessTaskBtn,
+        addPersonalTaskBtn,
+        addMerakiBtn,
+        addFamilyBtn,
+        addCleaningBtn
+      ];
+      inputEl.addEventListener('keydown', event => {
+        if (event.key === 'Enter') buttons[index].click();
+      });
     });
 
     addAppointmentBtn.addEventListener('click', () => {
@@ -1841,25 +1863,27 @@
       renderSchedule();
     });
 
+    [appointmentText, scheduleText].forEach((inputEl, index) => {
+      const buttons = [addAppointmentBtn, addScheduleBtn];
+      inputEl.addEventListener('keydown', event => {
+        if (event.key === 'Enter') buttons[index].click();
+      });
+    });
+
     addFinanceBtn.addEventListener('click', () => {
       const desc = financeDesc.value.trim();
       const amount = Number(financeAmount.value);
-
-      if (!desc || Number.isNaN(amount) || amount <= 0) return;
-
+      if (!desc || !amount) return;
       finances.unshift({
         id: uid(),
         desc,
         amount,
         type: financeType.value
       });
-
       save(storageKeys.finances, finances);
-
       financeDesc.value = '';
       financeAmount.value = '';
       financeType.value = 'expense';
-
       renderFinances();
     });
 
@@ -1919,17 +1943,11 @@
     });
 
     breathToggleBtn.addEventListener('click', () => {
-      if (breathingActive) {
-        stopBreathing();
-      } else {
-        startBreathing();
-      }
+      if (breathing) stopBreathing();
+      else startBreathing();
     });
 
-    breathResetBtn.addEventListener('click', () => {
-      stopBreathing();
-      resetBreathingUI();
-    });
+    breathResetBtn.addEventListener('click', resetBreathingUI);
 
     resetBusinessTasksBtn.addEventListener('click', () => {
       businessTasks = [];
@@ -2032,7 +2050,7 @@
       renderSleep();
     });
 
-    document.getElementById('resetJournalBtn').addEventListener('click', async () => {
+    resetJournalBtn.addEventListener('click', () => {
       journal = {
         mood: '',
         dreamTitle: '',
@@ -2041,38 +2059,10 @@
         journalEntry: ''
       };
       save(storageKeys.journal, journal);
-      try {
-        await saveCloudDoc(storageKeys.journal, journal);
-      } catch (error) {
-        console.error('Journal cloud reset failed:', error);
-      }
       renderJournal();
     });
 
-    [businessTaskInput, personalTaskInput, merakiInput, familyInput, cleaningInput].forEach((input, index) => {
-      const buttonMap = [
-        addBusinessTaskBtn,
-        addPersonalTaskBtn,
-        addMerakiBtn,
-        addFamilyBtn,
-        addCleaningBtn
-      ];
-      input.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          buttonMap[index].click();
-        }
-      });
-    });
-
-    [appointmentText, scheduleText, financeDesc].forEach((input, index) => {
-      const buttonMap = [addAppointmentBtn, addScheduleBtn, addFinanceBtn];
-      input.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-          buttonMap[index].click();
-        }
-      });
-    });
-
+    renderAll();
     resetBreathingUI();
     setupAuth();
   </script>
