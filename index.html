@@ -2062,11 +2062,129 @@
       renderJournal();
     });
 
-    renderAll();
-   resetBreathingUI();
+    async function saveCloudDoc(key, value) {
+  if (!currentUser || !window.db || !window.firebaseHelpers) return;
+  const { doc, setDoc } = window.firebaseHelpers;
+  await setDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key), value);
+}
 
-window.addEventListener('load', () => {
-  if (window.firebaseAuth && window.firebaseHelpers && window.db) {
+async function loadCloudDoc(key, fallback) {
+  if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
+  const { doc, getDoc } = window.firebaseHelpers;
+  const snap = await getDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key));
+  return snap.exists() ? snap.data() : fallback;
+}
+
+async function loadUserDataFromCloud() {
+  journal = await loadCloudDoc(storageKeys.journal, journal);
+  localStorage.setItem(storageKeys.journal, JSON.stringify(journal));
+  renderAll();
+}
+
+async function setupAuth() {
+  if (!window.firebaseAuth || !window.firebaseHelpers || !window.db) {
+    authStatus.textContent = 'Firebase is still loading. Please refresh and try again.';
+    console.error('Firebase helpers not available yet.', {
+      firebaseAuth: !!window.firebaseAuth,
+      firebaseHelpers: !!window.firebaseHelpers,
+      db: !!window.db
+    });
+    return;
+  }
+
+  const auth = window.firebaseAuth;
+  const {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } = window.firebaseHelpers;
+
+  if (!setupAuth.initialized) {
+    signUpBtn.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+
+      if (!email || !password) {
+        authStatus.textContent = 'Enter an email and password.';
+        return;
+      }
+
+      authStatus.textContent = 'Creating account...';
+
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        authStatus.textContent = 'Account created successfully.';
+      } catch (error) {
+        console.error('Create account error:', error);
+        authStatus.textContent = error.message || 'Unable to create account.';
+      }
+    });
+
+    signInBtn.addEventListener('click', async () => {
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+
+      if (!email || !password) {
+        authStatus.textContent = 'Enter an email and password.';
+        return;
+      }
+
+      authStatus.textContent = 'Signing in...';
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        authStatus.textContent = 'Signed in.';
+      } catch (error) {
+        console.error('Sign in error:', error);
+        authStatus.textContent = error.message || 'Unable to sign in.';
+      }
+    });
+
+    signOutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error('Sign out error:', error);
+        authStatus.textContent = error.message || 'Unable to sign out.';
+      }
+    });
+
+    setupAuth.initialized = true;
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+
+    if (user) {
+      authStatus.textContent = `Signed in as ${user.email}`;
+      signOutBtn.style.display = '';
+      signInBtn.style.display = 'none';
+      signUpBtn.style.display = 'none';
+
+      if (appShell) appShell.style.display = '';
+
+      try {
+        await loadUserDataFromCloud();
+      } catch (error) {
+        console.error('Cloud load error:', error);
+        authStatus.textContent = 'Signed in, but cloud data could not load.';
+      }
+    } else {
+      authStatus.textContent = 'Not signed in';
+      signOutBtn.style.display = 'none';
+      signInBtn.style.display = '';
+      signUpBtn.style.display = '';
+
+      if (appShell) appShell.style.display = '';
+      renderAll();
+    }
+  });
+}
+
+   resetBreathingUI();
+renderAll();
+
 window.addEventListener('load', () => {
   if (window.firebaseAuth && window.firebaseHelpers && window.db) {
     setupAuth();
