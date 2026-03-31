@@ -1052,18 +1052,46 @@
 
     let currentUser = null;
 
-    async function saveCloudDoc(key, value) {
-      if (!currentUser || !window.db || !window.firebaseHelpers) return;
-      const { doc, setDoc } = window.firebaseHelpers;
-      await setDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key), value);
-    }
+ async function saveCloudDoc(key, value) {
+  if (!currentUser || !window.db || !window.firebaseHelpers) return;
+  const { doc, setDoc } = window.firebaseHelpers;
 
-    async function loadCloudDoc(key, fallback) {
-      if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
-      const { doc, getDoc } = window.firebaseHelpers;
-      const snap = await getDoc(doc(window.db, 'users', currentUser.uid, 'dashboard', key));
-      return snap.exists() ? snap.data() : fallback;
+  await setDoc(
+    doc(window.db, 'users', currentUser.uid, 'dashboard', key),
+    {
+      value,
+      updatedAt: Date.now()
     }
+  );
+}
+
+async function loadCloudDoc(key, fallback) {
+  if (!currentUser || !window.db || !window.firebaseHelpers) return fallback;
+
+  const { doc, getDoc } = window.firebaseHelpers;
+  const snap = await getDoc(
+    doc(window.db, 'users', currentUser.uid, 'dashboard', key)
+  );
+
+  if (!snap.exists()) return fallback;
+
+  const data = snap.data();
+
+  // New format
+  if (data && typeof data === 'object' && 'value' in data) {
+    return data.value;
+  }
+
+  // Legacy support: if old docs used { items: [...] }
+  if (data && typeof data === 'object' && Array.isArray(data.items)) {
+    return data.items;
+  }
+
+  // Legacy support: if old docs were somehow already plain values
+  if (Array.isArray(data)) return data;
+
+  return fallback;
+}
 
     function save(key, value) {
       localStorage.setItem(key, JSON.stringify(value));
@@ -1325,28 +1353,31 @@
       return item;
     }
 
-    function renderTaskCollection(listEl, collection, saveKey, setCollection) {
-      listEl.innerHTML = '';
-      collection.forEach(task => {
-        listEl.appendChild(createTaskItem(
-          task,
-          () => {
-            const updated = collection.map(item =>
-              item.id === task.id ? { ...item, done: !item.done } : item
-            );
-            setCollection(updated);
-            save(saveKey, updated);
-            renderAll();
-          },
-          () => {
-            const updated = collection.filter(item => item.id !== task.id);
-            setCollection(updated);
-            save(saveKey, updated);
-            renderAll();
-          }
-        ));
-      });
-    }
+ function renderTaskCollection(listEl, collection, saveKey, setCollection) {
+  listEl.innerHTML = '';
+
+  const safeCollection = Array.isArray(collection) ? collection : [];
+
+  safeCollection.forEach(task => {
+    listEl.appendChild(createTaskItem(
+      task,
+      () => {
+        const updated = safeCollection.map(item =>
+          item.id === task.id ? { ...item, done: !item.done } : item
+        );
+        setCollection(updated);
+        save(saveKey, updated);
+        renderAll();
+      },
+      () => {
+        const updated = safeCollection.filter(item => item.id !== task.id);
+        setCollection(updated);
+        save(saveKey, updated);
+        renderAll();
+      }
+    ));
+  });
+}
 
     function renderBusinessTasks() {
       renderTaskCollection(
