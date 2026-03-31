@@ -955,46 +955,48 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyB7A82VMGP00juZFGQO4UzNtdBVSJ4WsYo",
-      authDomain: "my-dashboard-7e226.firebaseapp.com",
-      projectId: "my-dashboard-7e226",
-      storageBucket: "my-dashboard-7e226.firebasestorage.app",
-      messagingSenderId: "285644854859",
-      appId: "1:285644854859:web:9ea327fb231d7002a81fce"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyB7A82VMGP00juZFGQ04UzNtdBVSJ4WsYo",
+    authDomain: "my-dashboard-7e226.firebaseapp.com",
+    projectId: "my-dashboard-7e226",
+    storageBucket: "my-dashboard-7e226.firebasestorage.app",
+    messagingSenderId: "285644854859",
+    appId: "1:285644854859:web:9ea327fb231d7002a81fce"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    window.firebaseAuth = auth;
-    window.db = db;
-    window.firebaseHelpers = {
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged,
-      doc,
-      setDoc,
-      getDoc
-    };
-  </script>
+  window.firebaseAuth = auth;
+  window.db = db;
+  window.firebaseHelpers = {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged,
+    doc,
+    setDoc,
+    getDoc
+  };
+
+  console.log("Firebase module loaded");
+</script>
 
   <script>
     const isStandalone =
