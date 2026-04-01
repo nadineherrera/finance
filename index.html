@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -388,6 +389,64 @@
       flex: 1;
     }
 
+
+    .task-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.92);
+      color: var(--muted);
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .status-ok {
+      background: rgba(184,154,76,0.14);
+      color: #846a29;
+    }
+
+    .status-soon {
+      background: rgba(255,183,77,0.16);
+      color: #9a5c00;
+    }
+
+    .status-overdue {
+      background: rgba(227,107,66,0.14);
+      color: #a24b2c;
+    }
+
+    .status-paid {
+      background: rgba(72,187,120,0.15);
+      color: #2f7d4f;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 14px 0;
+      border: 0;
+    }
+
     .footer-note {
       margin-top: 16px;
       color: var(--muted);
@@ -556,6 +615,22 @@
             </div>
             <div class="schedule-list" id="scheduleList"></div>
           </section>
+
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>One-Time Tasks</h2>
+                <div class="sub">Important tasks that stay until you finish them.</div>
+              </div>
+              <button class="ghost" id="resetOneTimeTasksBtn">Clear</button>
+            </div>
+            <div class="input-row">
+              <input id="oneTimeTaskInput" type="text" placeholder="Add a one-time task" />
+              <button id="addOneTimeTaskBtn">Add</button>
+            </div>
+            <div class="task-list" id="oneTimeTaskList"></div>
+          </section>
         </div>
 
         <!-- MIDDLE COLUMN -->
@@ -616,6 +691,69 @@
             </div>
 
             <div class="finance-list" id="financeList"></div>
+          </section>
+
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Bills Due</h2>
+                <div class="sub">Bills stay visible until paid and reset at the start of a new month.</div>
+              </div>
+              <button class="ghost" id="resetBillsBtn">Clear</button>
+            </div>
+            <div class="mini" id="billsSummary">No bills added yet.</div>
+            <div class="finance-row">
+              <input id="billDesc" type="text" placeholder="Bill name" />
+              <input id="billAmount" type="number" step="0.01" placeholder="Amount" />
+              <select id="billDueDay">
+                <option value="">Due day</option>
+              </select>
+              <button id="addBillBtn">Add</button>
+            </div>
+            <div class="finance-list" id="billsList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Weekly Tasks</h2>
+                <div class="sub">These reset once each new week.</div>
+              </div>
+              <button class="ghost" id="resetWeeklyTasksBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="weeklyTaskInput" type="text" placeholder="Add a weekly task" />
+              <select id="weeklyTaskDay">
+                <option value="Sunday">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+              </select>
+              <button id="addWeeklyTaskBtn">Add</button>
+            </div>
+            <div class="task-list" id="weeklyTaskList"></div>
+          </section>
+
+          <section class="card">
+            <div class="section-head">
+              <div>
+                <h2>Monthly Tasks</h2>
+                <div class="sub">These reset at the start of a new month.</div>
+              </div>
+              <button class="ghost" id="resetMonthlyTasksBtn">Reset</button>
+            </div>
+            <div class="input-row">
+              <input id="monthlyTaskInput" type="text" placeholder="Add a monthly task" />
+              <select id="monthlyTaskDay">
+                <option value="">Day</option>
+              </select>
+              <button id="addMonthlyTaskBtn">Add</button>
+            </div>
+            <div class="task-list" id="monthlyTaskList"></div>
           </section>
 
           <section class="card">
@@ -1025,7 +1163,12 @@
       bodyLog: 'simpleDashboardBodyLog',
       medication: 'simpleDashboardMedication',
       sleep: 'simpleDashboardSleep',
-      journal: 'simpleDashboardJournal'
+      journal: 'simpleDashboardJournal',
+      bills: 'simpleDashboardBills',
+      weeklyTasks: 'simpleDashboardWeeklyTasks',
+      monthlyTasks: 'simpleDashboardMonthlyTasks',
+      oneTimeTasks: 'simpleDashboardOneTimeTasks',
+      resetMeta: 'simpleDashboardResetMeta'
     };
 
     function uid() {
@@ -1141,6 +1284,15 @@ async function loadCloudDoc(key, fallback) {
       { id: uid(), text: 'Clean cat litter', done: false }
     ];
 
+    const defaultWeeklyTasks = [
+      { id: uid(), text: 'Sweep & mop', day: 'Saturday', done: false },
+      { id: uid(), text: 'Wash laundry', day: 'Sunday', done: false }
+    ];
+
+    const defaultMonthlyTasks = [
+      { id: uid(), text: 'Transfer money to Roth IRA', day: 1, done: false }
+    ];
+
     let businessTasks = loadLocal(storageKeys.businessTasks, defaultBusinessTasks);
     let personalTasks = loadLocal(storageKeys.personalTasks, defaultPersonalTasks);
     let appointments = loadLocal(storageKeys.appointments, []);
@@ -1193,6 +1345,15 @@ async function loadCloudDoc(key, fallback) {
       journalTitle: '',
       journalEntry: ''
     });
+    let bills = loadLocal(storageKeys.bills, []);
+    let weeklyTasks = loadLocal(storageKeys.weeklyTasks, defaultWeeklyTasks);
+    let monthlyTasks = loadLocal(storageKeys.monthlyTasks, defaultMonthlyTasks);
+    let oneTimeTasks = loadLocal(storageKeys.oneTimeTasks, []);
+    let resetMeta = loadLocal(storageKeys.resetMeta, {
+      daily: '',
+      weekly: '',
+      monthly: ''
+    });
     let notes = loadLocal(storageKeys.notes, '');
 
     let breathing = false;
@@ -1232,6 +1393,11 @@ async function loadCloudDoc(key, fallback) {
     const scheduleList = document.getElementById('scheduleList');
     const resetScheduleBtn = document.getElementById('resetScheduleBtn');
 
+    const oneTimeTaskInput = document.getElementById('oneTimeTaskInput');
+    const addOneTimeTaskBtn = document.getElementById('addOneTimeTaskBtn');
+    const oneTimeTaskList = document.getElementById('oneTimeTaskList');
+    const resetOneTimeTasksBtn = document.getElementById('resetOneTimeTasksBtn');
+
     const financeDesc = document.getElementById('financeDesc');
     const financeAmount = document.getElementById('financeAmount');
     const financeType = document.getElementById('financeType');
@@ -1241,6 +1407,26 @@ async function loadCloudDoc(key, fallback) {
     const expenseTotal = document.getElementById('expenseTotal');
     const balanceTotal = document.getElementById('balanceTotal');
     const entryCount = document.getElementById('entryCount');
+
+    const billDesc = document.getElementById('billDesc');
+    const billAmount = document.getElementById('billAmount');
+    const billDueDay = document.getElementById('billDueDay');
+    const addBillBtn = document.getElementById('addBillBtn');
+    const billsList = document.getElementById('billsList');
+    const billsSummary = document.getElementById('billsSummary');
+    const resetBillsBtn = document.getElementById('resetBillsBtn');
+
+    const weeklyTaskInput = document.getElementById('weeklyTaskInput');
+    const weeklyTaskDay = document.getElementById('weeklyTaskDay');
+    const addWeeklyTaskBtn = document.getElementById('addWeeklyTaskBtn');
+    const weeklyTaskList = document.getElementById('weeklyTaskList');
+    const resetWeeklyTasksBtn = document.getElementById('resetWeeklyTasksBtn');
+
+    const monthlyTaskInput = document.getElementById('monthlyTaskInput');
+    const monthlyTaskDay = document.getElementById('monthlyTaskDay');
+    const addMonthlyTaskBtn = document.getElementById('addMonthlyTaskBtn');
+    const monthlyTaskList = document.getElementById('monthlyTaskList');
+    const resetMonthlyTasksBtn = document.getElementById('resetMonthlyTasksBtn');
 
     const waterText = document.getElementById('waterText');
     const waterFill = document.getElementById('waterFill');
@@ -1336,6 +1522,201 @@ async function loadCloudDoc(key, fallback) {
       }).format(Number(value) || 0);
     }
 
+    function getLocalDateKey(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function getLocalMonthKey(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      return `${year}-${month}`;
+    }
+
+    function getLocalWeekKey(date = new Date()) {
+      const copy = new Date(date);
+      copy.setHours(0, 0, 0, 0);
+      copy.setDate(copy.getDate() - copy.getDay());
+      return getLocalDateKey(copy);
+    }
+
+    function populateDaySelect(selectEl, includeBlank = false) {
+      if (!selectEl) return;
+      const currentValue = selectEl.value;
+      selectEl.innerHTML = includeBlank ? '<option value="">Day</option>' : '';
+      for (let day = 1; day <= 31; day += 1) {
+        const option = document.createElement('option');
+        option.value = String(day);
+        option.textContent = String(day);
+        selectEl.appendChild(option);
+      }
+      if (currentValue) selectEl.value = currentValue;
+    }
+
+    function resetTaskCompletion(collection) {
+      return (Array.isArray(collection) ? collection : []).map(item => ({
+        ...item,
+        done: false
+      }));
+    }
+
+    function clearDailyInputs() {
+      appointments = [];
+      scheduleItems = [];
+      water = {
+        ...water,
+        cups: 0
+      };
+      businessTasks = resetTaskCompletion(businessTasks);
+      personalTasks = resetTaskCompletion(personalTasks);
+      cleaning = resetTaskCompletion(cleaning);
+      meraki = resetTaskCompletion(meraki);
+      family = resetTaskCompletion(family);
+      meals = {
+        breakfast: { meal: '', ingredients: '' },
+        lunch: { meal: '', ingredients: '' },
+        dinner: { meal: '', ingredients: '' }
+      };
+      fitness = {
+        cardioExercise: '',
+        cardioTime: '',
+        cardioNotes: '',
+        strengthExercise: '',
+        strengthReps: '',
+        strengthNotes: ''
+      };
+      bodyLog = {
+        weight: '',
+        bodyFat: '',
+        waist: '',
+        hips: '',
+        chest: '',
+        arms: '',
+        thighs: '',
+        notes: ''
+      };
+      medication = {
+        morning: {
+          name: medication?.morning?.name || '',
+          time: medication?.morning?.time || '',
+          taken: false
+        },
+        night: {
+          name: medication?.night?.name || '',
+          time: medication?.night?.time || '',
+          taken: false
+        }
+      };
+      sleep = {
+        bedtime: '',
+        wakeTime: '',
+        hours: '',
+        quality: '',
+        notes: ''
+      };
+      journal = {
+        mood: '',
+        dreamTitle: '',
+        dreamEntry: '',
+        journalTitle: '',
+        journalEntry: ''
+      };
+    }
+
+    function persistAllStateLocally() {
+      localStorage.setItem(storageKeys.businessTasks, JSON.stringify(businessTasks));
+      localStorage.setItem(storageKeys.personalTasks, JSON.stringify(personalTasks));
+      localStorage.setItem(storageKeys.appointments, JSON.stringify(appointments));
+      localStorage.setItem(storageKeys.schedule, JSON.stringify(scheduleItems));
+      localStorage.setItem(storageKeys.finances, JSON.stringify(finances));
+      localStorage.setItem(storageKeys.water, JSON.stringify(water));
+      localStorage.setItem(storageKeys.notes, JSON.stringify(notes));
+      localStorage.setItem(storageKeys.cleaning, JSON.stringify(cleaning));
+      localStorage.setItem(storageKeys.meals, JSON.stringify(meals));
+      localStorage.setItem(storageKeys.meraki, JSON.stringify(meraki));
+      localStorage.setItem(storageKeys.family, JSON.stringify(family));
+      localStorage.setItem(storageKeys.fitness, JSON.stringify(fitness));
+      localStorage.setItem(storageKeys.bodyLog, JSON.stringify(bodyLog));
+      localStorage.setItem(storageKeys.medication, JSON.stringify(medication));
+      localStorage.setItem(storageKeys.sleep, JSON.stringify(sleep));
+      localStorage.setItem(storageKeys.journal, JSON.stringify(journal));
+      localStorage.setItem(storageKeys.bills, JSON.stringify(bills));
+      localStorage.setItem(storageKeys.weeklyTasks, JSON.stringify(weeklyTasks));
+      localStorage.setItem(storageKeys.monthlyTasks, JSON.stringify(monthlyTasks));
+      localStorage.setItem(storageKeys.oneTimeTasks, JSON.stringify(oneTimeTasks));
+      localStorage.setItem(storageKeys.resetMeta, JSON.stringify(resetMeta));
+    }
+
+    function runSmartResets() {
+      const todayKey = getLocalDateKey();
+      const weekKey = getLocalWeekKey();
+      const monthKey = getLocalMonthKey();
+      let changed = false;
+
+      if (resetMeta.daily !== todayKey) {
+        clearDailyInputs();
+        resetMeta.daily = todayKey;
+        changed = true;
+      }
+
+      if (resetMeta.weekly !== weekKey) {
+        weeklyTasks = resetTaskCompletion(weeklyTasks);
+        resetMeta.weekly = weekKey;
+        changed = true;
+      }
+
+      if (resetMeta.monthly !== monthKey) {
+        monthlyTasks = resetTaskCompletion(monthlyTasks);
+        bills = (Array.isArray(bills) ? bills : []).map(item => ({
+          ...item,
+          paid: false
+        }));
+        resetMeta.monthly = monthKey;
+        changed = true;
+      }
+
+      if (changed) {
+        persistAllStateLocally();
+        if (currentUser) {
+          saveCloudDoc(storageKeys.businessTasks, businessTasks).catch(() => {});
+          saveCloudDoc(storageKeys.personalTasks, personalTasks).catch(() => {});
+          saveCloudDoc(storageKeys.appointments, appointments).catch(() => {});
+          saveCloudDoc(storageKeys.schedule, scheduleItems).catch(() => {});
+          saveCloudDoc(storageKeys.water, water).catch(() => {});
+          saveCloudDoc(storageKeys.cleaning, cleaning).catch(() => {});
+          saveCloudDoc(storageKeys.meals, meals).catch(() => {});
+          saveCloudDoc(storageKeys.meraki, meraki).catch(() => {});
+          saveCloudDoc(storageKeys.family, family).catch(() => {});
+          saveCloudDoc(storageKeys.fitness, fitness).catch(() => {});
+          saveCloudDoc(storageKeys.bodyLog, bodyLog).catch(() => {});
+          saveCloudDoc(storageKeys.medication, medication).catch(() => {});
+          saveCloudDoc(storageKeys.sleep, sleep).catch(() => {});
+          saveCloudDoc(storageKeys.journal, journal).catch(() => {});
+          saveCloudDoc(storageKeys.bills, bills).catch(() => {});
+          saveCloudDoc(storageKeys.weeklyTasks, weeklyTasks).catch(() => {});
+          saveCloudDoc(storageKeys.monthlyTasks, monthlyTasks).catch(() => {});
+          saveCloudDoc(storageKeys.resetMeta, resetMeta).catch(() => {});
+        }
+      }
+    }
+
+    function getBillStatus(item) {
+      if (item.paid) {
+        return { label: 'Paid', className: 'status-paid' };
+      }
+
+      const dueDay = Math.min(31, Math.max(1, Number(item.dueDay) || 1));
+      const today = new Date().getDate();
+      const diff = dueDay - today;
+
+      if (diff < 0) return { label: 'Overdue', className: 'status-overdue' };
+      if (diff === 0) return { label: 'Due today', className: 'status-overdue' };
+      if (diff <= 3) return { label: `Due in ${diff} day${diff === 1 ? '' : 's'}`, className: 'status-soon' };
+      return { label: `Due on day ${dueDay}`, className: 'status-ok' };
+    }
+
     function createTaskItem(task, onToggle, onDelete) {
       const item = document.createElement('div');
       item.className = `task-item ${task.done ? 'done' : ''}`;
@@ -1422,6 +1803,140 @@ async function loadCloudDoc(key, fallback) {
         storageKeys.cleaning,
         updated => cleaning = updated
       );
+    }
+
+    function renderOneTimeTasks() {
+      renderTaskCollection(
+        oneTimeTaskList,
+        oneTimeTasks,
+        storageKeys.oneTimeTasks,
+        updated => oneTimeTasks = updated
+      );
+    }
+
+    function createRecurringTaskItem(task, label, onToggle, onDelete) {
+      const item = document.createElement('div');
+      item.className = `task-item ${task.done ? 'done' : ''}`;
+      item.innerHTML = `
+        <div class="task-top">
+          <label class="task-left">
+            <input class="check" type="checkbox" ${task.done ? 'checked' : ''} />
+            <span class="task-text">${escapeHtml(task.text)}</span>
+          </label>
+          <button class="tiny-btn">Delete</button>
+        </div>
+        <div class="task-meta">
+          <span class="meta-chip">${escapeHtml(label)}</span>
+        </div>
+      `;
+      item.querySelector('.check').addEventListener('change', onToggle);
+      item.querySelector('.tiny-btn').addEventListener('click', onDelete);
+      return item;
+    }
+
+    function renderWeeklyTasks() {
+      weeklyTaskList.innerHTML = '';
+      (Array.isArray(weeklyTasks) ? weeklyTasks : [])
+        .slice()
+        .sort((a, b) => (a.day || '').localeCompare(b.day || '') || (a.text || '').localeCompare(b.text || ''))
+        .forEach(task => {
+          weeklyTaskList.appendChild(createRecurringTaskItem(
+            task,
+            task.day || 'Weekly',
+            () => {
+              weeklyTasks = weeklyTasks.map(item =>
+                item.id === task.id ? { ...item, done: !item.done } : item
+              );
+              save(storageKeys.weeklyTasks, weeklyTasks);
+              renderWeeklyTasks();
+            },
+            () => {
+              weeklyTasks = weeklyTasks.filter(item => item.id !== task.id);
+              save(storageKeys.weeklyTasks, weeklyTasks);
+              renderWeeklyTasks();
+            }
+          ));
+        });
+    }
+
+    function renderMonthlyTasks() {
+      monthlyTaskList.innerHTML = '';
+      (Array.isArray(monthlyTasks) ? monthlyTasks : [])
+        .slice()
+        .sort((a, b) => (Number(a.day) || 0) - (Number(b.day) || 0) || (a.text || '').localeCompare(b.text || ''))
+        .forEach(task => {
+          monthlyTaskList.appendChild(createRecurringTaskItem(
+            task,
+            `Day ${task.day || ''}`.trim(),
+            () => {
+              monthlyTasks = monthlyTasks.map(item =>
+                item.id === task.id ? { ...item, done: !item.done } : item
+              );
+              save(storageKeys.monthlyTasks, monthlyTasks);
+              renderMonthlyTasks();
+            },
+            () => {
+              monthlyTasks = monthlyTasks.filter(item => item.id !== task.id);
+              save(storageKeys.monthlyTasks, monthlyTasks);
+              renderMonthlyTasks();
+            }
+          ));
+        });
+    }
+
+    function renderBills() {
+      billsList.innerHTML = '';
+      const safeBills = Array.isArray(bills) ? bills.slice() : [];
+      let unpaidCount = 0;
+      let unpaidTotal = 0;
+
+      safeBills
+        .sort((a, b) => {
+          const aPaid = a.paid ? 1 : 0;
+          const bPaid = b.paid ? 1 : 0;
+          if (aPaid !== bPaid) return aPaid - bPaid;
+          return (Number(a.dueDay) || 0) - (Number(b.dueDay) || 0);
+        })
+        .forEach(item => {
+          if (!item.paid) {
+            unpaidCount += 1;
+            unpaidTotal += Number(item.amount) || 0;
+          }
+
+          const status = getBillStatus(item);
+          const row = document.createElement('div');
+          row.className = 'finance-item';
+          row.innerHTML = `
+            <div class="finance-top">
+              <div>
+                <div><strong>${escapeHtml(item.desc)}</strong></div>
+                <div class="mini">${formatCurrency(item.amount)} • due day ${escapeHtml(item.dueDay)}</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <span class="status-chip ${status.className}">${status.label}</span>
+                <button class="ghost bill-toggle-btn">${item.paid ? 'Unpay' : 'Paid'}</button>
+                <button class="tiny-btn bill-delete-btn">Delete</button>
+              </div>
+            </div>
+          `;
+          row.querySelector('.bill-toggle-btn').addEventListener('click', () => {
+            bills = bills.map(entry =>
+              entry.id === item.id ? { ...entry, paid: !entry.paid } : entry
+            );
+            save(storageKeys.bills, bills);
+            renderBills();
+          });
+          row.querySelector('.bill-delete-btn').addEventListener('click', () => {
+            bills = bills.filter(entry => entry.id !== item.id);
+            save(storageKeys.bills, bills);
+            renderBills();
+          });
+          billsList.appendChild(row);
+        });
+
+      billsSummary.textContent = safeBills.length
+        ? `${unpaidCount} unpaid • ${formatCurrency(unpaidTotal)} remaining this month`
+        : 'No bills added yet.';
     }
 
     function createScheduleItem(item, onDelete) {
@@ -1687,7 +2202,11 @@ async function loadCloudDoc(key, fallback) {
       renderPersonalTasks();
       renderAppointments();
       renderSchedule();
+      renderOneTimeTasks();
       renderFinances();
+      renderBills();
+      renderWeeklyTasks();
+      renderMonthlyTasks();
       renderWater();
       renderCleaning();
       renderMeals();
@@ -1727,7 +2246,14 @@ async function loadCloudDoc(key, fallback) {
       medication = await loadCloudDoc(storageKeys.medication, medication);
       sleep = await loadCloudDoc(storageKeys.sleep, sleep);
       journal = await loadCloudDoc(storageKeys.journal, journal);
+      bills = await loadCloudDoc(storageKeys.bills, bills);
+      weeklyTasks = await loadCloudDoc(storageKeys.weeklyTasks, weeklyTasks);
+      monthlyTasks = await loadCloudDoc(storageKeys.monthlyTasks, monthlyTasks);
+      oneTimeTasks = await loadCloudDoc(storageKeys.oneTimeTasks, oneTimeTasks);
+      resetMeta = await loadCloudDoc(storageKeys.resetMeta, resetMeta);
       notes = await loadCloudDoc(storageKeys.notes, notes);
+
+      runSmartResets();
 
       localStorage.setItem(storageKeys.businessTasks, JSON.stringify(businessTasks));
       localStorage.setItem(storageKeys.personalTasks, JSON.stringify(personalTasks));
@@ -1744,6 +2270,11 @@ async function loadCloudDoc(key, fallback) {
       localStorage.setItem(storageKeys.medication, JSON.stringify(medication));
       localStorage.setItem(storageKeys.sleep, JSON.stringify(sleep));
       localStorage.setItem(storageKeys.journal, JSON.stringify(journal));
+      localStorage.setItem(storageKeys.bills, JSON.stringify(bills));
+      localStorage.setItem(storageKeys.weeklyTasks, JSON.stringify(weeklyTasks));
+      localStorage.setItem(storageKeys.monthlyTasks, JSON.stringify(monthlyTasks));
+      localStorage.setItem(storageKeys.oneTimeTasks, JSON.stringify(oneTimeTasks));
+      localStorage.setItem(storageKeys.resetMeta, JSON.stringify(resetMeta));
       localStorage.setItem(storageKeys.notes, JSON.stringify(notes));
 
       renderAll();
@@ -1841,6 +2372,7 @@ async function loadCloudDoc(key, fallback) {
           signOutBtn.style.display = 'none';
           signInBtn.style.display = '';
           signUpBtn.style.display = '';
+          runSmartResets();
           renderAll();
         }
       });
@@ -1863,6 +2395,16 @@ async function loadCloudDoc(key, fallback) {
         storageKeys.personalTasks,
         updated => personalTasks = updated,
         renderPersonalTasks
+      );
+    });
+
+    addOneTimeTaskBtn.addEventListener('click', () => {
+      addTask(
+        oneTimeTaskInput,
+        oneTimeTasks,
+        storageKeys.oneTimeTasks,
+        updated => oneTimeTasks = updated,
+        renderOneTimeTasks
       );
     });
 
@@ -1896,10 +2438,11 @@ async function loadCloudDoc(key, fallback) {
       );
     });
 
-    [businessTaskInput, personalTaskInput, merakiInput, familyInput, cleaningInput].forEach((inputEl, index) => {
+    [businessTaskInput, personalTaskInput, oneTimeTaskInput, merakiInput, familyInput, cleaningInput].forEach((inputEl, index) => {
       const buttons = [
         addBusinessTaskBtn,
         addPersonalTaskBtn,
+        addOneTimeTaskBtn,
         addMerakiBtn,
         addFamilyBtn,
         addCleaningBtn
@@ -1929,8 +2472,8 @@ async function loadCloudDoc(key, fallback) {
       renderSchedule();
     });
 
-    [appointmentText, scheduleText].forEach((inputEl, index) => {
-      const buttons = [addAppointmentBtn, addScheduleBtn];
+    [appointmentText, scheduleText, financeDesc, billDesc, weeklyTaskInput, monthlyTaskInput].forEach((inputEl, index) => {
+      const buttons = [addAppointmentBtn, addScheduleBtn, addFinanceBtn, addBillBtn, addWeeklyTaskBtn, addMonthlyTaskBtn];
       inputEl.addEventListener('keydown', event => {
         if (event.key === 'Enter') buttons[index].click();
       });
@@ -1951,6 +2494,62 @@ async function loadCloudDoc(key, fallback) {
       financeAmount.value = '';
       financeType.value = 'expense';
       renderFinances();
+    });
+
+    addBillBtn.addEventListener('click', () => {
+      const desc = billDesc.value.trim();
+      const amount = Number(billAmount.value);
+      const dueDay = Number(billDueDay.value);
+      if (!desc || !amount || !dueDay) return;
+      bills.unshift({
+        id: uid(),
+        desc,
+        amount,
+        dueDay,
+        paid: false
+      });
+      save(storageKeys.bills, bills);
+      billDesc.value = '';
+      billAmount.value = '';
+      billDueDay.value = '';
+      renderBills();
+    });
+
+    addWeeklyTaskBtn.addEventListener('click', () => {
+      const text = weeklyTaskInput.value.trim();
+      if (!text) return;
+      weeklyTasks = [
+        ...weeklyTasks,
+        {
+          id: uid(),
+          text,
+          day: weeklyTaskDay.value || 'Sunday',
+          done: false
+        }
+      ];
+      save(storageKeys.weeklyTasks, weeklyTasks);
+      weeklyTaskInput.value = '';
+      weeklyTaskDay.value = 'Sunday';
+      renderWeeklyTasks();
+    });
+
+    addMonthlyTaskBtn.addEventListener('click', () => {
+      const text = monthlyTaskInput.value.trim();
+      const day = Number(monthlyTaskDay.value);
+      if (!text || !day) return;
+      monthlyTasks = [
+        ...monthlyTasks,
+        {
+          id: uid(),
+          text,
+          day,
+          done: false
+        }
+      ];
+      save(storageKeys.monthlyTasks, monthlyTasks);
+      monthlyTaskInput.value = '';
+      monthlyTaskDay.value = '';
+      renderMonthlyTasks();
     });
 
     notesBox.addEventListener('input', () => {
@@ -2037,6 +2636,30 @@ async function loadCloudDoc(key, fallback) {
       scheduleItems = [];
       save(storageKeys.schedule, scheduleItems);
       renderSchedule();
+    });
+
+    resetOneTimeTasksBtn.addEventListener('click', () => {
+      oneTimeTasks = [];
+      save(storageKeys.oneTimeTasks, oneTimeTasks);
+      renderOneTimeTasks();
+    });
+
+    resetBillsBtn.addEventListener('click', () => {
+      bills = [];
+      save(storageKeys.bills, bills);
+      renderBills();
+    });
+
+    resetWeeklyTasksBtn.addEventListener('click', () => {
+      weeklyTasks = resetTaskCompletion(weeklyTasks);
+      save(storageKeys.weeklyTasks, weeklyTasks);
+      renderWeeklyTasks();
+    });
+
+    resetMonthlyTasksBtn.addEventListener('click', () => {
+      monthlyTasks = resetTaskCompletion(monthlyTasks);
+      save(storageKeys.monthlyTasks, monthlyTasks);
+      renderMonthlyTasks();
     });
 
     resetCleaningBtn.addEventListener('click', () => {
@@ -2128,6 +2751,9 @@ async function loadCloudDoc(key, fallback) {
       renderJournal();
     });
 
+    populateDaySelect(billDueDay, true);
+    populateDaySelect(monthlyTaskDay, true);
+    runSmartResets();
     renderAll();
     resetBreathingUI();
 
