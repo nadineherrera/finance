@@ -569,20 +569,43 @@
             <div class="task-list" id="businessTaskList"></div>
           </section>
 
-          <section class="card">
-            <div class="section-head">
-              <div>
-                <h2>Personal Tasks</h2>
-                <div class="sub">Life, wellness, home, and routines.</div>
-              </div>
-              <button class="ghost" id="resetPersonalTasksBtn">Reset</button>
-            </div>
-            <div class="input-row">
-              <input id="personalTaskInput" type="text" placeholder="Add a personal task" />
-              <button id="addPersonalTaskBtn">Add</button>
-            </div>
-            <div class="task-list" id="personalTaskList"></div>
-          </section>
+         <section class="card">
+  <div class="section-head">
+    <div>
+      <h2>Personal Tasks</h2>
+      <div class="sub">Life, wellness, home, and routines.</div>
+    </div>
+    <button class="ghost" id="resetPersonalTasksBtn">Reset</button>
+  </div>
+
+  <div class="stack" style="gap: 10px; margin-bottom: 12px;">
+    <a
+      href="https://docs.google.com/spreadsheets/d/1GblvA0FZCMKrkadMq1jwblt1MWJBgDsmw9C9sF8OuiY/edit?gid=1377209052#gid=1377209052"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:100%;
+        text-decoration:none;
+        background:var(--accent);
+        color:white;
+        padding:12px 16px;
+        border-radius:14px;
+        font-weight:500;
+      "
+    >
+      Tasks
+    </a>
+  </div>
+
+  <div class="input-row">
+    <input id="personalTaskInput" type="text" placeholder="Add a personal task" />
+    <button id="addPersonalTaskBtn">Add</button>
+  </div>
+  <div class="task-list" id="personalTaskList"></div>
+</section>
 
           <section class="card">
             <div class="section-head">
