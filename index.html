@@ -509,8 +509,24 @@
       </div>
 
       <div class="grid">
-        <!-- LEFT COLUMN -->
-        <div class="stack">
+  <!-- LEFT COLUMN -->
+  <div class="stack">
+
+    <!-- ✅ ADD THIS RIGHT HERE -->
+    <section class="card">
+      <div class="section-head">
+        <div>
+          <h2>Quick Open</h2>
+          <div class="sub">Open your email and calendar tools in one tap.</div>
+        </div>
+      </div>
+
+      <div class="stack" style="gap: 10px;">
+        <!-- your buttons -->
+      </div>
+    </section>
+
+   
           <section class="card">
             <div class="section-head">
               <div>
@@ -2801,5 +2817,14 @@ const logNotes = document.getElementById('logNotes');
       }
     });
   </script>
+  <script>
+  function openOutlookApp() {
+    window.location.href = "ms-outlook://";
+
+    setTimeout(() => {
+      window.open("https://outlook.office.com/mail/", "_blank");
+    }, 800);
+  }
+</script>
 </body>
 </html>
