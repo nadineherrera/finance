@@ -2873,13 +2873,20 @@ const logNotes = document.getElementById('logNotes');
       }
     });
   </script>
-  <script>
+<script>
   function openOutlookApp() {
+    const start = Date.now();
+
     window.location.href = "ms-outlook://";
 
     setTimeout(() => {
-      window.open("https://outlook.office.com/mail/", "_blank");
-    }, 800);
+      const elapsed = Date.now() - start;
+
+      // Only open website if app likely didn't open
+      if (elapsed < 1500) {
+        window.open("https://outlook.office.com/mail/", "_blank");
+      }
+    }, 1000);
   }
 </script>
 </body>
