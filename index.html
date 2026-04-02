@@ -844,33 +844,36 @@
             </div>
           </section>
 
-          <section class="card">
-            <div class="section-head">
-              <div>
-                <h2>Body Log</h2>
-                <div class="sub">Track weight, body fat, and measurements.</div>
-              </div>
-              <button class="ghost" id="resetBodyLogBtn">Reset</button>
-            </div>
-            <div class="stack" style="gap: 10px;">
-              <div class="input-row" style="margin-bottom: 0;">
-                <input id="logWeight" type="text" placeholder="Weight" />
-                <input id="logBodyFat" type="text" placeholder="Body fat %" />
-              </div>
-              <div class="input-row" style="margin-bottom: 0;">
-                <input id="logWaist" type="text" placeholder="Waist" />
-                <input id="logHips" type="text" placeholder="Hips" />
-              </div>
-              <div class="input-row" style="margin-bottom: 0;">
-                <input id="logChest" type="text" placeholder="Chest" />
-                <input id="logArms" type="text" placeholder="Arms" />
-              </div>
-              <div class="input-row" style="margin-bottom: 0;">
-                <input id="logThighs" type="text" placeholder="Thighs" />
-                <input id="logNotes" type="text" placeholder="Extra notes" />
-              </div>
-            </div>
-          </section>
+      <section class="card">
+  <div class="section-head">
+    <div>
+      <h2>Body Log</h2>
+      <div class="sub">Track weight, body fat, blood pressure, and measurements.</div>
+    </div>
+    <button class="ghost" id="resetBodyLogBtn">Reset</button>
+  </div>
+  <div class="stack" style="gap: 10px;">
+    <div class="input-row" style="margin-bottom: 0;">
+      <input id="logWeight" type="text" placeholder="Weight" />
+      <input id="logBodyFat" type="text" placeholder="Body fat %" />
+    </div>
+    <div class="input-row" style="margin-bottom: 0;">
+      <input id="logBloodPressure" type="text" placeholder="Blood pressure (e.g. 120/80)" />
+      <input id="logWaist" type="text" placeholder="Waist" />
+    </div>
+    <div class="input-row" style="margin-bottom: 0;">
+      <input id="logHips" type="text" placeholder="Hips" />
+      <input id="logChest" type="text" placeholder="Chest" />
+    </div>
+    <div class="input-row" style="margin-bottom: 0;">
+      <input id="logArms" type="text" placeholder="Arms" />
+      <input id="logThighs" type="text" placeholder="Thighs" />
+    </div>
+    <div class="input-row" style="margin-bottom: 0;">
+      <input id="logNotes" type="text" placeholder="Extra notes" />
+    </div>
+  </div>
+</section>
 
           <section class="card">
             <div class="section-head">
@@ -1343,6 +1346,7 @@ async function loadCloudDoc(key, fallback) {
     let bodyLog = loadLocal(storageKeys.bodyLog, {
       weight: '',
       bodyFat: '',
+      bloodPressure: '',
       waist: '',
       hips: '',
       chest: '',
@@ -1491,14 +1495,15 @@ async function loadCloudDoc(key, fallback) {
     const strengthNotes = document.getElementById('strengthNotes');
     const resetFitnessBtn = document.getElementById('resetFitnessBtn');
 
-    const logWeight = document.getElementById('logWeight');
-    const logBodyFat = document.getElementById('logBodyFat');
-    const logWaist = document.getElementById('logWaist');
-    const logHips = document.getElementById('logHips');
-    const logChest = document.getElementById('logChest');
-    const logArms = document.getElementById('logArms');
-    const logThighs = document.getElementById('logThighs');
-    const logNotes = document.getElementById('logNotes');
+const logWeight = document.getElementById('logWeight');
+const logBodyFat = document.getElementById('logBodyFat');
+const logBloodPressure = document.getElementById('logBloodPressure');
+const logWaist = document.getElementById('logWaist');
+const logHips = document.getElementById('logHips');
+const logChest = document.getElementById('logChest');
+const logArms = document.getElementById('logArms');
+const logThighs = document.getElementById('logThighs');
+const logNotes = document.getElementById('logNotes');
     const resetBodyLogBtn = document.getElementById('resetBodyLogBtn');
 
     const morningMedicationName = document.getElementById('morningMedicationName');
@@ -2073,6 +2078,7 @@ async function loadCloudDoc(key, fallback) {
     function renderBodyLog() {
       logWeight.value = bodyLog.weight || '';
       logBodyFat.value = bodyLog.bodyFat || '';
+      logBloodPressure.value = bodyLog.bloodPressure || '';
       logWaist.value = bodyLog.waist || '';
       logHips.value = bodyLog.hips || '';
       logChest.value = bodyLog.chest || '';
@@ -2135,6 +2141,7 @@ async function loadCloudDoc(key, fallback) {
       bodyLog = {
         weight: logWeight.value,
         bodyFat: logBodyFat.value,
+        bloodPressure: logBloodPressure.value,
         waist: logWaist.value,
         hips: logHips.value,
         chest: logChest.value,
@@ -2586,7 +2593,7 @@ async function loadCloudDoc(key, fallback) {
     [cardioExercise, cardioTime, cardioNotes, strengthExercise, strengthReps, strengthNotes]
       .forEach(el => el.addEventListener('input', saveFitness));
 
-    [logWeight, logBodyFat, logWaist, logHips, logChest, logArms, logThighs, logNotes]
+    [logWeight, logBodyFat, logBloodPressure, logWaist, logHips, logChest, logArms, logThighs, logNotes]
       .forEach(el => el.addEventListener('input', saveBodyLog));
 
     [
@@ -2730,6 +2737,7 @@ async function loadCloudDoc(key, fallback) {
       bodyLog = {
         weight: '',
         bodyFat: '',
+        bloodPressure: '',
         waist: '',
         hips: '',
         chest: '',
