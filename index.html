@@ -473,6 +473,37 @@
       .schedule-layout { flex-direction: column; gap: 4px; }
       .schedule-time { min-width: 0; }
     }
+
+.credit-score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.credit-score-field {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  background: rgba(255,255,255,0.82);
+}
+
+.credit-score-field .label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin-bottom: 8px;
+}
+
+.credit-score-date {
+  margin-bottom: 12px;
+}
+
+@media (max-width: 780px) {
+  .credit-score-grid {
+    grid-template-columns: 1fr;
+  }
+}
+    
   </style>
 </head>
 <body>
@@ -978,7 +1009,7 @@
 </a>
   
 </div>
-            <div style="margin-bottom: 12px;">
+           <div style="margin-bottom: 12px;">
   <div class="section-head">
     <div>
       <h2>Credit Scores</h2>
@@ -987,26 +1018,26 @@
     <button class="ghost" id="resetCreditScoresBtn">Reset</button>
   </div>
 
-  <div class="finance-summary">
-    <div class="summary-box">
+  <div class="credit-score-grid">
+    <div class="credit-score-field">
       <div class="label">TransUnion</div>
       <input id="transunionScore" type="number" placeholder="e.g. 642" />
     </div>
 
-    <div class="summary-box">
+    <div class="credit-score-field">
       <div class="label">Experian</div>
       <input id="experianScore" type="number" placeholder="e.g. 655" />
     </div>
 
-    <div class="summary-box">
+    <div class="credit-score-field">
       <div class="label">Equifax</div>
       <input id="equifaxScore" type="number" placeholder="e.g. 648" />
     </div>
+  </div>
 
-    <div class="summary-box">
-      <div class="label">Last Updated</div>
-      <input id="creditScoreDate" type="date" />
-    </div>
+  <div class="credit-score-date">
+    <div class="label" style="color: var(--muted); font-size: 0.82rem; margin-bottom: 8px;">Last Updated</div>
+    <input id="creditScoreDate" type="date" />
   </div>
 </div>
             
