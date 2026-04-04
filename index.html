@@ -863,6 +863,50 @@
 
         <!-- MIDDLE COLUMN -->
         <div class="stack">
+
+<section class="card">
+  <div class="section-head">
+    <div>
+      <h2>Affirmations</h2>
+      <div class="sub">A message to return to throughout the day.</div>
+    </div>
+    <button class="ghost" id="newAffirmationBtn">New</button>
+  </div>
+
+  <div class="input-row" style="margin-bottom: 12px;">
+    <select id="affirmationCategory">
+      <option value="all">All</option>
+      <option value="selfWorth">Self-Worth</option>
+      <option value="healing">Healing</option>
+      <option value="confidence">Confidence</option>
+      <option value="abundance">Abundance</option>
+      <option value="peace">Peace</option>
+    </select>
+    <button class="ghost" id="saveAffirmationBtn">Save</button>
+  </div>
+
+  <div
+    style="
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      background: rgba(255,255,255,0.82);
+      text-align: center;
+      margin-bottom: 10px;
+    "
+  >
+    <p
+      id="affirmationText"
+      style="margin:0; font-size:1.15rem; line-height:1.7;"
+    >
+      I am valuable, lovable, and worthy of love.
+    </p>
+  </div>
+
+  <div class="mini" id="affirmationStatus"></div>
+</section>
+          
+          
           <section class="card">
             <h2>Finances</h2>
             <div class="sub">A light tracker for money in and money out.</div>
@@ -3453,5 +3497,182 @@ document.getElementById('resetCreditScoresBtn').addEventListener('click', () => 
     }, 1000);
   }
 </script>
+
+  <script>
+  const affirmations = {
+    all: [
+      "I am grounded, capable, and becoming more of myself every day.",
+      "I trust myself to make aligned decisions.",
+      "I am worthy of peace, progress, and good things.",
+      "I do not need to rush to become who I already am.",
+      "I am allowed to grow slowly and still be powerful."
+    ],
+    selfWorth: [
+      "I am worthy of love, respect, and care.",
+      "I do not have to earn my value.",
+      "I honor who I am and who I am becoming.",
+      "I am valuable, lovable, and worthy of love."
+    ],
+    healing: [
+      "I allow myself to heal at my own pace.",
+      "I release what no longer belongs to me.",
+      "I am safe to soften and begin again."
+    ],
+    confidence: [
+      "I trust my voice, my vision, and my presence.",
+      "I can take up space without apology.",
+      "I am becoming more confident with every step."
+    ],
+    abundance: [
+      "I am open to new opportunities and overflow.",
+      "I welcome aligned success into my life.",
+      "I am capable of building a life that supports me."
+    ],
+    peace: [
+      "Peace begins with the way I speak to myself.",
+      "I choose calm over chaos when possible.",
+      "I return to the present moment with gentleness."
+    ]
+  };
+
+  const affirmationText = document.getElementById('affirmationText');
+  const affirmationCategory = document.getElementById('affirmationCategory');
+  const newAffirmationBtn = document.getElementById('newAffirmationBtn');
+  const saveAffirmationBtn = document.getElementById('saveAffirmationBtn');
+  const affirmationStatus = document.getElementById('affirmationStatus');
+
+  const affirmationStorageKey = 'dashboard_daily_affirmation';
+  const savedAffirmationsKey = 'dashboard_saved_affirmations';
+
+  function getTodayString() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function getPool(category) {
+    if (category === 'all') {
+      return [
+        ...affirmations.all,
+        ...affirmations.selfWorth,
+        ...affirmations.healing,
+        ...affirmations.confidence,
+        ...affirmations.abundance,
+        ...affirmations.peace
+      ];
+    }
+    return affirmations[category] || affirmations.all;
+  }
+
+  function getRandomAffirmation(category) {
+    const pool = getPool(category);
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  function setAffirmation(text, category, dateString) {
+    if (!affirmationText) return;
+
+    affirmationText.textContent = text;
+
+    localStorage.setItem(
+      affirmationStorageKey,
+      JSON.stringify({
+        text,
+        category,
+        date: dateString
+      })
+    );
+  }
+
+  function showNewDailyAffirmation(category = 'all') {
+    const today = getTodayString();
+    const text = getRandomAffirmation(category);
+    setAffirmation(text, category, today);
+
+    if (affirmationStatus) {
+      affirmationStatus.textContent = 'New daily affirmation loaded.';
+    }
+  }
+
+  function loadDailyAffirmation() {
+    const today = getTodayString();
+    const saved = localStorage.getItem(affirmationStorageKey);
+
+    if (!saved) {
+      showNewDailyAffirmation('all');
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(saved);
+      const savedDate = parsed.date;
+      const savedCategory = parsed.category || 'all';
+
+      if (affirmationCategory) {
+        affirmationCategory.value = savedCategory;
+      }
+
+      if (savedDate === today && parsed.text) {
+        if (affirmationText) {
+          affirmationText.textContent = parsed.text;
+        }
+
+        if (affirmationStatus) {
+          affirmationStatus.textContent = 'Today’s affirmation is ready.';
+        }
+      } else {
+        showNewDailyAffirmation(savedCategory);
+      }
+    } catch {
+      showNewDailyAffirmation('all');
+    }
+  }
+
+  function saveCurrentAffirmation() {
+    if (!affirmationText) return;
+
+    const currentText = affirmationText.textContent.trim();
+    if (!currentText) return;
+
+    let savedList = [];
+    const existing = localStorage.getItem(savedAffirmationsKey);
+
+    if (existing) {
+      try {
+        savedList = JSON.parse(existing);
+      } catch {
+        savedList = [];
+      }
+    }
+
+    if (!savedList.includes(currentText)) {
+      savedList.push(currentText);
+      localStorage.setItem(savedAffirmationsKey, JSON.stringify(savedList));
+
+      if (affirmationStatus) {
+        affirmationStatus.textContent = 'Affirmation saved.';
+      }
+    } else {
+      if (affirmationStatus) {
+        affirmationStatus.textContent = 'Already saved.';
+      }
+    }
+  }
+
+  newAffirmationBtn?.addEventListener('click', () => {
+    showNewDailyAffirmation(affirmationCategory?.value || 'all');
+  });
+
+  affirmationCategory?.addEventListener('change', () => {
+    showNewDailyAffirmation(affirmationCategory.value);
+  });
+
+  saveAffirmationBtn?.addEventListener('click', saveCurrentAffirmation);
+
+  loadDailyAffirmation();
+</script>
+  
 </body>
 </html>
