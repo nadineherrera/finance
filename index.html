@@ -3668,31 +3668,33 @@ function getCompletedTaskTexts(listId) {
   ).map(el => el.textContent.trim());
 }
 
-function getInputValue(id) {
+function getValue(id) {
   const el = document.getElementById(id);
   if (!el) return '';
+  if (el.type === 'checkbox') return el.checked ? 'Yes' : 'No';
   return (el.value || el.textContent || '').trim();
 }
 
-function addSectionIfHasContent(recapParts, title, lines) {
-  const filtered = lines.filter(line => line && line.trim() !== '');
-  if (filtered.length) {
-    recapParts.push(`${title}\n${filtered.join('\n')}`);
-  }
+function addSection(lines, title, items) {
+  const filtered = items.filter(Boolean);
+  if (!filtered.length) return;
+  lines.push(title);
+  filtered.forEach(item => lines.push(item));
+  lines.push('');
 }
 
 function generateDailyRecap() {
-  const recapParts = [];
-  recapParts.push("✨ Daily Recap");
+  const lines = [];
+  lines.push('✨ Daily Recap');
+  lines.push('');
 
-  // Completed tasks by section
   const sections = [
-    { label: "Business", id: "businessTaskList" },
-    { label: "Personal", id: "personalTaskList" },
-    { label: "Meraki", id: "merakiList" },
-    { label: "Family", id: "familyList" },
-    { label: "Cleaning", id: "cleaningList" },
-    { label: "One-Time Tasks", id: "oneTimeTaskList" }
+    { label: 'Business', id: 'businessTaskList' },
+    { label: 'Personal', id: 'personalTaskList' },
+    { label: 'Meraki', id: 'merakiList' },
+    { label: 'Family', id: 'familyList' },
+    { label: 'Cleaning', id: 'cleaningList' },
+    { label: 'One-Time Tasks', id: 'oneTimeTaskList' }
   ];
 
   let foundAnyTasks = false;
@@ -3701,8 +3703,8 @@ function generateDailyRecap() {
     const completed = getCompletedTaskTexts(section.id);
     if (completed.length) {
       foundAnyTasks = true;
-      addSectionIfHasContent(
-        recapParts,
+      addSection(
+        lines,
         `✔ ${section.label}:`,
         completed.map(text => `- ${text}`)
       );
@@ -3710,81 +3712,122 @@ function generateDailyRecap() {
   });
 
   if (!foundAnyTasks) {
-    addSectionIfHasContent(recapParts, "✔ Tasks Completed:", [
-      "- No tasks marked complete"
-    ]);
+    addSection(lines, '✔ Tasks Completed:', ['- No tasks marked complete']);
   }
 
-  // Affirmation
-  const affirmation = getInputValue('affirmationText');
-  addSectionIfHasContent(recapParts, "🌿 Affirmation:", [
-    `"${affirmation}"`
+  const affirmation = getValue('affirmationText');
+  if (affirmation) {
+    addSection(lines, '🌿 Affirmation:', [`"${affirmation}"`]);
+  }
+
+  const transunion = getValue('transunionScore');
+  const experian = getValue('experianScore');
+  const equifax = getValue('equifaxScore');
+  const creditUpdated = getValue('creditScoreDate');
+
+  addSection(lines, '💳 Credit Scores:', [
+    transunion ? `- TransUnion: ${transunion}` : '',
+    experian ? `- Experian: ${experian}` : '',
+    equifax ? `- Equifax: ${equifax}` : '',
+    creditUpdated ? `- Updated: ${creditUpdated}` : ''
   ]);
 
-  // Journal
-  const journalEntry = getInputValue('journalEntry');
-  addSectionIfHasContent(recapParts, "📝 Journal:", [
-    journalEntry
+  const breakfastMeal = getValue('breakfastMeal');
+  const breakfastIngredients = getValue('breakfastIngredients');
+  const lunchMeal = getValue('lunchMeal');
+  const lunchIngredients = getValue('lunchIngredients');
+  const dinnerMeal = getValue('dinnerMeal');
+  const dinnerIngredients = getValue('dinnerIngredients');
+
+  addSection(lines, '🍽 Meals:', [
+    breakfastMeal ? `- Breakfast: ${breakfastMeal}${breakfastIngredients ? ` (${breakfastIngredients})` : ''}` : '',
+    lunchMeal ? `- Lunch: ${lunchMeal}${lunchIngredients ? ` (${lunchIngredients})` : ''}` : '',
+    dinnerMeal ? `- Dinner: ${dinnerMeal}${dinnerIngredients ? ` (${dinnerIngredients})` : ''}` : ''
   ]);
 
-  // Mood
-  const mood = getInputValue('moodSelect') || getInputValue('moodInput');
-  addSectionIfHasContent(recapParts, "💛 Mood:", [
-    mood
+  const cardioExercise = getValue('cardioExercise');
+  const cardioTime = getValue('cardioTime');
+  const cardioNotes = getValue('cardioNotes');
+  const strengthExercise = getValue('strengthExercise');
+  const strengthReps = getValue('strengthReps');
+  const strengthNotes = getValue('strengthNotes');
+
+  addSection(lines, '🏃 Fitness:', [
+    cardioExercise ? `- Cardio: ${cardioExercise}${cardioTime ? ` for ${cardioTime}` : ''}${cardioNotes ? ` — ${cardioNotes}` : ''}` : '',
+    strengthExercise ? `- Strength: ${strengthExercise}${strengthReps ? ` (${strengthReps})` : ''}${strengthNotes ? ` — ${strengthNotes}` : ''}` : ''
   ]);
 
-  // Body measurements / body log
-  const weight = getInputValue('logWeight');
-  const bodyFat = getInputValue('logBodyFat');
-  const bloodPressure = getInputValue('logBloodPressure');
-  const waist = getInputValue('logWaist');
-  const hips = getInputValue('logHips');
-  const neck = getInputValue('logNeck');
-  const shoulders = getInputValue('logShoulders');
+  const weight = getValue('logWeight');
+  const bodyFat = getValue('logBodyFat');
+  const bloodPressure = getValue('logBloodPressure');
+  const waist = getValue('logWaist');
+  const hips = getValue('logHips');
+  const neck = getValue('logNeck');
+  const shoulders = getValue('logShoulders');
+  const chest = getValue('logChest');
+  const arms = getValue('logArms');
+  const thighs = getValue('logThighs');
+  const bodyNotes = getValue('logNotes');
 
-  addSectionIfHasContent(recapParts, "⚖️ Body Log:", [
+  addSection(lines, '⚖️ Body Log:', [
     weight ? `- Weight: ${weight}` : '',
     bodyFat ? `- Body Fat: ${bodyFat}` : '',
     bloodPressure ? `- Blood Pressure: ${bloodPressure}` : '',
     waist ? `- Waist: ${waist}` : '',
     hips ? `- Hips: ${hips}` : '',
     neck ? `- Neck: ${neck}` : '',
-    shoulders ? `- Shoulders: ${shoulders}` : ''
+    shoulders ? `- Shoulders: ${shoulders}` : '',
+    chest ? `- Chest: ${chest}` : '',
+    arms ? `- Arms: ${arms}` : '',
+    thighs ? `- Thighs: ${thighs}` : '',
+    bodyNotes ? `- Notes: ${bodyNotes}` : ''
   ]);
 
-  // Water
-  const waterCount = getInputValue('waterCount');
-  addSectionIfHasContent(recapParts, "💧 Water:", [
-    waterCount ? `- ${waterCount}` : ''
+  const morningMedicationName = getValue('morningMedicationName');
+  const morningMedicationTime = getValue('morningMedicationTime');
+  const morningMedicationTaken = getValue('morningMedicationTaken');
+  const nightMedicationName = getValue('nightMedicationName');
+  const nightMedicationTime = getValue('nightMedicationTime');
+  const nightMedicationTaken = getValue('nightMedicationTaken');
+
+  addSection(lines, '💊 Medication:', [
+    morningMedicationName ? `- Morning: ${morningMedicationName}${morningMedicationTime ? ` at ${morningMedicationTime}` : ''} — Taken: ${morningMedicationTaken}` : '',
+    nightMedicationName ? `- Night: ${nightMedicationName}${nightMedicationTime ? ` at ${nightMedicationTime}` : ''} — Taken: ${nightMedicationTaken}` : ''
   ]);
 
-  // Exercise
-  const cardio = getInputValue('cardioInput');
-  const strength = getInputValue('strengthInput');
+  const sleepBedtime = getValue('sleepBedtime');
+  const sleepWakeTime = getValue('sleepWakeTime');
+  const sleepHours = getValue('sleepHours');
+  const sleepQuality = getValue('sleepQuality');
+  const sleepNotes = getValue('sleepNotes');
 
-  addSectionIfHasContent(recapParts, "🏃 Movement:", [
-    cardio ? `- Cardio: ${cardio}` : '',
-    strength ? `- Strength: ${strength}` : ''
+  addSection(lines, '😴 Sleep:', [
+    sleepBedtime ? `- Bedtime: ${sleepBedtime}` : '',
+    sleepWakeTime ? `- Wake Time: ${sleepWakeTime}` : '',
+    sleepHours ? `- Hours: ${sleepHours}` : '',
+    sleepQuality ? `- Quality: ${sleepQuality}` : '',
+    sleepNotes ? `- Notes: ${sleepNotes}` : ''
   ]);
 
-  // Meals
-  const breakfast = getInputValue('breakfastInput');
-  const lunch = getInputValue('lunchInput');
-  const dinner = getInputValue('dinnerInput');
+  const mood = getValue('moodPicker');
+  const journalTitle = getValue('journalTitle');
+  const journalEntry = getValue('journalEntry');
+  const dreamTitle = getValue('dreamTitle');
+  const dreamEntry = getValue('dreamEntry');
 
-  addSectionIfHasContent(recapParts, "🍽 Meals:", [
-    breakfast ? `- Breakfast: ${breakfast}` : '',
-    lunch ? `- Lunch: ${lunch}` : '',
-    dinner ? `- Dinner: ${dinner}` : ''
+  addSection(lines, '📝 Journal:', [
+    mood ? `- Mood: ${mood}` : '',
+    journalTitle ? `- Journal Title: ${journalTitle}` : '',
+    journalEntry ? `- Journal Entry: ${journalEntry}` : '',
+    dreamTitle ? `- Dream Title: ${dreamTitle}` : '',
+    dreamEntry ? `- Dream Entry: ${dreamEntry}` : ''
   ]);
 
-  // Reflection prompts
-  addSectionIfHasContent(recapParts, "🧠 Reflection:", [
-    "- What did I do well today?",
-    "- What can I improve tomorrow?"
-  ]);
+  lines.push('🧠 Reflection:');
+  lines.push('- What did I do well today?');
+  lines.push('- What can I improve tomorrow?');
 
-  recapOutput.textContent = recapParts.join("\n\n");
+  recapOutput.textContent = lines.join('\n');
 }
 
 generateRecapBtn?.addEventListener('click', generateDailyRecap);
