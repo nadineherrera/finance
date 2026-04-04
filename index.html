@@ -503,6 +503,71 @@
     grid-template-columns: 1fr;
   }
 }
+
+    .daily-affirmation-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,247,241,0.94));
+  border: 1px solid #ddd4c8;
+}
+
+.affirmation-head {
+  margin-bottom: 16px;
+}
+
+.daily-affirmation-card h2 {
+  font-size: 1.5rem;
+  letter-spacing: -0.04em;
+  margin-bottom: 6px;
+}
+
+.daily-affirmation-card .sub {
+  font-size: 1rem;
+  color: #746d65;
+  margin-bottom: 0;
+}
+
+.affirmation-quote-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  padding: 28px 26px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.82), rgba(248,244,237,0.96));
+  border: 1px solid #d9d0c4;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.75),
+    0 8px 22px rgba(0,0,0,0.03);
+}
+
+.affirmation-quote {
+  margin: 0;
+  max-width: 520px;
+  text-align: center;
+  font-size: clamp(1.7rem, 2.8vw, 2.15rem);
+  line-height: 1.5;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+  color: #242424;
+}
+
+@media (max-width: 560px) {
+  .affirmation-quote-wrap {
+    min-height: 180px;
+    padding: 22px 18px;
+    border-radius: 22px;
+  }
+
+  .affirmation-quote {
+    font-size: 1.45rem;
+    line-height: 1.45;
+  }
+
+  .daily-affirmation-card h2 {
+    font-size: 1.3rem;
+  }
+}
     
   </style>
 </head>
@@ -864,28 +929,17 @@
         <!-- MIDDLE COLUMN -->
         <div class="stack">
 
-<section class="card">
-  <div class="section-head">
+<section class="card daily-affirmation-card">
+  <div class="section-head affirmation-head">
     <div>
       <h2>Daily Affirmation</h2>
       <div class="sub">A message chosen for today.</div>
     </div>
   </div>
 
-  <div
-    style="
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      padding: 22px;
-      background: rgba(255,255,255,0.82);
-      text-align: center;
-    "
-  >
-    <p
-      id="affirmationText"
-      style="margin:0; font-size:1.15rem; line-height:1.7;"
-    >
-      I am valuable, lovable, and worthy of love.
+  <div class="affirmation-quote-wrap">
+    <p id="affirmationText" class="affirmation-quote">
+      I am grounded, capable, and becoming more of myself every day.
     </p>
   </div>
 </section>
