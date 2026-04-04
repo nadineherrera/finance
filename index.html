@@ -1757,6 +1757,7 @@
       sleep: 'simpleDashboardSleep',
       journal: 'simpleDashboardJournal',
       bills: 'simpleDashboardBills',
+      creditScores: 'simpleDashboardCreditScores',
       weeklyTasks: 'simpleDashboardWeeklyTasks',
       monthlyTasks: 'simpleDashboardMonthlyTasks',
       oneTimeTasks: 'simpleDashboardOneTimeTasks',
@@ -1918,6 +1919,8 @@ async function loadCloudDoc(key, fallback) {
       chest: '',
       arms: '',
       thighs: '',
+      neck: '',
+      shoulders: '',
       notes: ''
     });
     let medication = loadLocal(storageKeys.medication, {
@@ -2065,6 +2068,8 @@ const logWeight = document.getElementById('logWeight');
 const logBodyFat = document.getElementById('logBodyFat');
 const logBloodPressure = document.getElementById('logBloodPressure');
 const logWaist = document.getElementById('logWaist');
+const logNeck = document.getElementById('logNeck');
+const logShoulders = document.getElementById('logShoulders');
 const logHips = document.getElementById('logHips');
 const logChest = document.getElementById('logChest');
 const logArms = document.getElementById('logArms');
@@ -2101,7 +2106,7 @@ const logNotes = document.getElementById('logNotes');
     const breathToggleBtn = document.getElementById('breathToggleBtn');
     const breathResetBtn = document.getElementById('breathResetBtn');
 
-    // ✅ ADD CREDIT SCORE CODE RIGHT HERE
+ // ✅ CREDIT SCORE SYNC (Firebase + local)
 
 const creditScoreFields = {
   transunion: document.getElementById('transunionScore'),
@@ -2110,41 +2115,29 @@ const creditScoreFields = {
   updated: document.getElementById('creditScoreDate')
 };
 
-const creditScoreStorageKey = 'dashboard_credit_scores';
+let creditScores = loadLocal(storageKeys.creditScores, {
+  transunion: '',
+  experian: '',
+  equifax: '',
+  updated: ''
+});
+
+function renderCreditScores() {
+  creditScoreFields.transunion.value = creditScores.transunion || '';
+  creditScoreFields.experian.value = creditScores.experian || '';
+  creditScoreFields.equifax.value = creditScores.equifax || '';
+  creditScoreFields.updated.value = creditScores.updated || '';
+}
 
 function saveCreditScores() {
-  const data = {
+  creditScores = {
     transunion: creditScoreFields.transunion.value || '',
     experian: creditScoreFields.experian.value || '',
     equifax: creditScoreFields.equifax.value || '',
     updated: creditScoreFields.updated.value || ''
   };
 
-  localStorage.setItem(creditScoreStorageKey, JSON.stringify(data));
-}
-
-function loadCreditScores() {
-  const saved = localStorage.getItem(creditScoreStorageKey);
-  if (!saved) return;
-
-  try {
-    const data = JSON.parse(saved);
-    creditScoreFields.transunion.value = data.transunion || '';
-    creditScoreFields.experian.value = data.experian || '';
-    creditScoreFields.equifax.value = data.equifax || '';
-    creditScoreFields.updated.value = data.updated || '';
-  } catch (error) {
-    console.error('Could not load credit scores:', error);
-  }
-}
-
-function resetCreditScores() {
-  creditScoreFields.transunion.value = '';
-  creditScoreFields.experian.value = '';
-  creditScoreFields.equifax.value = '';
-  creditScoreFields.updated.value = '';
-
-  localStorage.removeItem(creditScoreStorageKey);
+  save(storageKeys.creditScores, creditScores);
 }
 
 [
@@ -2157,11 +2150,17 @@ function resetCreditScores() {
   field.addEventListener('change', saveCreditScores);
 });
 
-document
-  .getElementById('resetCreditScoresBtn')
-  .addEventListener('click', resetCreditScores);
+document.getElementById('resetCreditScoresBtn').addEventListener('click', () => {
+  creditScores = {
+    transunion: '',
+    experian: '',
+    equifax: '',
+    updated: ''
+  };
 
-loadCreditScores();
+  save(storageKeys.creditScores, creditScores);
+  renderCreditScores();
+});
 
     function formatToday() {
       todayDate.textContent = new Date().toLocaleDateString(undefined, {
@@ -2712,6 +2711,8 @@ loadCreditScores();
       logChest.value = bodyLog.chest || '';
       logArms.value = bodyLog.arms || '';
       logThighs.value = bodyLog.thighs || '';
+      logNeck.value = bodyLog.neck || '';
+      logShoulders.value = bodyLog.shoulders || '';
       logNotes.value = bodyLog.notes || '';
     }
 
@@ -2775,6 +2776,8 @@ loadCreditScores();
         chest: logChest.value,
         arms: logArms.value,
         thighs: logThighs.value,
+        neck: logNeck.value,
+        shoulders: logShoulders.value,
         notes: logNotes.value
       };
       save(storageKeys.bodyLog, bodyLog);
@@ -2863,6 +2866,7 @@ loadCreditScores();
       renderOneTimeTasks();
       renderFinances();
       renderBills();
+      renderCreditScores();
       renderWeeklyTasks();
       renderMonthlyTasks();
       renderWater();
@@ -2905,6 +2909,7 @@ loadCreditScores();
       sleep = await loadCloudDoc(storageKeys.sleep, sleep);
       journal = await loadCloudDoc(storageKeys.journal, journal);
       bills = await loadCloudDoc(storageKeys.bills, bills);
+      creditScores = await loadCloudDoc(storageKeys.creditScores, creditScores);
       weeklyTasks = await loadCloudDoc(storageKeys.weeklyTasks, weeklyTasks);
       monthlyTasks = await loadCloudDoc(storageKeys.monthlyTasks, monthlyTasks);
       oneTimeTasks = await loadCloudDoc(storageKeys.oneTimeTasks, oneTimeTasks);
@@ -3221,7 +3226,8 @@ loadCreditScores();
     [cardioExercise, cardioTime, cardioNotes, strengthExercise, strengthReps, strengthNotes]
       .forEach(el => el.addEventListener('input', saveFitness));
 
-    [logWeight, logBodyFat, logBloodPressure, logWaist, logHips, logChest, logArms, logThighs, logNotes]
+    [logWeight, logBodyFat, logBloodPressure, logWaist, logHips, logChest, logArms, logThighs, logNeck,
+  logShoulders, logNotes]
       .forEach(el => el.addEventListener('input', saveBodyLog));
 
     [
@@ -3371,6 +3377,8 @@ loadCreditScores();
         chest: '',
         arms: '',
         thighs: '',
+        neck: '',
+        shoulders: '',
         notes: ''
       };
       save(storageKeys.bodyLog, bodyLog);
