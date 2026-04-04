@@ -1773,6 +1773,31 @@
     </div>
   </div>
 
+<section class="card">
+  <div class="section-head">
+    <div>
+      <h2>Daily Recap</h2>
+      <div class="sub">Reflect on what you completed today.</div>
+    </div>
+    <button class="ghost" id="generateRecapBtn">Generate</button>
+  </div>
+
+  <div
+    id="recapOutput"
+    style="
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: rgba(255,255,255,0.85);
+      white-space: pre-wrap;
+      font-size: 0.95rem;
+    "
+  >
+    Your recap will appear here.
+  </div>
+</section>
+
+  
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
@@ -3631,6 +3656,44 @@ document.getElementById('resetCreditScoresBtn').addEventListener('click', () => 
   }
 
   loadDailyAffirmation();
+</script>
+
+  <script>
+const generateRecapBtn = document.getElementById('generateRecapBtn');
+const recapOutput = document.getElementById('recapOutput');
+
+function generateDailyRecap() {
+  let recap = "✨ Daily Recap\n\n";
+
+  // ✅ Get tasks (adjust selector if needed)
+  const completedTasks = document.querySelectorAll('.task.completed');
+
+  recap += "✔ Tasks Completed:\n";
+
+  if (completedTasks.length === 0) {
+    recap += "- No tasks marked complete\n";
+  } else {
+    completedTasks.forEach(task => {
+      recap += `- ${task.textContent.trim()}\n`;
+    });
+  }
+
+  // ✅ Affirmation
+  const affirmation = document.getElementById('affirmationText')?.textContent;
+
+  if (affirmation) {
+    recap += `\n🌿 Affirmation:\n"${affirmation}"\n`;
+  }
+
+  // ✅ Add reflection prompts
+  recap += "\n🧠 Reflection:\n";
+  recap += "- What did I do well today?\n";
+  recap += "- What can I improve tomorrow?\n";
+
+  recapOutput.textContent = recap;
+}
+
+generateRecapBtn?.addEventListener('click', generateDailyRecap);
 </script>
   
 </body>
