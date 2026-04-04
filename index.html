@@ -3668,9 +3668,24 @@ function getCompletedTaskTexts(listId) {
   ).map(el => el.textContent.trim());
 }
 
-function generateDailyRecap() {
-  let recap = "✨ Daily Recap\n\n";
+function getInputValue(id) {
+  const el = document.getElementById(id);
+  if (!el) return '';
+  return (el.value || el.textContent || '').trim();
+}
 
+function addSectionIfHasContent(recapParts, title, lines) {
+  const filtered = lines.filter(line => line && line.trim() !== '');
+  if (filtered.length) {
+    recapParts.push(`${title}\n${filtered.join('\n')}`);
+  }
+}
+
+function generateDailyRecap() {
+  const recapParts = [];
+  recapParts.push("✨ Daily Recap");
+
+  // Completed tasks by section
   const sections = [
     { label: "Business", id: "businessTaskList" },
     { label: "Personal", id: "personalTaskList" },
@@ -3680,35 +3695,96 @@ function generateDailyRecap() {
     { label: "One-Time Tasks", id: "oneTimeTaskList" }
   ];
 
-  let foundAny = false;
+  let foundAnyTasks = false;
 
   sections.forEach(section => {
     const completed = getCompletedTaskTexts(section.id);
-
     if (completed.length) {
-      foundAny = true;
-      recap += `✔ ${section.label}:\n`;
-      completed.forEach(text => {
-        recap += `- ${text}\n`;
-      });
-      recap += "\n";
+      foundAnyTasks = true;
+      addSectionIfHasContent(
+        recapParts,
+        `✔ ${section.label}:`,
+        completed.map(text => `- ${text}`)
+      );
     }
   });
 
-  if (!foundAny) {
-    recap += "✔ Tasks Completed:\n- No tasks marked complete\n\n";
+  if (!foundAnyTasks) {
+    addSectionIfHasContent(recapParts, "✔ Tasks Completed:", [
+      "- No tasks marked complete"
+    ]);
   }
 
-  const affirmation = document.getElementById('affirmationText')?.textContent?.trim();
-  if (affirmation) {
-    recap += `🌿 Affirmation:\n"${affirmation}"\n\n`;
-  }
+  // Affirmation
+  const affirmation = getInputValue('affirmationText');
+  addSectionIfHasContent(recapParts, "🌿 Affirmation:", [
+    `"${affirmation}"`
+  ]);
 
-  recap += "🧠 Reflection:\n";
-  recap += "- What did I do well today?\n";
-  recap += "- What can I improve tomorrow?\n";
+  // Journal
+  const journalEntry = getInputValue('journalEntry');
+  addSectionIfHasContent(recapParts, "📝 Journal:", [
+    journalEntry
+  ]);
 
-  recapOutput.textContent = recap;
+  // Mood
+  const mood = getInputValue('moodSelect') || getInputValue('moodInput');
+  addSectionIfHasContent(recapParts, "💛 Mood:", [
+    mood
+  ]);
+
+  // Body measurements / body log
+  const weight = getInputValue('logWeight');
+  const bodyFat = getInputValue('logBodyFat');
+  const bloodPressure = getInputValue('logBloodPressure');
+  const waist = getInputValue('logWaist');
+  const hips = getInputValue('logHips');
+  const neck = getInputValue('logNeck');
+  const shoulders = getInputValue('logShoulders');
+
+  addSectionIfHasContent(recapParts, "⚖️ Body Log:", [
+    weight ? `- Weight: ${weight}` : '',
+    bodyFat ? `- Body Fat: ${bodyFat}` : '',
+    bloodPressure ? `- Blood Pressure: ${bloodPressure}` : '',
+    waist ? `- Waist: ${waist}` : '',
+    hips ? `- Hips: ${hips}` : '',
+    neck ? `- Neck: ${neck}` : '',
+    shoulders ? `- Shoulders: ${shoulders}` : ''
+  ]);
+
+  // Water
+  const waterCount = getInputValue('waterCount');
+  addSectionIfHasContent(recapParts, "💧 Water:", [
+    waterCount ? `- ${waterCount}` : ''
+  ]);
+
+  // Exercise
+  const cardio = getInputValue('cardioInput');
+  const strength = getInputValue('strengthInput');
+
+  addSectionIfHasContent(recapParts, "🏃 Movement:", [
+    cardio ? `- Cardio: ${cardio}` : '',
+    strength ? `- Strength: ${strength}` : ''
+  ]);
+
+  // Meals
+  const breakfast = getInputValue('breakfastInput');
+  const lunch = getInputValue('lunchInput');
+  const dinner = getInputValue('dinnerInput');
+
+  addSectionIfHasContent(recapParts, "🍽 Meals:", [
+    breakfast ? `- Breakfast: ${breakfast}` : '',
+    lunch ? `- Lunch: ${lunch}` : '',
+    dinner ? `- Dinner: ${dinner}` : ''
+  ]);
+
+  // Reflection prompts
+  addSectionIfHasContent(recapParts, "🧠 Reflection:", [
+    "- What did I do well today?",
+    "- What can I improve tomorrow?"
+  ]);
+
+  recapOutput.textContent = recapParts.join("\n\n");
 }
 
 generateRecapBtn?.addEventListener('click', generateDailyRecap);
