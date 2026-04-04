@@ -2101,6 +2101,68 @@ const logNotes = document.getElementById('logNotes');
     const breathToggleBtn = document.getElementById('breathToggleBtn');
     const breathResetBtn = document.getElementById('breathResetBtn');
 
+    // ✅ ADD CREDIT SCORE CODE RIGHT HERE
+
+const creditScoreFields = {
+  transunion: document.getElementById('transunionScore'),
+  experian: document.getElementById('experianScore'),
+  equifax: document.getElementById('equifaxScore'),
+  updated: document.getElementById('creditScoreDate')
+};
+
+const creditScoreStorageKey = 'dashboard_credit_scores';
+
+function saveCreditScores() {
+  const data = {
+    transunion: creditScoreFields.transunion.value || '',
+    experian: creditScoreFields.experian.value || '',
+    equifax: creditScoreFields.equifax.value || '',
+    updated: creditScoreFields.updated.value || ''
+  };
+
+  localStorage.setItem(creditScoreStorageKey, JSON.stringify(data));
+}
+
+function loadCreditScores() {
+  const saved = localStorage.getItem(creditScoreStorageKey);
+  if (!saved) return;
+
+  try {
+    const data = JSON.parse(saved);
+    creditScoreFields.transunion.value = data.transunion || '';
+    creditScoreFields.experian.value = data.experian || '';
+    creditScoreFields.equifax.value = data.equifax || '';
+    creditScoreFields.updated.value = data.updated || '';
+  } catch (error) {
+    console.error('Could not load credit scores:', error);
+  }
+}
+
+function resetCreditScores() {
+  creditScoreFields.transunion.value = '';
+  creditScoreFields.experian.value = '';
+  creditScoreFields.equifax.value = '';
+  creditScoreFields.updated.value = '';
+
+  localStorage.removeItem(creditScoreStorageKey);
+}
+
+[
+  creditScoreFields.transunion,
+  creditScoreFields.experian,
+  creditScoreFields.equifax,
+  creditScoreFields.updated
+].forEach(field => {
+  field.addEventListener('input', saveCreditScores);
+  field.addEventListener('change', saveCreditScores);
+});
+
+document
+  .getElementById('resetCreditScoresBtn')
+  .addEventListener('click', resetCreditScores);
+
+loadCreditScores();
+
     function formatToday() {
       todayDate.textContent = new Date().toLocaleDateString(undefined, {
         weekday: 'long',
