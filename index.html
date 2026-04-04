@@ -3658,35 +3658,53 @@ document.getElementById('resetCreditScoresBtn').addEventListener('click', () => 
   loadDailyAffirmation();
 </script>
 
-  <script>
+<script>
 const generateRecapBtn = document.getElementById('generateRecapBtn');
 const recapOutput = document.getElementById('recapOutput');
+
+function getCompletedTaskTexts(listId) {
+  return Array.from(
+    document.querySelectorAll(`#${listId} .task-item.done .task-text`)
+  ).map(el => el.textContent.trim());
+}
 
 function generateDailyRecap() {
   let recap = "✨ Daily Recap\n\n";
 
-  // ✅ Get tasks (adjust selector if needed)
-  const completedTasks = document.querySelectorAll('.task.completed');
+  const sections = [
+    { label: "Business", id: "businessTaskList" },
+    { label: "Personal", id: "personalTaskList" },
+    { label: "Meraki", id: "merakiList" },
+    { label: "Family", id: "familyList" },
+    { label: "Cleaning", id: "cleaningList" },
+    { label: "One-Time Tasks", id: "oneTimeTaskList" }
+  ];
 
-  recap += "✔ Tasks Completed:\n";
+  let foundAny = false;
 
-  if (completedTasks.length === 0) {
-    recap += "- No tasks marked complete\n";
-  } else {
-    completedTasks.forEach(task => {
-      recap += `- ${task.textContent.trim()}\n`;
-    });
+  sections.forEach(section => {
+    const completed = getCompletedTaskTexts(section.id);
+
+    if (completed.length) {
+      foundAny = true;
+      recap += `✔ ${section.label}:\n`;
+      completed.forEach(text => {
+        recap += `- ${text}\n`;
+      });
+      recap += "\n";
+    }
+  });
+
+  if (!foundAny) {
+    recap += "✔ Tasks Completed:\n- No tasks marked complete\n\n";
   }
 
-  // ✅ Affirmation
-  const affirmation = document.getElementById('affirmationText')?.textContent;
-
+  const affirmation = document.getElementById('affirmationText')?.textContent?.trim();
   if (affirmation) {
-    recap += `\n🌿 Affirmation:\n"${affirmation}"\n`;
+    recap += `🌿 Affirmation:\n"${affirmation}"\n\n`;
   }
 
-  // ✅ Add reflection prompts
-  recap += "\n🧠 Reflection:\n";
+  recap += "🧠 Reflection:\n";
   recap += "- What did I do well today?\n";
   recap += "- What can I improve tomorrow?\n";
 
